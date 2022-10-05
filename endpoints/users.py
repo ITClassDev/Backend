@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from repositories.users import UserRepository
 from models.user import User
-from .depends import get_user_repository
+from .depends import get_user_repository, get_current_user
 
 router = APIRouter()
 
@@ -17,3 +17,12 @@ async def get_user_info(user_id, users: UserRepository = Depends(get_user_reposi
 async def create_user():
     pass
 
+
+# Remove on PROD
+@router.get("/test_auth")
+async def test_auth(current_user: User = Depends(get_current_user)):
+    if current_user:
+        return {"status": True, "user_id": current_user.id, "user_fname": current_user.first_name}
+    else:
+        return {"status": False, "info": "Non authed"}
+    

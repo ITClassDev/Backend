@@ -5,6 +5,18 @@ from db.base import database
 from endpoints import users, auth
 
 app = FastAPI(title="ITC REST API")
+# For DEV !
+from fastapi.middleware.cors import CORSMiddleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['*'],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+# For DEV !
 app.include_router(users.router, prefix="/users", tags=["users"])
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
 
