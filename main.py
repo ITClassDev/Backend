@@ -1,8 +1,12 @@
 from fastapi import FastAPI
 import uvicorn
 from core.config import SERVER_HOST, SERVER_PORT
+from db.base import database
+from endpoints import users
 
 app = FastAPI()
+app.include_router(users.router, prefix="/users", tags=["users"])
+
 
 @app.get("/")
 async def index():
@@ -10,11 +14,11 @@ async def index():
 
 @app.on_event("startup")
 async def startup():
-    print("Starting")
+    await database.connect()
 
 @app.on_event("shutdown")
 async def shutdown():
-    print("Stopping")
+    await database.disconnect()
 
 
 

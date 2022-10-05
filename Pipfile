@@ -9,6 +9,7 @@ sqlalchemy = "*"
 uvicorn = "*"
 databases = {extras = ["postgresql"], version = "*"}
 starlette = "*"
+psycopg2 = "*"
 
 [dev-packages]
 
