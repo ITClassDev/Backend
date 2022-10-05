@@ -4,7 +4,7 @@ from core.config import SERVER_HOST, SERVER_PORT
 from db.base import database
 from endpoints import users
 
-app = FastAPI()
+app = FastAPI(title="ITC REST API")
 app.include_router(users.router, prefix="/users", tags=["users"])
 
 
