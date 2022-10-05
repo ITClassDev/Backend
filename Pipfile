@@ -12,6 +12,9 @@ starlette = "*"
 psycopg2 = "*"
 pydantic = {extras = ["email"], version = "*"}
 alembic = "*"
+passlib = "*"
+jose = "*"
+python-jose = "*"
 
 [dev-packages]
 

@@ -12,3 +12,8 @@ async def get_user_info(user_id, users: UserRepository = Depends(get_user_reposi
     if data:
         return {"status": True, "first_name": data.first_name, "last_name": data.last_name, "email": data.email, "coins": data.coins, "rating": data.rating, "role": data.user_role}
     return {"status": False, "info": "no user with such id"}
+
+@router.post("/create_user")
+async def create_user():
+    pass
+

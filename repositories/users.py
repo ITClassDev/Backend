@@ -10,3 +10,10 @@ class UserRepository(BaseRepository):
         if user is None:
             return None
         return User.parse_obj(user)
+
+    async def get_user_by_email(self, email: str) -> User:
+        query = users.select().where(users.c.email == email)
+        user = await self.database.fetch_one(query)
+        if user is None:
+            return None
+        return User.parse_obj(user)
