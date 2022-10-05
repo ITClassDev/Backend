@@ -11,6 +11,7 @@ databases = {extras = ["postgresql"], version = "*"}
 starlette = "*"
 psycopg2 = "*"
 pydantic = {extras = ["email"], version = "*"}
+alembic = "*"
 
 [dev-packages]
 

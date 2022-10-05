@@ -10,11 +10,12 @@ app.include_router(users.router, prefix="/users", tags=["users"])
 
 @app.get("/")
 async def index():
-    return {"status": True, "data": "It works"}
+    return {"status": True, "data": "Hello from ITC backend!"}
 
 @app.on_event("startup")
 async def startup():
     await database.connect()
+    
 
 @app.on_event("shutdown")
 async def shutdown():

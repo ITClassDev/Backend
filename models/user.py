@@ -8,3 +8,6 @@ class User(BaseModel):
     hashed_password: str
     first_name: str
     last_name: str
+    coins: int
+    rating: int
+    user_role: int

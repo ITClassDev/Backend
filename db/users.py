@@ -1,5 +1,5 @@
 import sqlalchemy
-from .base import metadata
+from .base import metadata, engine
 import datetime
 
 users = sqlalchemy.Table(
@@ -10,4 +10,7 @@ users = sqlalchemy.Table(
     sqlalchemy.Column("hashed_password", sqlalchemy.String),
     sqlalchemy.Column("first_name", sqlalchemy.String),
     sqlalchemy.Column("last_name", sqlalchemy.String),
+    sqlalchemy.Column("coins", sqlalchemy.Integer),
+    sqlalchemy.Column("rating", sqlalchemy.Integer),
+    sqlalchemy.Column("user_role", sqlalchemy.Integer, default=0) # Default non admin user
 )
