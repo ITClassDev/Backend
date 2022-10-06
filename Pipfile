@@ -17,6 +17,7 @@ jose = "*"
 python-jose = "*"
 protobuf = "*"
 requests = "*"
+termcolor = "*"
 
 [dev-packages]
 

@@ -13,6 +13,11 @@ async def create_answer(data: dict, buffer_type):
     answer_buffer_final = answer_buffer.SerializeToString()
     return Response(content=answer_buffer_final, media_type="application/protobuf")
 
+async def check_req_type(req: Request):
+    req_type = "applciation/json"
+    if "content-type" in req.headers:
+        req_type = req.headers["content-type"]
+
 
 NON_AUTH_PACKET = {"status": False, "info": "Non authed"}
 
@@ -20,7 +25,7 @@ router = APIRouter()
 
 @router.get("/{user_id}/info")
 async def get_user_info(user_id, users: UserRepository = Depends(get_user_repository), request: Request = Request):
-    req_type = request.headers["content-type"]
+    req_type = await check_req_type(request)
     data = await users.get_user_info(int(user_id))
     return_data = {"status": False, "info": "no user with such id"}
     if data:
