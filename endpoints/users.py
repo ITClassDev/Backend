@@ -3,6 +3,8 @@ from repositories.users import UserRepository
 from models.user import User
 from .depends import get_user_repository, get_current_user
 
+NON_AUTH_PACKET = {"status": False, "info": "Non authed"}
+
 router = APIRouter()
 
 @router.get("/{user_id}/info")
@@ -23,6 +25,11 @@ async def create_user():
 async def test_auth(current_user: User = Depends(get_current_user)):
     if current_user:
         return {"status": True, "user_id": current_user.id, "user_fname": current_user.first_name}
-    else:
-        return {"status": False, "info": "Non authed"}
-    
+    return NON_AUTH_PACKET
+
+@router.post("/{user_id}/update_profile")
+async def update_user_info(current_user: User = Depends(get_current_user)):
+    if current_user:
+        print(current_user.id)
+    return NON_AUTH_PACKET
+

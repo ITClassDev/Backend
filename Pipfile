@@ -15,6 +15,8 @@ alembic = "*"
 passlib = "*"
 jose = "*"
 python-jose = "*"
+protobuf = "*"
+requests = "*"
 
 [dev-packages]
 

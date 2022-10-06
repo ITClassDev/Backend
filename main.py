@@ -2,7 +2,7 @@ from fastapi import FastAPI
 import uvicorn
 from core.config import SERVER_HOST, SERVER_PORT
 from db.base import database
-from endpoints import users, auth
+from endpoints import users, auth, protobuf
 
 app = FastAPI(title="ITC REST API")
 # For DEV !
@@ -19,6 +19,7 @@ app.add_middleware(
 # For DEV !
 app.include_router(users.router, prefix="/users", tags=["users"])
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
+app.include_router(protobuf.router, prefix="/pb", tags=["pb"])
 
 
 @app.get("/")
