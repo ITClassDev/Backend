@@ -11,10 +11,11 @@ def parse_data(data, buffer_type):
 
 
 if __name__ == "__main__":
-    '''buffer = MainBuffer.User()
-    buffer.a = 1024
-    buffer_final = buffer.SerializeToString()'''
-    data = requests.get("http://localhost:8080/users/1/info", headers={'Content-Type': 'application/protobuf'})
+    buffer = MainBuffer.AuthData()
+    buffer.email = "ret7020@gmail.com"
+    buffer.password = "12345"
+    buffer_final = buffer.SerializeToString()
+    data = requests.post("http://localhost:8080/auth/login/", headers={'Content-Type': 'application/protobuf'}, data=buffer_final)
     answer = data.content
-    parsed = parse_data(answer, MainBuffer.UserData)
-    print("Answer:", parsed.first_name)
+    parsed = parse_data(answer, MainBuffer.AccessToken)
+    print("Answer:", parsed)

@@ -3,11 +3,21 @@ syntax = "proto3";
 package mainpb;
 
 message UserData {
-    optional string first_name = 1;
+    string first_name = 1;
     string last_name = 2;
     string email = 3;
     int64 coins = 4;
     int64 rating = 5;
     int64 role = 6;
     int64 user_id = 7;
+}
+
+message AuthData {
+    string email = 1;
+    string password = 2;
+}
+
+message AccessToken {
+    string access_token = 1;
+    string token_type = 2;
 }
