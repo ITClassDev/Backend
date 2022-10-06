@@ -1,24 +1,37 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request, Response
 from repositories.users import UserRepository
 from models.user import User
 from .depends import get_user_repository, get_current_user
+import pbs.main_pb2 as MainBuffer
+
+# Move to extrenal library FIXIT
+async def create_answer(data: dict, buffer_type):
+    answer_buffer = buffer_type()
+    for el in data:
+        if el != "status": # REST API JSON REQ STATUS
+            setattr(answer_buffer, el, data[el])
+    answer_buffer_final = answer_buffer.SerializeToString()
+    return Response(content=answer_buffer_final, media_type="application/protobuf")
+
 
 NON_AUTH_PACKET = {"status": False, "info": "Non authed"}
 
 router = APIRouter()
 
 @router.get("/{user_id}/info")
-async def get_user_info(user_id, users: UserRepository = Depends(get_user_repository)):
+async def get_user_info(user_id, users: UserRepository = Depends(get_user_repository), request: Request = Request):
+    req_type = request.headers["content-type"]
     data = await users.get_user_info(int(user_id))
-    print(data)
+    return_data = {"status": False, "info": "no user with such id"}
     if data:
-        return {"status": True, "first_name": data.first_name, "last_name": data.last_name, "email": data.email, "coins": data.coins, "rating": data.rating, "role": data.user_role}
-    return {"status": False, "info": "no user with such id"}
+        return_data = {"status": True, "first_name": data.first_name, "last_name": data.last_name, "email": data.email, "coins": data.coins, "rating": data.rating, "role": data.user_role}
+    if req_type == "application/protobuf":
+        return_data = await create_answer(return_data, MainBuffer.UserData)
+    return return_data
 
 @router.post("/create_user")
 async def create_user():
     pass
-
 
 # Remove on PROD
 @router.get("/test_auth")

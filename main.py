@@ -19,7 +19,7 @@ app.add_middleware(
 # For DEV !
 app.include_router(users.router, prefix="/users", tags=["users"])
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
-app.include_router(protobuf.router, prefix="/pb", tags=["pb"])
+#app.include_router(protobuf.router, prefix="/pb", tags=["pb"]) Merge all API to adaptive
 
 
 @app.get("/")
