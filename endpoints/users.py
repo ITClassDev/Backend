@@ -16,7 +16,7 @@ async def get_user_info(user_id, users: UserRepository = Depends(get_user_reposi
     return_data = {"status": False, "info": "no user with such id"}
     if data:
         return_data = {"status": True, "first_name": data.first_name, "last_name": data.last_name,
-                       "email": data.email, "coins": data.coins, "rating": data.rating, "role": data.user_role}
+                       "email": data.email, "coins": data.coins, "rating": data.rating, "role": data.user_role, "telegram_link": data.user_telegram, "github_link": data.user_github, "avatar_path": data.user_avatar_path}
     if req_type == "application/protobuf":
         return_data = await create_answer(return_data, MainBuffer.UserData)
     return return_data

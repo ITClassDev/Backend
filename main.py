@@ -2,7 +2,7 @@ from fastapi import FastAPI
 import uvicorn
 from core.config import SERVER_HOST, SERVER_PORT
 from db.base import database
-from endpoints import users, auth, protobuf
+from endpoints import users, auth, market
 
 app = FastAPI(title="ITC REST API")
 # For DEV !
@@ -19,6 +19,7 @@ app.add_middleware(
 # For DEV !
 app.include_router(users.router, prefix="/users", tags=["users"])
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
+app.include_router(market.router, prefix="/market", tags=["market"])
 #app.include_router(protobuf.router, prefix="/pb", tags=["pb"]) Merge all API to adaptive
 
 

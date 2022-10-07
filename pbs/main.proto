@@ -9,7 +9,9 @@ message UserData {
     int64 coins = 4;
     int64 rating = 5;
     int64 role = 6;
-    int64 user_id = 7;
+    string telegram_link = 7;
+    string github_link = 8;
+    string avatar_path = 9;
 }
 
 message AuthData {
@@ -21,3 +23,9 @@ message AccessToken {
     string access_token = 1;
     string token_type = 2;
 }
+
+message MarketProduct {
+    
+}
+
+message MarketProducts

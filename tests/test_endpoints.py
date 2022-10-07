@@ -6,7 +6,6 @@ sys.path.append("../")
 import pbs.main_pb2 as MainBuffer
 
 
-
 def start_test(tests, url="http://localhost:8080"):
     print(colored(f"Pending tests: {len(tests)}", "green"))
     test_number = 0
@@ -67,7 +66,9 @@ def start_test(tests, url="http://localhost:8080"):
 if __name__ == "__main__":
     tests = [
         {"endpoint": "/users/1/info", "method": "get", "code": 200,
-            "res_json": {"status": True, "first_name": "Stephan", "last_name": "Zhdanov"}},
+            "res_json": {"status": True, "first_name": "Stephan", "last_name": "Zhdanov", "github_link": "ret7020"}},
+        {"endpoint": "/users/1/info", "method": "get", "code": 200,
+            "res_json": {"first_name": "Stephan", "last_name": "Zhdanov", "github_link": "ret7020"}, "serialization_pb": True, "buffer_recv_name": MainBuffer.UserData},
         {"endpoint": "/users/test_auth", "method": "get",
             "code": 403, "res_json": {"detail": "Not authenticated"}},
         {"endpoint": "/auth/login", "method": "post", "code": 200, "res_json": {"token_type": "Bearer"},

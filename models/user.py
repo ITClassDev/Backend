@@ -11,3 +11,7 @@ class User(BaseModel):
     coins: int
     rating: int
     user_role: int
+    user_telegram: str
+    user_github: str
+    user_about_text: str
+    user_avatar_path: str
