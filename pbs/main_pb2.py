@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\nmain.proto\x12\x06mainpb\"\xae\x01\n\x08UserData\x12\x12\n\nfirst_name\x18\x01 \x01(\t\x12\x11\n\tlast_name\x18\x02 \x01(\t\x12\r\n\x05\x65mail\x18\x03 \x01(\t\x12\r\n\x05\x63oins\x18\x04 \x01(\x03\x12\x0e\n\x06rating\x18\x05 \x01(\x03\x12\x0c\n\x04role\x18\x06 \x01(\x03\x12\x15\n\rtelegram_link\x18\x07 \x01(\t\x12\x13\n\x0bgithub_link\x18\x08 \x01(\t\x12\x13\n\x0b\x61vatar_path\x18\t \x01(\t\"+\n\x08\x41uthData\x12\r\n\x05\x65mail\x18\x01 \x01(\t\x12\x10\n\x08password\x18\x02 \x01(\t\"7\n\x0b\x41\x63\x63\x65ssToken\x12\x14\n\x0c\x61\x63\x63\x65ss_token\x18\x01 \x01(\t\x12\x12\n\ntoken_type\x18\x02 \x01(\tb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\nmain.proto\x12\x06mainpb\"\xa9\x01\n\x08UserData\x12\x11\n\tfirstName\x18\x01 \x01(\t\x12\x10\n\x08lastName\x18\x02 \x01(\t\x12\r\n\x05\x65mail\x18\x03 \x01(\t\x12\r\n\x05\x63oins\x18\x04 \x01(\x03\x12\x0e\n\x06rating\x18\x05 \x01(\x03\x12\x0c\n\x04role\x18\x06 \x01(\x03\x12\x14\n\x0ctelegramLink\x18\x07 \x01(\t\x12\x12\n\ngithubLink\x18\x08 \x01(\t\x12\x12\n\navatarPath\x18\t \x01(\t\"+\n\x08\x41uthData\x12\r\n\x05\x65mail\x18\x01 \x01(\t\x12\x10\n\x08password\x18\x02 \x01(\t\"5\n\x0b\x41\x63\x63\x65ssToken\x12\x13\n\x0b\x61\x63\x63\x65ssToken\x18\x01 \x01(\t\x12\x11\n\ttokenType\x18\x02 \x01(\t\"p\n\rMarketProduct\x12\n\n\x02id\x18\x01 \x01(\x03\x12\r\n\x05title\x18\x02 \x01(\t\x12\x0c\n\x04\x63ost\x18\x03 \x01(\x03\x12\x14\n\x0cremainAmount\x18\x04 \x01(\x03\x12\r\n\x05\x61\x62out\x18\x05 \x01(\t\x12\x11\n\timagePath\x18\x06 \x01(\t\"8\n\x0eMarketProducts\x12&\n\x07product\x18\x01 \x03(\x0b\x32\x15.mainpb.MarketProductb\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'main_pb2', globals())
@@ -21,9 +21,13 @@ if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
   _USERDATA._serialized_start=23
-  _USERDATA._serialized_end=197
-  _AUTHDATA._serialized_start=199
-  _AUTHDATA._serialized_end=242
-  _ACCESSTOKEN._serialized_start=244
-  _ACCESSTOKEN._serialized_end=299
+  _USERDATA._serialized_end=192
+  _AUTHDATA._serialized_start=194
+  _AUTHDATA._serialized_end=237
+  _ACCESSTOKEN._serialized_start=239
+  _ACCESSTOKEN._serialized_end=292
+  _MARKETPRODUCT._serialized_start=294
+  _MARKETPRODUCT._serialized_end=406
+  _MARKETPRODUCTS._serialized_start=408
+  _MARKETPRODUCTS._serialized_end=464
 # @@protoc_insertion_point(module_scope)

@@ -9,17 +9,17 @@ users = sqlalchemy.Table(
                       primary_key=True, autoincrement=True, unique=True),
     sqlalchemy.Column("email", sqlalchemy.String,
                       primary_key=True, unique=True),
-    sqlalchemy.Column("hashed_password", sqlalchemy.String),
-    sqlalchemy.Column("first_name", sqlalchemy.String),
-    sqlalchemy.Column("last_name", sqlalchemy.String),
+    sqlalchemy.Column("hashedPassword", sqlalchemy.String),
+    sqlalchemy.Column("firstName", sqlalchemy.String),
+    sqlalchemy.Column("lastName", sqlalchemy.String),
     sqlalchemy.Column("coins", sqlalchemy.Integer),
     sqlalchemy.Column("rating", sqlalchemy.Integer),
-    sqlalchemy.Column("user_role", sqlalchemy.Integer,
+    sqlalchemy.Column("userRole", sqlalchemy.Integer,
                       default=0),  # Default non admin user
-    sqlalchemy.Column("user_telegram", sqlalchemy.String),
-    sqlalchemy.Column("user_github", sqlalchemy.String),
-    sqlalchemy.Column("user_about_text", sqlalchemy.String),
-    sqlalchemy.Column("user_avatar_path", sqlalchemy.String),
+    sqlalchemy.Column("userTelegram", sqlalchemy.String),
+    sqlalchemy.Column("userGithub", sqlalchemy.String),
+    sqlalchemy.Column("userAboutText", sqlalchemy.String),
+    sqlalchemy.Column("userAvatarPath", sqlalchemy.String),
 
 
 

@@ -28,11 +28,11 @@ async def auth_login(request: Request = Request, users: UserRepository = Depends
     token = create_access_token({"sub": user.email})
     if req_type == "application/protobuf":
         token_resp = await create_answer(
-            {"access_token": token, "token_type": "Bearer"}, MainBuffer.AccessToken)
+            {"accessToken": token, "tokenType": "Bearer"}, MainBuffer.AccessToken)
     else:
         token_resp = Token(  # Answer for JSON mode
-            access_token=token,
-            token_type="Bearer"
+            accessToken=token,
+            tokenType="Bearer"
         )
 
     return token_resp

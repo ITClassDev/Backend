@@ -15,8 +15,8 @@ async def get_user_info(user_id, users: UserRepository = Depends(get_user_reposi
     data = await users.get_user_info(int(user_id))
     return_data = {"status": False, "info": "no user with such id"}
     if data:
-        return_data = {"status": True, "first_name": data.first_name, "last_name": data.last_name,
-                       "email": data.email, "coins": data.coins, "rating": data.rating, "role": data.user_role, "telegram_link": data.user_telegram, "github_link": data.user_github, "avatar_path": data.user_avatar_path}
+        return_data = {"status": True, "firstName": data.first_name, "lastName": data.last_name,
+                       "email": data.email, "coins": data.coins, "rating": data.rating, "role": data.user_role, "telegramLink": data.user_telegram, "githubLink": data.user_github, "avatarPath": data.user_avatar_path}
     if req_type == "application/protobuf":
         return_data = await create_answer(return_data, MainBuffer.UserData)
     return return_data
@@ -32,7 +32,7 @@ async def create_user():
 @router.get("/test_auth")
 async def test_auth(current_user: User = Depends(get_current_user)):
     if current_user:
-        return {"status": True, "user_id": current_user.id, "user_fname": current_user.first_name}
+        return {"status": True, "userId": current_user.id, "userFname": current_user.first_name}
     return NON_AUTH_PACKET
 
 

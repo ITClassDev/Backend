@@ -5,6 +5,6 @@ class MarketProducts(BaseModel):
     id: Optional[int] = None
     title: str
     cost: int
-    remain_amount: int
+    remainAmount: int
     about: str
-    image_path: str
+    imagePath: str

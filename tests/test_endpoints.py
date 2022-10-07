@@ -5,6 +5,9 @@ import sys
 sys.path.append("../")
 import pbs.main_pb2 as MainBuffer
 
+from google.protobuf.json_format import MessageToDict
+
+
 
 def start_test(tests, url="http://localhost:8080"):
     print(colored(f"Pending tests: {len(tests)}", "green"))
@@ -37,13 +40,18 @@ def start_test(tests, url="http://localhost:8080"):
         if res != None and res.status_code == test["code"]:
             try:
                 if "serialization_pb" in test and test["serialization_pb"]:
-                    data = {}
                     data_buffer = test["buffer_recv_name"]()
                     data_buffer.ParseFromString(res.content)
-                    for test_entry in test["res_json"]:
-                        data[test_entry] = getattr(data_buffer, test_entry)
+                    data = MessageToDict(data_buffer)
+                    print(data)
+                    #data = {}
+                    #for test_entry in test["res_json"]:
+                    #    data[test_entry] = getattr(data_buffer, test_entry)
+                    #print(data)
                 else:
                     data = res.json()
+                if "element_ind" in test:
+                    data = data[test["element_ind"]]
                 for test_attr in test["res_json"]:
                     if not (test_attr in data and test["res_json"][test_attr] == data[test_attr]):
                         test_status = False
@@ -66,16 +74,19 @@ def start_test(tests, url="http://localhost:8080"):
 if __name__ == "__main__":
     tests = [
         {"endpoint": "/users/1/info", "method": "get", "code": 200,
-            "res_json": {"status": True, "first_name": "Stephan", "last_name": "Zhdanov", "github_link": "ret7020"}},
+            "res_json": {"status": True, "firstName": "Stephan", "lastName": "Zhdanov", "githubLink": "ret7020"}},
         {"endpoint": "/users/1/info", "method": "get", "code": 200,
-            "res_json": {"first_name": "Stephan", "last_name": "Zhdanov", "github_link": "ret7020"}, "serialization_pb": True, "buffer_recv_name": MainBuffer.UserData},
+            "res_json": {"firstName": "Stephan", "lastName": "Zhdanov", "githubLink": "ret7020"}, "serialization_pb": True, "buffer_recv_name": MainBuffer.UserData},
         {"endpoint": "/users/test_auth", "method": "get",
             "code": 403, "res_json": {"detail": "Not authenticated"}},
-        {"endpoint": "/auth/login", "method": "post", "code": 200, "res_json": {"token_type": "Bearer"},
+        {"endpoint": "/auth/login", "method": "post", "code": 200, "res_json": {"tokenType": "Bearer"},
             "data": {"email": "ret7020@gmail.com", "password": "12345"}},
         {"endpoint": "/auth/login", "method": "post", "code": 401, "res_json": {},
             "data": {"email": "ret7020@gmail.com", "password": "6262"}},
-        {"endpoint": "/auth/login", "method": "post", "code": 200, "res_json": {"token_type": "Bearer"},
-         "data": {"email": "ret7020@gmail.com", "password": "12345"}, "serialization_pb": True, "buffer_send_name": MainBuffer.AuthData, "buffer_recv_name": MainBuffer.AccessToken}
+        {"endpoint": "/auth/login", "method": "post", "code": 200, "res_json": {"tokenType": "Bearer"},
+         "data": {"email": "ret7020@gmail.com", "password": "12345"}, "serialization_pb": True, "buffer_send_name": MainBuffer.AuthData, "buffer_recv_name": MainBuffer.AccessToken},
+        {"endpoint": "/market/all", "method": "get", "code": 200, "res_json": {"id": 1, "cost": 100, "about": "This is a test product for sale"}, "element_ind": 0},
+        {"endpoint": "/market/all", "method": "get", "code": 200, "res_json": {"id": 1, "cost": 100, "about": "This is a test product for sale"}, "element_ind": 0, "serialization_pb": True, "buffer_recv_name": MainBuffer.MarketProducts}
+
     ]
     start_test(tests)
