@@ -21,5 +21,5 @@ async def get_all_products(market_rep: MarketRepository = Depends(get_market_rep
             all_products.product.append(one_product)
         data = all_products.SerializeToString()
         data = Response(content=data, media_type="application/protobuf")
-
+        
     return data

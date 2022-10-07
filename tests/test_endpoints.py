@@ -43,7 +43,9 @@ def start_test(tests, url="http://localhost:8080"):
                     data_buffer = test["buffer_recv_name"]()
                     data_buffer.ParseFromString(res.content)
                     data = MessageToDict(data_buffer)
-                    print(data)
+                    if "key_to_extract" in test:
+                        data = data[test["key_to_extract"]]
+                    
                     #data = {}
                     #for test_entry in test["res_json"]:
                     #    data[test_entry] = getattr(data_buffer, test_entry)
@@ -86,7 +88,7 @@ if __name__ == "__main__":
         {"endpoint": "/auth/login", "method": "post", "code": 200, "res_json": {"tokenType": "Bearer"},
          "data": {"email": "ret7020@gmail.com", "password": "12345"}, "serialization_pb": True, "buffer_send_name": MainBuffer.AuthData, "buffer_recv_name": MainBuffer.AccessToken},
         {"endpoint": "/market/all", "method": "get", "code": 200, "res_json": {"id": 1, "cost": 100, "about": "This is a test product for sale"}, "element_ind": 0},
-        {"endpoint": "/market/all", "method": "get", "code": 200, "res_json": {"id": 1, "cost": 100, "about": "This is a test product for sale"}, "element_ind": 0, "serialization_pb": True, "buffer_recv_name": MainBuffer.MarketProducts}
+        {"endpoint": "/market/all", "method": "get", "code": 200, "res_json": {"id": '1', "cost": '100', "about": "This is a test product for sale"}, "element_ind": 0, "serialization_pb": True, "buffer_recv_name": MainBuffer.MarketProducts, "key_to_extract": "product"}
 
     ]
     start_test(tests)

@@ -5,13 +5,13 @@ from typing import Optional
 class User(BaseModel):
     id: Optional[int] = None
     email: EmailStr
-    hashed_password: str
-    first_name: str
-    last_name: str
+    hashedPassword: str
+    firstName: str
+    lastName: str
     coins: int
     rating: int
-    user_role: int
-    user_telegram: str
-    user_github: str
-    user_about_text: str
-    user_avatar_path: str
+    userRole: int
+    userTelegram: str
+    userGithub: str
+    userAboutText: str
+    userAvatarPath: str

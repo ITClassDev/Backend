@@ -22,7 +22,7 @@ async def auth_login(request: Request = Request, users: UserRepository = Depends
         password=req_data["password"]
     )
     user = await users.get_user_by_email(login.email)
-    if user is None or not verify_password(login.password, user.hashed_password):
+    if user is None or not verify_password(login.password, user.hashedPassword):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail="Incorrect pair of login && password")
     token = create_access_token({"sub": user.email})
