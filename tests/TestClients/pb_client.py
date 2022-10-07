@@ -1,6 +1,6 @@
 import requests
 import sys
-sys.path.append("../")
+sys.path.append("../../")
 import pbs.main_pb2 as MainBuffer
 
 def parse_data(data, buffer_type):
@@ -18,4 +18,6 @@ if __name__ == "__main__":
     data = requests.post("http://localhost:8080/auth/login/", headers={'Content-Type': 'application/protobuf'}, data=buffer_final)
     answer = data.content
     parsed = parse_data(answer, MainBuffer.AccessToken)
-    print("Answer:", parsed)
+    access_token = parsed.accessToken
+    print(f"Token: {access_token}")
+    #data = requests.post("http://localhost:8080/auth")
