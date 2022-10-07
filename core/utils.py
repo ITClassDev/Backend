@@ -9,6 +9,12 @@ async def create_answer(data: dict, buffer_type, return_object=False):
     answer_buffer = buffer_type()
     for el in data:
         setattr(answer_buffer, el, data[el])
+        #print(type(getattr(answer_buffer, el)))
+    #json_string = json.dumps(data)
+    #json_format.Parse(json_string, answer_buffer)
+    print(answer_buffer)
+
+
     if return_object:
         return answer_buffer
     answer_buffer_final = answer_buffer.SerializeToString()

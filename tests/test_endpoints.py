@@ -76,6 +76,10 @@ if __name__ == "__main__":
     tests = [
         {"endpoint": "/users/1/info", "method": "get", "code": 200,
             "res_json": {"status": True, "firstName": "Stephan", "lastName": "Zhdanov", "githubLink": "ret7020"}},
+        {"endpoint": "/users/10/info", "method": "get", "code": 200,
+            "res_json": {"status": False}, "serialization_pb": True, "buffer_recv_name": MainBuffer.UserData},
+        {"endpoint": "/users/10/info", "method": "get", "code": 200,
+            "res_json": {"status": False}},
         {"endpoint": "/users/1/info", "method": "get", "code": 200,
             "res_json": {"firstName": "Stephan", "lastName": "Zhdanov", "githubLink": "ret7020"}, "serialization_pb": True, "buffer_recv_name": MainBuffer.UserData},
         {"endpoint": "/users/test_auth", "method": "get",
@@ -87,12 +91,14 @@ if __name__ == "__main__":
         {"endpoint": "/auth/login", "method": "post", "code": 200, "res_json": {"tokenType": "Bearer"},
          "data": {"email": "ret7020@gmail.com", "password": "12345"}, "serialization_pb": True, "buffer_send_name": MainBuffer.AuthData, "buffer_recv_name": MainBuffer.AccessToken},
         {"endpoint": "/market/all", "method": "get", "code": 200, "res_json": {"id": 1, "cost": 100, "about": "This is a test product for sale"}, "element_ind": 0},
-        {"endpoint": "/market/all", "method": "get", "code": 200, "res_json": {"id": '1', "cost": '100', "about": "This is a test product for sale"}, "element_ind": 0, "serialization_pb": True, "buffer_recv_name": MainBuffer.MarketProducts, "key_to_extract": "product"},
+        {"endpoint": "/market/all", "method": "get", "code": 200, "res_json": {"id": 1, "cost": 100, "about": "This is a test product for sale"}, "element_ind": 0, "serialization_pb": True, "buffer_recv_name": MainBuffer.MarketProducts, "key_to_extract": "product"},
         {"endpoint": "/market/1/info", "method": "get", "code": 200,
             "res_json": {"status": True, "title": "Test Product", "cost": 100, "remainAmount": 100}},
         {"endpoint": "/market/5/info", "method": "get", "code": 200,
             "res_json": {"status": False}},
         {"endpoint": "/market/1/info", "method": "get", "code": 200,
-            "res_json": {"status": True, "title": "Test Product", "cost": "100", "remainAmount": "100"}, "serialization_pb": True, "buffer_recv_name": MainBuffer.MarketProduct},
+            "res_json": {"status": True, "title": "Test Product", "cost": 100, "remainAmount": 100}, "serialization_pb": True, "buffer_recv_name": MainBuffer.MarketProduct},
+        {"endpoint": "/market/10/info", "method": "get", "code": 200,
+            "res_json": {"status": False}, "serialization_pb": True, "buffer_recv_name": MainBuffer.MarketProduct},
     ]
     start_test(tests)

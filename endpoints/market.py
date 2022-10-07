@@ -25,9 +25,10 @@ async def get_product_info(product_id: int, market_rep: MarketRepository = Depen
         data["status"] = True
         if req_type == "application/protobuf":
             data = await create_answer(data, MainBuffer.MarketProduct)
-    else:
-        data = {"status": False, "info": "no product with such id"}
-        if req_type == "application/protobuf":
-            data = await create_answer(data, MainBuffer.MarketProduct)
+        return data
+    
+    data = {"status": False, "info": "no product with such id"}
+    if req_type == "application/protobuf":
+        data = await create_answer(data, MainBuffer.MarketProduct)
 
     return data
