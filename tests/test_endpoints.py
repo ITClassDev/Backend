@@ -45,7 +45,6 @@ def start_test(tests, url="http://localhost:8080"):
                     data = MessageToDict(data_buffer)
                     if "key_to_extract" in test:
                         data = data[test["key_to_extract"]]
-                    
                     #data = {}
                     #for test_entry in test["res_json"]:
                     #    data[test_entry] = getattr(data_buffer, test_entry)
@@ -88,7 +87,12 @@ if __name__ == "__main__":
         {"endpoint": "/auth/login", "method": "post", "code": 200, "res_json": {"tokenType": "Bearer"},
          "data": {"email": "ret7020@gmail.com", "password": "12345"}, "serialization_pb": True, "buffer_send_name": MainBuffer.AuthData, "buffer_recv_name": MainBuffer.AccessToken},
         {"endpoint": "/market/all", "method": "get", "code": 200, "res_json": {"id": 1, "cost": 100, "about": "This is a test product for sale"}, "element_ind": 0},
-        {"endpoint": "/market/all", "method": "get", "code": 200, "res_json": {"id": '1', "cost": '100', "about": "This is a test product for sale"}, "element_ind": 0, "serialization_pb": True, "buffer_recv_name": MainBuffer.MarketProducts, "key_to_extract": "product"}
-
+        {"endpoint": "/market/all", "method": "get", "code": 200, "res_json": {"id": '1', "cost": '100', "about": "This is a test product for sale"}, "element_ind": 0, "serialization_pb": True, "buffer_recv_name": MainBuffer.MarketProducts, "key_to_extract": "product"},
+        {"endpoint": "/market/1/info", "method": "get", "code": 200,
+            "res_json": {"status": True, "title": "Test Product", "cost": 100, "remainAmount": 100}},
+        {"endpoint": "/market/5/info", "method": "get", "code": 200,
+            "res_json": {"status": False}},
+        {"endpoint": "/market/1/info", "method": "get", "code": 200,
+            "res_json": {"status": True, "title": "Test Product", "cost": "100", "remainAmount": "100"}, "serialization_pb": True, "buffer_recv_name": MainBuffer.MarketProduct},
     ]
     start_test(tests)

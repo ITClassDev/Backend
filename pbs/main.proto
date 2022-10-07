@@ -3,15 +3,16 @@ syntax = "proto3";
 package mainpb;
 
 message UserData {
-    string firstName = 1;
-    string lastName = 2;
-    string email = 3;
-    int64 coins = 4;
-    int64 rating = 5;
-    int64 role = 6;
-    string telegramLink = 7;
-    string githubLink = 8;
-    string avatarPath = 9;
+    bool status = 1;
+    string firstName = 2;
+    string lastName = 3;
+    string email = 4;
+    int64 coins = 5;
+    int64 rating = 6;
+    int64 role = 7;
+    string telegramLink = 8;
+    string githubLink = 9;
+    string avatarPath = 10;
 }
 
 message AuthData {
@@ -25,12 +26,14 @@ message AccessToken {
 }
 
 message MarketProduct {
-    int64 id = 1;
-    string title = 2;
-    int64 cost = 3;
-    int64 remainAmount = 4;
-    string about = 5;
-    string imagePath = 6;
+    bool status = 1;
+    optional string info = 2;
+    optional int64 id = 3;
+    optional string title = 4;
+    optional int64 cost = 5;
+    optional int64 remainAmount = 6;
+    optional string about = 7;
+    optional string imagePath = 8;
 }
 
 message MarketProducts {
