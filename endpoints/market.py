@@ -63,7 +63,8 @@ async def add_new_product(current_user: User = Depends(get_current_user), reques
             buffer_data = await parse_data(await request.body(), MainBuffer.NewProduct)
             req_data = {"product_title": buffer_data.product_title, "product_cost": buffer_data.product_cost,
                         "product_about_text": buffer_data.product_about_text, "product_current_amount": buffer_data.product_current_amount}
-        new_product_object = MarketProducts(title=req_data["product_title"], cost=req_data["product_cost"], remainAmount=req_data["product_current_amount"], about=req_data["product_about_text"], imagePath="def.png")
+        new_product_object = MarketProducts(title=req_data["product_title"], cost=req_data["product_cost"],
+                                            remainAmount=req_data["product_current_amount"], about=req_data["product_about_text"], imagePath="def.png")
         print(new_product_object)
         return {"status": True}
 
