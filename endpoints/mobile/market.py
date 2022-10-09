@@ -6,6 +6,6 @@ import pbs.main_pb2 as MainBuffer
 
 router = APIRouter()
 
-@router.get("/{user_id}/info", include_in_schema=False)
+@router.get("/{user_id}/info")
 async def info(user_id: int, users = Depends(get_user_repository)):
     return await create_answer(await users_endpoint.get_user_info(user_id, users), MainBuffer.UserData)

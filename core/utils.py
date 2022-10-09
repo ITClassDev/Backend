@@ -1,6 +1,6 @@
 from fastapi import Request, Response
-import json
-from google.protobuf import json_format
+from google.protobuf.json_format import MessageToDict
+from pydantic import create_model
 
 NON_AUTH_PACKET = {"status": False, "info": "Non authed"}
 
@@ -9,11 +9,6 @@ async def create_answer(data: dict, buffer_type, return_object=False):
     answer_buffer = buffer_type()
     for el in data:
         setattr(answer_buffer, el, data[el])
-        #print(type(getattr(answer_buffer, el)))
-    #json_string = json.dumps(data)
-    #json_format.Parse(json_string, answer_buffer)
-    print(answer_buffer)
-
 
     if return_object:
         return answer_buffer
@@ -40,3 +35,8 @@ async def parse_data(data, buffer_type):
     res_buffer = buffer_type()
     res_buffer.ParseFromString(data)
     return res_buffer
+
+
+async def parse_to_object(data, object_class, buffer_type):
+    data = MessageToDict(await parse_data(data, buffer_type))
+    return object_class(**data)

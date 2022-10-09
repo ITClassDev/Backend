@@ -10,7 +10,7 @@ router = APIRouter()
 
 
 @router.get("/{user_id}/info")
-async def get_user_info(user_id, users: UserRepository = Depends(get_user_repository), request: Request = Request):
+async def get_user_info(user_id: int, users: UserRepository = Depends(get_user_repository)):
     #req_type = await check_req_type(request)
     data = await users.get_user_info(int(user_id))
     return_data = {"status": False, "info": "no user with such id"}
