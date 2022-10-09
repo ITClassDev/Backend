@@ -1,21 +1,4 @@
 # API docs
-## Users
-<hr style="border:none solid gray"> </hr>
-`/users/{USER_ID}/info` - get USER_ID info </br>
-<hr style="border:none solid gray"> </hr>
-<hr style="border:none solid gray"> </hr>
-`/users/{USER_ID}/info` - get USER_ID info </br>
-<hr style="border:none solid gray"> </hr>
-<hr style="border:none solid gray"> </hr>
-`/users/{USER_ID}/info` - get USER_ID info </br>
-<hr style="border:none solid gray"> </hr>
-<hr style="border:none solid gray"> </hr>
-`/users/{USER_ID}/info` - get USER_ID info </br>
-<hr style="border:none solid gray"> </hr>
-<hr style="border:none solid gray"> </hr>
-`/users/{USER_ID}/info` - get USER_ID info </br>
-<hr style="border:none solid gray"> </hr>
-## Auth
-
+If you want to find documentation about REST API via JSON serialization you can use openapi and swagger.
 
 ## Market

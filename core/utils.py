@@ -24,9 +24,9 @@ async def nested_answer(data: list, main_buffer, inner_buffer):
     data = all_products.SerializeToString()
     return Response(content=data, media_type="application/protobuf")
 
+# Deprecated
 async def check_req_type(req: Request):
     req_type = "applciation/json"
-    print(req.headers)
     if "content-type" in req.headers:
         req_type = req.headers["content-type"]
     return req_type

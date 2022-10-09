@@ -18,11 +18,8 @@ def start_test(tests, url="http://localhost:8080"):
         final_url = f"{url}{test['endpoint']}"
         res = None
         try:
-            headers = {"content-type": "application/json"}
-            if "serialization_pb" in test and test["serialization_pb"]:
-                headers["content-type"] = "application/protobuf"
             if test["method"] == "get":
-                res = requests.get(final_url, headers=headers)
+                res = requests.get(final_url)
             elif test["method"] == "post":
                 if "serialization_pb" in test and test["serialization_pb"]:
                     dt = test["buffer_send_name"]()
@@ -30,25 +27,24 @@ def start_test(tests, url="http://localhost:8080"):
                         setattr(dt, entry, test["data"][entry])
                     dt = dt.SerializeToString()
                     res = requests.post(
-                        final_url, data=dt, headers=headers)
+                        final_url, data=dt)
                 else:
                     res = requests.post(
-                        final_url, json=test["data"], headers=headers)
+                        final_url, json=test["data"])
         except requests.exceptions.ConnectionError:
             test_status = False
-
         if res != None and res.status_code == test["code"]:
             try:
                 if "serialization_pb" in test and test["serialization_pb"]:
-                    data_buffer = test["buffer_recv_name"]()
-                    data_buffer.ParseFromString(res.content)
-                    data = MessageToDict(data_buffer)
-                    if "key_to_extract" in test:
-                        data = data[test["key_to_extract"]]
-                    #data = {}
-                    #for test_entry in test["res_json"]:
-                    #    data[test_entry] = getattr(data_buffer, test_entry)
-                    #print(data)
+                    if "buffer_recv_name" in test:
+                        data_buffer = test["buffer_recv_name"]()
+                        data_buffer.ParseFromString(res.content)
+                        data = MessageToDict(data_buffer)
+                        if "key_to_extract" in test:
+                            data = data[test["key_to_extract"]]
+                    else:
+                        data = {}
+                    
                 else:
                     data = res.json()
                 if "element_ind" in test:
@@ -70,10 +66,11 @@ def start_test(tests, url="http://localhost:8080"):
         test_number += 1
     print(colored(
         f"Tests passed {passed_tests}/{len(tests)} - {(passed_tests / len(tests) * 100)}%", "yellow"))
+    return len(tests), passed_tests
 
 
 if __name__ == "__main__":
-    tests = [
+    tests_for_json = [
         {"endpoint": "/users/1/info", "method": "get", "code": 200,
             "res_json": {"status": True, "firstName": "Stephan", "lastName": "Zhdanov", "githubLink": "ret7020"}},
         {"endpoint": "/users/10/info", "method": "get", "code": 200,
@@ -90,4 +87,19 @@ if __name__ == "__main__":
         {"endpoint": "/market/5/info", "method": "get", "code": 200,
             "res_json": {"status": False}},
     ]
-    start_test(tests)
+    print("Testing JSON")
+    json_all, json_passed = start_test(tests_for_json)
+    print("Testing protobuf")
+    tests_for_protobuf = [
+        {"endpoint": "/users/1/info", "method": "get", "code": 200, 
+            "res_json": {"status": True, "firstName": "Stephan", "lastName": "Zhdanov", "githubLink": "ret7020"}, "serialization_pb": True, "buffer_recv_name": MainBuffer.UserData},
+        {"endpoint": "/users/10/info", "method": "get", "code": 200, 
+            "res_json": {"status": False}, "serialization_pb": True, "buffer_recv_name": MainBuffer.UserData},
+        {"endpoint": "/auth/login", "method": "post", "code": 200, 
+            "data": {"email": "ret7020@gmail.com", "password": "12345"}, "res_json": {"tokenType": "Bearer"}, "serialization_pb": True, "buffer_recv_name": MainBuffer.AccessToken, "buffer_send_name": MainBuffer.AuthData},
+        {"endpoint": "/auth/login", "method": "post", "code": 401, 
+            "data": {"email": "ret7020@gmail.com", "password": "ahfhsdhf"}, "res_json": {}, "serialization_pb": True, "buffer_send_name": MainBuffer.AuthData},
+        
+    ]
+    protobuf_all, protobuf_passed = start_test(tests_for_protobuf, url="http://localhost:8080/mobile")
+    print(colored(f"Summary: passed {json_passed + protobuf_passed}/{json_all + protobuf_all}", color="red"))
