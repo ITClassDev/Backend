@@ -6,21 +6,17 @@ from core.utils import check_req_type, create_answer, nested_answer
 import pbs.main_pb2 as MainBuffer
 from models.user import User
 from models.market import MarketProducts
-
+from typing import List
 
 router = APIRouter()
 
 
-@router.get("/all")
-async def get_all_products(market_rep: MarketRepository = Depends(get_market_repository), request: Request = Request):
+@router.get("/all", response_model=List[MarketProducts])
+async def get_all_products(market_rep: MarketRepository = Depends(get_market_repository)):
     '''
     Input: None
     '''
-    req_type = await check_req_type(request)
     data = await market_rep.get_all_products()
-    data = jsonable_encoder(data)
-    if req_type == "application/protobuf":
-        data = await nested_answer(data, MainBuffer.MarketProducts, MainBuffer.MarketProduct)
     return data
 
 
@@ -35,14 +31,9 @@ async def get_product_info(product_id: int, market_rep: MarketRepository = Depen
     if data:
         data = jsonable_encoder(data)
         data["status"] = True
-        if req_type == "application/protobuf":
-            data = await create_answer(data, MainBuffer.MarketProduct)
         return data
 
     data = {"status": False, "info": "no product with such id"}
-    if req_type == "application/protobuf":
-        data = await create_answer(data, MainBuffer.MarketProduct)
-
     return data
 
 
@@ -55,7 +46,6 @@ async def add_new_product(current_user: User = Depends(get_current_user), reques
     product_about_text: str
     product_current_amount: int
     '''
-    req_type = await check_req_type(request)
     if current_user and current_user.userRole == 1:  # Role 1 is admin role
         if req_type == "application/json":
             req_data = await request.json()
@@ -65,12 +55,9 @@ async def add_new_product(current_user: User = Depends(get_current_user), reques
                         "product_about_text": buffer_data.product_about_text, "product_current_amount": buffer_data.product_current_amount}
         new_product_object = MarketProducts(title=req_data["product_title"], cost=req_data["product_cost"],
                                             remainAmount=req_data["product_current_amount"], about=req_data["product_about_text"], imagePath="def.png")
-        print(new_product_object)
         return {"status": True}
 
     data = {"status": False, "info": "Low privilages"}
-    if req_type == "application/protobuf":
-        data = await create_answer(data, MainBuffer.MarketProduct)
     return data
 
 

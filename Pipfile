@@ -18,6 +18,7 @@ python-jose = "*"
 protobuf = "*"
 requests = "*"
 termcolor = "*"
+python-multipart = "*"
 
 [dev-packages]
 

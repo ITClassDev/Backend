@@ -9,30 +9,11 @@ import pbs.main_pb2 as MainBuffer
 router = APIRouter()
 
 
-@router.post("/login")
-async def auth_login(request: Request = Request, users: UserRepository = Depends(get_user_repository)):
-    req_type = await check_req_type(request)
-    if req_type == "application/json":
-        req_data = await request.json()
-    else:
-        req_data = await parse_data(await request.body(), MainBuffer.AuthData)
-        req_data = {"email": req_data.email, "password": req_data.password}
-    login = Login(
-        email=req_data["email"],
-        password=req_data["password"]
-    )
+@router.post("/login", response_model=Token)
+async def auth_login(login: Login, users: UserRepository = Depends(get_user_repository)):
     user = await users.get_user_by_email(login.email)
-    if user is None or not verify_password(login.password, user.hashedassword):
+    if user is None or not verify_password(login.password, user.hashedPassword):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail="Incorrect pair of login && password")
     token = create_access_token({"sub": user.email})
-    if req_type == "application/protobuf":
-        token_resp = await create_answer(
-            {"accessToken": token, "tokenType": "Bearer"}, MainBuffer.AccessToken)
-    else:
-        token_resp = Token(  # Answer for JSON mode
-            accessToken=token,
-            tokenType="Bearer"
-        )
-
-    return token_resp
+    return Token(accessToken=token, tokenType="Bearer")

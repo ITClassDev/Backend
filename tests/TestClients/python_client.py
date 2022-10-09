@@ -1,4 +1,14 @@
 import requests
+import sys
+sys.path.append("../..")
+import pbs.main_pb2 as MainBuffer
+
+# Sync protbuf compiler
+def create_answer(data: dict, buffer_type):
+    answer_buffer = buffer_type()
+    for el in data:
+        setattr(answer_buffer, el, data[el])
+    return answer_buffer
 
 class User:
     def __init__(self, host="http://localhost:8080"):
@@ -23,11 +33,19 @@ class User:
                 return True
         return False
 
+
+    def upload_file(self, data, endpoint="users/temp_files"):
+        data = requests.post(f"{self.host}/{endpoint}", files={'file': open('test_data.txt', 'rb')}, headers={"content-type": "application/protobuf"})
+        return data
+
 if __name__ == "__main__":
     client = User()
-    client.auth("ret7020@gmail.com", "12345")
+    cont = create_answer({"email": "world", "password": "TestPass"}, MainBuffer.AuthData)
+    client.upload_file(cont)
+    '''client.auth("ret7020@gmail.com", "12345")
     res = client.test_protected_endpoint()
     if res:
         print(client.id, "-", client.f_name)
     else:
         print("Error")
+    '''

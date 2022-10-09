@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Request, Response
+from fastapi import APIRouter, Depends, HTTPException, status, Request, Response, File, UploadFile
 from repositories.users import UserRepository
 from models.user import User
 from .depends import get_user_repository, get_current_user
@@ -11,20 +11,23 @@ router = APIRouter()
 
 @router.get("/{user_id}/info")
 async def get_user_info(user_id, users: UserRepository = Depends(get_user_repository), request: Request = Request):
-    req_type = await check_req_type(request)
+    #req_type = await check_req_type(request)
     data = await users.get_user_info(int(user_id))
     return_data = {"status": False, "info": "no user with such id"}
     if data:
         return_data = {"status": True, "firstName": data.firstName, "lastName": data.lastName,
                        "email": data.email, "coins": data.coins, "rating": data.rating, "role": data.userRole, "telegramLink": data.userTelegram, "githubLink": data.userGithub, "avatarPath": data.userAvatarPath}
-    if req_type == "application/protobuf":
-        return_data = await create_answer(return_data, MainBuffer.UserData)
     return return_data
 
 
 @router.post("/create_user")
 async def create_user():
     pass
+
+# Dev route
+@router.post("/temp_files")
+async def upload_file(request: Request = Request, file: UploadFile = None):
+    print(file.filename)
 
 # Remove on PROD
 
