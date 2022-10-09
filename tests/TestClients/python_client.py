@@ -34,14 +34,15 @@ class User:
         return False
 
 
-    def upload_file(self, data, endpoint="users/temp_files"):
-        data = requests.post(f"{self.host}/{endpoint}", files={'file': open('test_data.txt', 'rb')}, headers={"content-type": "application/protobuf"})
+    def upload_file(self, data, endpoint="users/temp_files_upload"):
+        data = requests.post(f"{self.host}/{endpoint}", files={'file': open('test_data.txt', 'rb')})
         return data
 
 if __name__ == "__main__":
     client = User()
     cont = create_answer({"email": "world", "password": "TestPass"}, MainBuffer.AuthData)
-    client.upload_file(cont)
+    data = client.upload_file(cont)
+    print(data)
     '''client.auth("ret7020@gmail.com", "12345")
     res = client.test_protected_endpoint()
     if res:
