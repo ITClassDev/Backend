@@ -19,8 +19,11 @@ async def get_user_info(user_id: int, users: UserRepository = Depends(get_user_r
     return return_data
 
 @router.post("/create_user")
-async def create_user():
-    pass
+async def create_user(current_user: User = Depends(get_current_user)):
+    if current_user.role == 1: # Is admin
+        pass
+    else:
+        pass
 
 # Dev route
 @router.post("/temp_files_upload")
