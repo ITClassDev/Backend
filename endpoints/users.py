@@ -3,8 +3,8 @@ from repositories.users import UserRepository
 from models.user import User
 from .depends import get_user_repository, get_current_user
 import pbs.main_pb2 as MainBuffer
-from core.utils import create_answer, check_req_type, NON_AUTH_PACKET, get_file_extension, generate_filename, upload_file
-
+from core.utils.variables import NON_AUTH_PACKET
+from core.utils.files import upload_file
 
 router = APIRouter()
 

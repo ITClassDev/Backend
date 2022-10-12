@@ -1,0 +1,1 @@
+NON_AUTH_PACKET = {"status": False, "info": "Non authed"}

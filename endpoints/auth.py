@@ -3,8 +3,6 @@ from models.token import Token, Login
 from repositories.users import UserRepository
 from core.security import verify_password, create_access_token
 from .depends import get_user_repository
-from core.utils import check_req_type, create_answer, parse_data
-import pbs.main_pb2 as MainBuffer
 
 router = APIRouter()
 

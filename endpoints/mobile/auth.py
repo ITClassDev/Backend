@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Request
 import endpoints.auth as auth_endpoint
 from endpoints.depends import get_user_repository, get_current_user
-from core.utils import create_answer, parse_to_object
+from core.utils.protobuf import create_answer, parse_to_object
 import pbs.main_pb2 as MainBuffer
 from models.token import Token, Login
 

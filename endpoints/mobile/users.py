@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 import endpoints.users as users_endpoint
 from endpoints.depends import get_user_repository, get_current_user
-from core.utils import create_answer
+from core.utils.protobuf import create_answer
 import pbs.main_pb2 as MainBuffer
 
 router = APIRouter()
