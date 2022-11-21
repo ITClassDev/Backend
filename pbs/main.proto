@@ -25,25 +25,3 @@ message AccessToken {
     string accessToken = 1;
     string tokenType = 2;
 }
-
-message MarketProduct {
-    optional bool status = 1;
-    optional string info = 2;
-    optional uint32 id = 3;
-    optional string title = 4;
-    optional uint32 cost = 5;
-    optional uint32 remainAmount = 6;
-    optional string about = 7;
-    optional string imagePath = 8;
-}
-
-message MarketProducts {
-    repeated MarketProduct product = 1;
-}
-
-message NewProduct {
-    optional string product_title = 1;
-    optional uint32 product_cost = 2;
-    optional string product_about_text = 3;
-    optional uint32 product_current_amount = 4;
-}

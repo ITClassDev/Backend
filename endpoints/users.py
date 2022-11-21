@@ -14,8 +14,8 @@ async def get_user_info(user_id: int, users: UserRepository = Depends(get_user_r
     data = await users.get_user_info(int(user_id))
     return_data = {"status": False, "info": "no user with such id"}
     if data:
-        return_data = {"status": True, "firstName": data.firstName, "lastName": data.lastName,
-                       "email": data.email, "coins": data.coins, "rating": data.rating, "role": data.userRole, "telegramLink": data.userTelegram, "githubLink": data.userGithub, "avatarPath": data.userAvatarPath}
+        return_data = {"status": True, "firstName": data.firstName, "lastName": data.lastName, "middleName": data.middleName,
+                       "email": data.email, "rating": data.rating, "role": data.userRole, "telegramLink": data.userTelegram, "githubLink": data.userGithub, "stepikLink": data.userStepik, "kaggleLink": data.userKaggle, "avatarPath": data.userAvatarPath}
     return return_data
 
 @router.post("/create_user")

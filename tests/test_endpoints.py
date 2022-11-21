@@ -81,11 +81,6 @@ if __name__ == "__main__":
             "data": {"email": "ret7020@gmail.com", "password": "12345"}},
         {"endpoint": "/auth/login", "method": "post", "code": 401, "res_json": {},
             "data": {"email": "ret7020@gmail.com", "password": "6262"}},
-        {"endpoint": "/market/all", "method": "get", "code": 200, "res_json": {"id": 1, "cost": 100, "about": "This is a test product for sale"}, "element_ind": 0},
-        {"endpoint": "/market/1/info", "method": "get", "code": 200,
-            "res_json": {"status": True, "title": "Test Product", "cost": 100, "remainAmount": 100}},
-        {"endpoint": "/market/5/info", "method": "get", "code": 200,
-            "res_json": {"status": False}},
     ]
     print("Testing JSON")
     json_all, json_passed = start_test(tests_for_json)

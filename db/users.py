@@ -12,15 +12,14 @@ users = sqlalchemy.Table(
     sqlalchemy.Column("hashedPassword", sqlalchemy.String),
     sqlalchemy.Column("firstName", sqlalchemy.String),
     sqlalchemy.Column("lastName", sqlalchemy.String),
-    sqlalchemy.Column("coins", sqlalchemy.Integer),
+    sqlalchemy.Column("middleName", sqlalchemy.String),
     sqlalchemy.Column("rating", sqlalchemy.Integer),
     sqlalchemy.Column("userRole", sqlalchemy.Integer,
                       default=0),  # Default non admin user
     sqlalchemy.Column("userTelegram", sqlalchemy.String),
     sqlalchemy.Column("userGithub", sqlalchemy.String),
+    sqlalchemy.Column("userStepik", sqlalchemy.String),
+    sqlalchemy.Column("userKaggle", sqlalchemy.String),
     sqlalchemy.Column("userAboutText", sqlalchemy.String),
     sqlalchemy.Column("userAvatarPath", sqlalchemy.String),
-
-
-
 )

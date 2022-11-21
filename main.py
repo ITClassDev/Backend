@@ -2,7 +2,7 @@ from fastapi import FastAPI
 import uvicorn
 from core.config import SERVER_HOST, SERVER_PORT
 from db.base import database
-from endpoints import users, auth, market
+from endpoints import users, auth
 from endpoints.mobile import (
     users as users_mobile,
     auth as auth_mobile
@@ -23,7 +23,6 @@ app.add_middleware(
 # Native JSON REST API
 app.include_router(users.router, prefix="/users", tags=["users"])
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
-app.include_router(market.router, prefix="/market", tags=["market"])
 
 # Mobile Protocol buffer API
 app.include_router(users_mobile.router, prefix="/mobile/users", tags=["Protobuf(NO Swagger)"])
@@ -32,7 +31,7 @@ app.include_router(auth_mobile.router, prefix="/mobile/auth", tags=["Protobuf(NO
 
 @app.get("/")
 async def index():
-    return {"status": True, "data": "Hello from ITC backend!"}
+    return {"status": True, "data": "Hello from ITC API! If you are a developer, then you can learn the documentation on our service"}
 
 @app.on_event("startup")
 async def startup():

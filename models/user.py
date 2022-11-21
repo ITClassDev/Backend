@@ -8,10 +8,12 @@ class User(BaseModel):
     hashedPassword: str
     firstName: str
     lastName: str
-    coins: int
+    middleName: Optional[str]
     rating: int
     userRole: int
-    userTelegram: str
-    userGithub: str
+    userTelegram: Optional[str]
+    userGithub: Optional[str]
+    userStepik: Optional[str]
+    userKaggle: Optional[str]
     userAboutText: str
     userAvatarPath: str
