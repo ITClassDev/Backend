@@ -7,13 +7,15 @@ message UserData {
     optional string info = 2;
     string firstName = 3;
     string lastName = 4;
-    string email = 5;
-    uint32 coins = 6;
+    optional string middleName = 5;
+    string email = 6;
     uint32 rating = 7;
     uint32 role = 8;
-    string telegramLink = 9;
-    string githubLink = 10;
-    string avatarPath = 11;
+    optional string telegramLink = 9;
+    optional string githubLink = 10;
+    optional string stepikLink = 11;
+    optional string kaggleLink = 12;
+    string avatarPath = 13;
 }
 
 message AuthData {

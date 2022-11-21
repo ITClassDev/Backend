@@ -6,7 +6,8 @@ from pydantic import create_model
 async def create_answer(data: dict, buffer_type, return_object=False):
     answer_buffer = buffer_type()
     for el in data:
-        setattr(answer_buffer, el, data[el])
+        if data[el] != None:
+            setattr(answer_buffer, el, data[el])
 
     if return_object:
         return answer_buffer
