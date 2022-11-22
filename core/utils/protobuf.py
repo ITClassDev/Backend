@@ -8,7 +8,6 @@ async def create_answer(data: dict, buffer_type, return_object=False):
     for el in data:
         if data[el] != None:
             setattr(answer_buffer, el, data[el])
-
     if return_object:
         return answer_buffer
     answer_buffer_final = answer_buffer.SerializeToString()

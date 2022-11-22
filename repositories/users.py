@@ -17,3 +17,8 @@ class UserRepository(BaseRepository):
         if user is None:
             return None
         return User.parse_obj(user)
+
+    async def update_avatar(self, id: int, avatar: str) -> User:
+        query = users.update().where(users.c.id == id).values(
+            {"userAvatarPath": avatar})
+        await self.database.execute(query)

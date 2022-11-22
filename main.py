@@ -7,10 +7,14 @@ from endpoints.mobile import (
     users as users_mobile,
     auth as auth_mobile
 )
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from core.config import USERS_STORAGE
 
 app = FastAPI(title="ITC REST API")
-# For DEV !
-from fastapi.middleware.cors import CORSMiddleware
+app.mount("/storage", StaticFiles(directory=USERS_STORAGE), name="storage") # User data storage(local)
+
+# FIXIT Security ALERT; Remove on prod
 app.add_middleware(
     CORSMiddleware,
     allow_origins=['*'],
