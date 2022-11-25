@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Request, Response, File, UploadFile
 from repositories.users import UserRepository
-from models.user import User
+from models.user import User, UserIn
 from .depends import get_user_repository, get_current_user
 import pbs.main_pb2 as MainBuffer
 from core.utils.variables import NON_AUTH_PACKET
@@ -22,9 +22,9 @@ async def get_user_info(user_id: int, users: UserRepository = Depends(get_user_r
 
 
 @router.post("/create_user")
-async def create_user(current_user: User = Depends(get_current_user)):
-    if current_user.role == 1:  # Is admin
-        pass
+async def create_user(new_user: UserIn, current_user: User = Depends(get_current_user), users: UserRepository = Depends(get_user_repository)):
+    if current_user.userRole == 1:  # Is admin
+        return await users.create(u=new_user)
     else:
         pass
 

@@ -17,3 +17,12 @@ class User(BaseModel):
     userKaggle: Optional[str]
     userAboutText: str
     userAvatarPath: str
+
+
+class UserIn(BaseModel):
+    email: EmailStr
+    hashedPassword: str
+    firstName: str
+    lastName: str
+    rating: int
+    userRole: int

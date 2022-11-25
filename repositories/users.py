@@ -1,6 +1,6 @@
 from db.users import users
 from .base import BaseRepository
-from models.user import User
+from models.user import User, UserIn
 
 
 class UserRepository(BaseRepository):
@@ -22,3 +22,6 @@ class UserRepository(BaseRepository):
         query = users.update().where(users.c.id == id).values(
             {"userAvatarPath": avatar})
         await self.database.execute(query)
+
+    async def create(self, ):
+        pass
