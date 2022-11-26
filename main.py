@@ -9,9 +9,9 @@ from endpoints.mobile import (
 )
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from core.config import USERS_STORAGE
+from core.config import USERS_STORAGE, API_VER
 
-app = FastAPI(title="ITC REST API")
+app = FastAPI(title="ITC REST API", version="0.0.1")
 app.mount("/storage", StaticFiles(directory=USERS_STORAGE), name="storage") # User data storage(local)
 
 # FIXIT Security ALERT; Remove on prod
@@ -35,7 +35,11 @@ app.include_router(auth_mobile.router, prefix="/mobile/auth", tags=["Protobuf(NO
 
 @app.get("/")
 async def index():
-    return {"status": True, "data": "Hello from ITC API! If you are a developer, then you can learn the documentation on our service"}
+    return {"status": True, "api_ver": API_VER, "endpoints": {"storage": "/storage", "mobile": "/mobile/"}}
+
+@app.get("/mobile")
+async def mobile_placeholder():
+    return {"status": True, "about": "This is an optimized version of our API for mobile devices. This version of the api completely repeats the behavior of the main version. The only difference is that in the main version we use the usual json as serialization, but in this version we use the buffers protocol. You can learn more in our documentation."}
 
 @app.on_event("startup")
 async def startup():
