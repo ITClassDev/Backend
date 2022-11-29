@@ -23,5 +23,5 @@ class UserRepository(BaseRepository):
             {"userAvatarPath": avatar})
         await self.database.execute(query)
 
-    async def create(self, ):
+    async def create(self, user: UserIn):
         pass
