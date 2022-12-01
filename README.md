@@ -26,7 +26,7 @@ Tech-Stack
 9. Docker + Docker compose
 10. Pipenv
 
-<
+
 <a name="req_handling"></a>
 ## How we Handle HTTP Requests
 <p>Our API supports 2 types of data serialization: JSON(we use in our React client) and ProtocolBuffer(we use in our Java Android client).<p>
@@ -34,9 +34,8 @@ Tech-Stack
 <p>So, we have a routing that accepts an input as a pydantic object or a json, it is convenient to work with it, there is no need to worry about parsing inputs from the request. Routing returns a pythonic dictionary or also a pydantic object, which in our case is the same. In our project, everything is simple - there is a wrapper above the usual json routings, which converts the received input from the protobuffers into the one necessary for the endpoint and similarly works on the result of the endpoint, converting it into a protobuffer. More detailed diagram in the image below.</p>
 <p>
 <img src="https://raw.githubusercontent.com/ITClassDev/Backend/master/docs/images/req_flow.png">
-
-
 </p>
+
 <a name="tests"></a>
 ## Why self-written tests?!?!?!
 <p>Why did we invent the wheel and write a system for api test from scratch?<p>

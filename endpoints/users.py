@@ -26,7 +26,7 @@ async def create_user(new_user: UserIn, current_user: User = Depends(get_current
     if current_user.userRole == 1:  # Is admin
         return await users.create(u=new_user)
     else:
-        pass
+        return NON_AUTH_PACKET
 
 
 @router.post("/upload_avatar")
