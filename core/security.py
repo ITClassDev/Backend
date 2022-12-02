@@ -3,6 +3,7 @@ from fastapi import Request, HTTPException, status
 from fastapi.security import HTTPBearer
 from passlib.context import CryptContext
 from jose import jwt
+import jose
 from .config import ACCESS_TOKEN_EXPIRE_MINUTES, SECRET_KEY, ALGORITHM
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -36,13 +37,17 @@ class JWTBearer(HTTPBearer):
         super(JWTBearer, self).__init__(auto_error=auto_error)
 
     async def __call__(self, request: Request):
-        credentials: HTTPAuthorizationCredentials = await super(JWTBearer, self).__call__(request)
-        exp = HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Invalid auth token")
-        if credentials:
-            token = decode_access_token(credentials.credentials)
-            if token is None:
+        try:
+            credentials: HTTPAuthorizationCredentials = await super(JWTBearer, self).__call__(request)
+            exp = HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, detail="Invalid auth token")
+            if credentials:
+                token = decode_access_token(credentials.credentials)
+                if token is None:
+                    raise exp
+                return credentials.credentials
+            else:
                 raise exp
-            return credentials.credentials
-        else:
-            raise exp
+        except (jose.exceptions.ExpiredSignatureError, jose.exceptions.JWTError):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, detail="Credentials are not valid")
