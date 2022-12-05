@@ -10,11 +10,14 @@ from endpoints.mobile import (
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from core.config import USERS_STORAGE, API_VER
+from core.utils.system import get_system_status
 
-app = FastAPI(title="ITC REST API", version="0.0.1")
+app = FastAPI(title="ITC REST API", version=API_VER)
 app.mount("/storage", StaticFiles(directory=USERS_STORAGE), name="storage") # User data storage(local)
 
 # FIXIT Security ALERT; Remove on prod
+# We have to enable only frontend domain
+# But we didn't have it now
 app.add_middleware(
     CORSMiddleware,
     allow_origins=['*'],
@@ -35,7 +38,8 @@ app.include_router(auth_mobile.router, prefix="/mobile/auth", tags=["Protobuf(NO
 
 @app.get("/")
 async def index():
-    return {"status": True, "api_ver": API_VER, "endpoints": {"storage": "/storage", "mobile": "/mobile/"}}
+    cpu_load, ram_load = get_system_status()
+    return {"status": True, "api_ver": API_VER, "endpoints": {"storage": "/storage", "mobile": "/mobile/"}, "system_status": {"cpu": cpu_load, "ram": ram_load}}
 
 @app.get("/mobile")
 async def mobile_placeholder():
