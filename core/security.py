@@ -24,7 +24,7 @@ def create_access_token(data: dict) -> str:
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 
-def decode_access_token(token: str):
+def decode_access_token(token: str) -> str:
     try:
         encoded_jwt = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
     except jwt.JWSError:
@@ -50,4 +50,4 @@ class JWTBearer(HTTPBearer):
                 raise exp
         except (jose.exceptions.ExpiredSignatureError, jose.exceptions.JWTError):
             raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN, detail="Credentials are not valid")
+                status_code=status.HTTP_403_FORBIDDEN, detail="Credentials invalid")
