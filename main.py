@@ -2,7 +2,7 @@ from fastapi import FastAPI
 import uvicorn
 from core.config import SERVER_HOST, SERVER_PORT
 from db.base import database
-from endpoints import users, auth
+from endpoints import users, auth, achievements
 from endpoints.mobile import (
     users as users_mobile,
     auth as auth_mobile
@@ -30,6 +30,7 @@ app.add_middleware(
 # Native JSON REST API
 app.include_router(users.router, prefix="/users", tags=["users"])
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
+app.include_router(achievements.router, prefix="/achievements", tags=["achievements"])
 
 # Mobile Protocol buffer API
 app.include_router(users_mobile.router, prefix="/mobile/users", tags=["Protobuf(NO Swagger)"])
