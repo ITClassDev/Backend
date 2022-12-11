@@ -9,3 +9,6 @@ class App(BaseModel):
     permission_level: int
     verified: bool
     created_at: datetime.datetime
+
+class ProvideAccessRequest(BaseModel):
+    app_id: int
