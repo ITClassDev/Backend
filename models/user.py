@@ -11,6 +11,7 @@ class User(BaseModel):
     middleName: Optional[str]
     rating: int
     userRole: int
+    learningClass: int
     userTelegram: Optional[str]
     userGithub: Optional[str]
     userStepik: Optional[str]
@@ -26,6 +27,7 @@ class UserIn(BaseModel):
     lastName: str
     rating: int
     userRole: int
+    learningClass: int
 
 
 class AboutText(BaseModel):

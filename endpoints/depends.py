@@ -1,5 +1,6 @@
 from repositories.users import UserRepository
 from repositories.achievements import AchievementRepository
+from repositories.apps import AppsRepository
 from db.base import database
 from fastapi import Depends, HTTPException, status
 from core.security import JWTBearer, decode_access_token
@@ -11,6 +12,9 @@ def get_user_repository() -> UserRepository:
 
 def get_achievement_repository() -> AchievementRepository:
     return AchievementRepository(database)
+
+def get_apps_repository() -> AppsRepository:
+    return AppsRepository(database)
     
 
 async def get_current_user(

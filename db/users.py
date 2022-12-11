@@ -16,10 +16,12 @@ users = sqlalchemy.Table(
     sqlalchemy.Column("rating", sqlalchemy.Integer),
     sqlalchemy.Column("userRole", sqlalchemy.Integer,
                       default=0),  # Default non admin user
+    sqlalchemy.Column("learningClass", sqlalchemy.Integer),
     sqlalchemy.Column("userTelegram", sqlalchemy.String),
     sqlalchemy.Column("userGithub", sqlalchemy.String),
     sqlalchemy.Column("userStepik", sqlalchemy.String),
     sqlalchemy.Column("userKaggle", sqlalchemy.String),
     sqlalchemy.Column("userAboutText", sqlalchemy.String),
-    sqlalchemy.Column("userAvatarPath", sqlalchemy.String, default="default.png"),
+    sqlalchemy.Column("userAvatarPath", sqlalchemy.String,
+                      default="default.png"),
 )
