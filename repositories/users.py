@@ -23,5 +23,9 @@ class UserRepository(BaseRepository):
             {"userAvatarPath": avatar})
         await self.database.execute(query)
 
+    async def update_about_text(self, id: int, new_about_text: str) -> None:
+        query = users.update().where(users.c.id == id).values({"userAboutText": new_about_text})
+        await self.database.execute(query)
+
     async def create(self, user: UserIn):
         pass

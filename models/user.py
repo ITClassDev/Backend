@@ -26,3 +26,7 @@ class UserIn(BaseModel):
     lastName: str
     rating: int
     userRole: int
+
+
+class AboutText(BaseModel):
+    about_text: str

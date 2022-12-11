@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Request, Response, File, UploadFile
 from repositories.users import UserRepository
-from models.user import User, UserIn
+from models.user import User, UserIn, AboutText
 from .depends import get_user_repository, get_current_user
 import pbs.main_pb2 as MainBuffer
 from core.utils.variables import NON_AUTH_PACKET
@@ -54,4 +54,11 @@ async def test_auth(current_user: User = Depends(get_current_user)):
 async def update_user_info(current_user: User = Depends(get_current_user)):
     if current_user:
         print(current_user.id)
+    return NON_AUTH_PACKET
+
+@router.post("/update_about_text")
+async def update_avatar(AboutText: AboutText, current_user: User = Depends(get_current_user), users: UserRepository = Depends(get_user_repository)):
+    if current_user:
+        await users.update_about_text(current_user.id, AboutText.about_text)
+        return {"status": True, "new_about": AboutText.about_text}
     return NON_AUTH_PACKET
