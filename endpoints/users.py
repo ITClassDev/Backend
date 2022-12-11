@@ -62,3 +62,7 @@ async def update_avatar(AboutText: AboutText, current_user: User = Depends(get_c
         await users.update_about_text(current_user.id, AboutText.about_text)
         return {"status": True, "new_about": AboutText.about_text}
     return NON_AUTH_PACKET
+
+@router.get("/get_leaderboard")
+async def get_leaderboard(limit: int = 10, users: UserRepository = Depends(get_user_repository)):
+    return await users.get_top(limit)

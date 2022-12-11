@@ -1,7 +1,8 @@
 from db.users import users
 from .base import BaseRepository
 from models.user import User, UserIn
-
+from typing import List
+from sqlalchemy import select
 
 class UserRepository(BaseRepository):
     async def get_user_info(self, id: int) -> User:
@@ -26,6 +27,10 @@ class UserRepository(BaseRepository):
     async def update_about_text(self, id: int, new_about_text: str) -> None:
         query = users.update().where(users.c.id == id).values({"userAboutText": new_about_text})
         await self.database.execute(query)
+
+    async def get_top(self, count: int) -> List[User]:
+        query = select(users.c.id, users.c.firstName, users.c.lastName, users.c.userAvatarPath, users.c.rating).order_by(users.c.rating.desc()).limit(count)
+        return await self.database.fetch_all(query)
 
     async def create(self, user: UserIn):
         pass
