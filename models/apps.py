@@ -8,6 +8,7 @@ class App(BaseModel):
     name: str
     permission_level: int
     verified: bool
+    redirect_url: str
     created_at: datetime.datetime
 
 class ProvideAccessRequest(BaseModel):

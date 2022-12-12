@@ -4,6 +4,7 @@ from fastapi.security import HTTPBearer
 from passlib.context import CryptContext
 from jose import jwt
 import string
+import random
 import jose
 from .config import ACCESS_TOKEN_EXPIRE_MINUTES, SECRET_KEY, ALGORITHM
 
@@ -18,8 +19,9 @@ def verify_password(password: str, hash_: str) -> bool:
     return pwd_context.verify(password, hash_)
 
 
-def create_oauth_access_token(to_user: int) -> str:
-    token = f"oauth_access_{''.join(random.choice(string.ascii_letters + string.punctuation) for x in range(10))}"
+def create_oauth_access_token(to_user: int, app_id: int) -> str:
+    payload_avaliable = string.ascii_letters + "()-_*!<>"
+    return f"oauth_access_{to_user * app_id}_{''.join(random.choice(payload_avaliable) for x in range(14))}"
 
 def create_access_token(data: dict) -> str:
     to_encode = data.copy()

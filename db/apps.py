@@ -8,6 +8,7 @@ apps = sqlalchemy.Table(
     sqlalchemy.Column("owner_id", sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'), nullable=False),
     sqlalchemy.Column("name", sqlalchemy.String),
     sqlalchemy.Column("permission_level", sqlalchemy.Integer, default=0),
+    sqlalchemy.Column("redirect_url", sqlalchemy.String),
     sqlalchemy.Column("created_at", sqlalchemy.DateTime),
     sqlalchemy.Column("verified", sqlalchemy.Boolean)
 )
