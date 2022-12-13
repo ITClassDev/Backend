@@ -34,4 +34,11 @@ async def provide_access(app_info: ProvideAccessRequest, current_user: User = De
 @router.get("/get_user/{token}")
 async def get_user(token: str, tokens: OAuthTokensRepository = Depends(get_oauth_tokens_repository)):
     token_data = await tokens.get_by_token(token)
-    return {"user_id": token_data.to_user}
+    if token_data:
+        await tokens.expire_token(token) # Delete token after use
+        # TODO
+        # PREVENT GARBAGE FLOOD TOKENS
+        # FOR EXAMPLE DELETE OLD TOKENS (1h) before generate new
+        return {"status": True, "user_id": token_data.to_user}
+    else:
+        return {"status": False, "detail": "Please provide working token"}
