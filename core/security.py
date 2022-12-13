@@ -21,7 +21,7 @@ def verify_password(password: str, hash_: str) -> bool:
 
 def create_oauth_access_token(to_user: int, app_id: int) -> str:
     payload_avaliable = string.ascii_letters + "()-_*!<>"
-    return f"oauth_access_{to_user * app_id}_{''.join(random.choice(payload_avaliable) for x in range(14))}"
+    return f"oauth_access_{(to_user * app_id) * random.randint(3, 20)}_{''.join(random.choice(payload_avaliable) for x in range(14))}"
 
 def create_access_token(data: dict) -> str:
     to_encode = data.copy()
