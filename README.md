@@ -41,3 +41,9 @@ Tech-Stack
 <p>Why did we invent the wheel and write a system for api test from scratch?<p>
 <p>The main problem is support for protobuffers. We don't use them in the context of grpc, we use them as a separate tool for serializing packages. It makes no sense to get into the code of ready-made autotests - it is very long and inconvenient. It's faster to write your own test system and not fool around.</p>
 
+
+## Extra
+### User roles:
+0 - Base student
+1 - Teacher
+2 - Super Admin - Have access to all features

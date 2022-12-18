@@ -10,7 +10,6 @@ import os
 
 router = APIRouter()
 
-
 @router.get("/{user_id}/info")
 async def get_user_info(user_id: int, users: UserRepository = Depends(get_user_repository)):
     data = await users.get_user_info(int(user_id))

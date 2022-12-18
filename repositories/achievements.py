@@ -9,7 +9,7 @@ class AchievementRepository(BaseRepository):
         pass   
 
     async def get_all_for_user(self, user_id: int) -> List[Achievement]:
-        query = achievements.select().where(achievements.c.to_user == user_id)
+        query = achievements.select().where(achievements.c.to_user == user_id, achievements.c.accepted_by != None)
         result_data = await self.database.fetch_all(query)
         return result_data
 
@@ -29,3 +29,10 @@ class AchievementRepository(BaseRepository):
         result = await self.database.execute(query)
         print(result)
         return result
+    
+    async def change_status(self, achievement_id: int, accepted_by, accept=True):
+        pass
+    async def get_moderation_queue_for_one(self, for_user_id: int):
+        pass
+    async def get_moderation_queue_for_all(self):
+        pass
