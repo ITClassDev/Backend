@@ -32,21 +32,13 @@ async def create_user(new_user: UserIn, current_user: User = Depends(get_current
 @router.post("/upload_avatar")
 async def upload_file_test(current_user: User = Depends(get_current_user), request: Request = Request, file: UploadFile = None, users: UserRepository = Depends(get_user_repository)):
     if current_user:
-        allowed_extensions = ["png", "jpg"]
+        allowed_extensions = ["png", "jpg"] # no gifs for now
         uploaded_avatar =  await upload_file(file, allowed_extensions, os.path.join(USERS_STORAGE, "avatars"), custom_name=f"{current_user.id}_avatar")
         if uploaded_avatar["status"]:
             await users.update_avatar(current_user.id, uploaded_avatar["file_name"])
             return {"status": True, "avatar": uploaded_avatar["file_name"]}
         else:
             return {"status": False, "info": uploaded_avatar["info"]}
-    return NON_AUTH_PACKET
-
-
-# Dev
-@router.get("/test_auth")
-async def test_auth(current_user: User = Depends(get_current_user)):
-    if current_user:
-        return {"status": True, "userId": current_user.id, "userFname": current_user.firstName}
     return NON_AUTH_PACKET
 
 

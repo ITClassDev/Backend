@@ -20,7 +20,7 @@ requests = "*"
 termcolor = "*"
 python-multipart = "*"
 psutil = "*"
-
+asyncpg = "*"
 [dev-packages]
 
 [requires]

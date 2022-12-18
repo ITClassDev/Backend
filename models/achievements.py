@@ -5,10 +5,14 @@ import datetime
 class Achievement(BaseModel):
     id: Optional[int] = None
     to_user: int
-    accepted_by: int
+    accepted_by: Optional[int] = None
     type: int
     title: str
     description: str
-    point: int
+    points: int
     received_at: datetime.datetime
 
+class AchievementIn(BaseModel):
+    type: int
+    title: str
+    description: str

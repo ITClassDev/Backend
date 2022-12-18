@@ -11,6 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from core.config import USERS_STORAGE, API_VER
 from core.utils.system import get_system_status
+import core.security
 
 app = FastAPI(title="ITC REST API", version=API_VER)
 app.mount("/storage", StaticFiles(directory=USERS_STORAGE), name="storage") # User data storage(local)
@@ -42,6 +43,7 @@ app.include_router(auth_mobile.router, prefix="/mobile/auth", tags=["Protobuf(NO
 async def index():
     cpu_load, ram_load = get_system_status()
     return {"status": True, "api_ver": API_VER, "endpoints": {"storage": "/storage", "mobile": "/mobile/"}, "system_status": {"cpu": cpu_load, "ram": ram_load}}
+
 
 @app.get("/mobile")
 async def mobile_placeholder():

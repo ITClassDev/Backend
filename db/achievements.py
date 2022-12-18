@@ -6,7 +6,7 @@ achievements = sqlalchemy.Table(
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True, autoincrement=True, unique=True),
     sqlalchemy.Column("to_user", sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'), nullable=False),
-    sqlalchemy.Column("accepted_by", sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'), nullable=False),
+    sqlalchemy.Column("accepted_by", sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id')),
     sqlalchemy.Column("type", sqlalchemy.Integer),
     sqlalchemy.Column("title", sqlalchemy.String),
     sqlalchemy.Column("description", sqlalchemy.String),

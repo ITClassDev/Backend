@@ -1,0 +1,16 @@
+sqlalchemy
+uvicorn
+databases
+starlette
+psycopg2
+pydantic
+alembic
+passlib
+jose
+python-jose
+protobuf
+requests
+termcolor
+python-multipart
+psutil
+
