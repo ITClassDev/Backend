@@ -10,8 +10,7 @@ class AchievementRepository(BaseRepository):
 
     async def get_all_for_user(self, user_id: int) -> List[Achievement]:
         query = achievements.select().where(achievements.c.to_user == user_id, achievements.c.accepted_by != None)
-        result_data = await self.database.fetch_all(query)
-        return result_data
+        return await self.database.fetch_all(query)
 
     async def add(self, achievement: AchievementIn, to_user_id: int) -> Achievement:
         achievement_final = Achievement(
@@ -26,13 +25,13 @@ class AchievementRepository(BaseRepository):
         values.pop("id", None)
         values.pop("accepted_by", None)
         query = achievements.insert().values(**values)
-        result = await self.database.execute(query)
-        print(result)
-        return result
+        return await self.database.execute(query)
     
     async def change_status(self, achievement_id: int, accepted_by, accept=True):
         pass
-    async def get_moderation_queue_for_one(self, for_user_id: int):
-        pass
-    async def get_moderation_queue_for_all(self):
-        pass
+    async def get_moderation_queue_for_one(self, for_user_id: int) -> List[Achievement]:
+        query = achievements.select().where(achievements.c.to_user == for_user_id, achievements.c.accepted_by == None)
+        return await self.database.fetch_all(query)
+    async def get_moderation_queue_for_all(self) -> List[Achievement]:
+        query = achievements.select().where(achievements.c.accepted_by == None)
+        return await self.database.fetch_all(query)
