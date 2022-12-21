@@ -1,14 +1,17 @@
 from fastapi import APIRouter, Depends
-from .depends import get_current_user, get_achievement_repository
+from .depends import get_current_user, get_achievement_repository, get_user_repository
 from models.user import User
 from models.achievements import AchievementIn
 from repositories.achievements import AchievementRepository
+from repositories.users import UserRepository
 
 router = APIRouter()
 
 @router.get("/get_my")
-async def get_my_achievements(current_user: User = Depends(get_current_user), achievements: AchievementRepository = Depends(get_achievement_repository)):
-    res = await achievements.get_all_for_user(current_user.id)
+async def get_my_achievements(current_user: User = Depends(get_current_user), achievements: AchievementRepository = Depends(get_achievement_repository), users: UserRepository = Depends(get_user_repository)):
+    res = {"base": await achievements.get_all_for_user(current_user.id)}
+    system = await users.get_user_info(current_user.id)
+    res["system"] = system.systemAchievements
     return {"status": True, "achievements": res}
 
 @router.post("/add")

@@ -1,6 +1,7 @@
 import sqlalchemy
 from .base import metadata, engine
 import datetime
+from sqlalchemy.types import ARRAY
 
 users = sqlalchemy.Table(
     "users",
@@ -24,4 +25,5 @@ users = sqlalchemy.Table(
     sqlalchemy.Column("userAboutText", sqlalchemy.String),
     sqlalchemy.Column("userAvatarPath", sqlalchemy.String,
                       default="default.png"),
+    sqlalchemy.Column("systemAchievements", ARRAY(sqlalchemy.Integer))
 )

@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
-from typing import Optional
+from typing import Optional, List
 
 
 class User(BaseModel):
@@ -18,6 +18,7 @@ class User(BaseModel):
     userKaggle: Optional[str]
     userAboutText: str
     userAvatarPath: str
+    systemAchievements: Optional[List]
 
 
 class UserIn(BaseModel):

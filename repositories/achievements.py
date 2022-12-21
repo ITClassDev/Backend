@@ -8,9 +8,18 @@ class AchievementRepository(BaseRepository):
     async def get_by_id():
         pass   
 
+    async def get_category_for_user(self, user_id: int, achievement_type: int = 0) -> List[Achievement]:
+        # Type 0: Olimpiads
+        # Type 1: events
+        # Type 2: system
+        query = achievements.select().where(achievements.c.to_user == user_id, achievements.c.accepted_by != None, achievements.c.type == achievement_type)
+        data = await self.database.fetch_all(query)
+        return data
+
     async def get_all_for_user(self, user_id: int) -> List[Achievement]:
         query = achievements.select().where(achievements.c.to_user == user_id, achievements.c.accepted_by != None)
-        return await self.database.fetch_all(query)
+        data = await self.database.fetch_all(query)
+        return data
 
     async def add(self, achievement: AchievementIn, to_user_id: int) -> Achievement:
         achievement_final = Achievement(
