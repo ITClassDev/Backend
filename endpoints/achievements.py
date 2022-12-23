@@ -21,7 +21,7 @@ async def add_achievement(achievement: AchievementIn, current_user: User = Depen
         return {"status": True}
 
 @router.get("/accept/{achievement_id}")
-async def accepr_achievement(achievement_id: int, current_user: User = Depends(get_current_user), ):
+async def accepr_achievement(achievement_id: int, current_user: User = Depends(get_current_user)):
     pass
 
 @router.get("/my_queue")

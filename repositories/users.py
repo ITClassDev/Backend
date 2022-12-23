@@ -12,6 +12,11 @@ class UserRepository(BaseRepository):
             return None
         return User.parse_obj(user)
 
+
+    async def get_all_users(self) -> List[User]:
+        query = select(users.c.id, users.c.firstName, users.c.lastName, users.c.userAvatarPath)
+        return await self.database.fetch_all(query)
+
     async def get_user_by_email(self, email: str) -> User:
         query = users.select().where(users.c.email == email)
         user = await self.database.fetch_one(query)
