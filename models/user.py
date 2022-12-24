@@ -31,5 +31,16 @@ class UserIn(BaseModel):
     learningClass: int
 
 
+class UserUpdate(BaseModel):
+    email: EmailStr
+    firstName: str
+    lastName: str
+    rating: int
+    userRole: int
+    learningClass: int
+    userAboutText: str
+
+
+
 class AboutText(BaseModel):
     about_text: str

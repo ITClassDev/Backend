@@ -22,7 +22,7 @@ Tech-Stack
 5. Pydantic
 6. Protobuf(Proto3)
 7. jose - JWT Auth
-8. Self-written API test system(to support protobuffers)
+8. Self-written API test system(to support protobuf)
 9. Docker + Docker compose
 10. Pipenv
 
@@ -39,7 +39,7 @@ Tech-Stack
 <a name="tests"></a>
 ## Why self-written tests?!?!?!
 <p>Why did we invent the wheel and write a system for api test from scratch?<p>
-<p>The main problem is support for protobuffers. We don't use them in the context of grpc, we use them as a separate tool for serializing packages. It makes no sense to get into the code of ready-made autotests - it is very long and inconvenient. It's faster to write your own test system and not fool around.</p>
+<p>The main problem is support for protobuf. We don't use them in the context of grpc, we use them as a separate tool for serializing packages. It makes no sense to get into the code of ready-made autotests - it is very long and inconvenient. It's faster to write your own test system and not fool around.</p>
 
 
 ## Extra

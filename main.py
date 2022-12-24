@@ -14,7 +14,7 @@ from core.utils.system import get_system_status
 import core.security
 
 app = FastAPI(title="ITC REST API", version=API_VER)
-app.mount("/storage", StaticFiles(directory=USERS_STORAGE), name="storage") # User data storage(local)
+app.mount("/storage", StaticFiles(directory=USERS_STORAGE), name="storage")  # User data storage(local)
 
 # FIXIT Security ALERT; Remove on prod
 # We have to enable only frontend domain
@@ -26,7 +26,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 
 # Native JSON REST API
 app.include_router(users.router, prefix="/users", tags=["users"])
@@ -43,22 +42,24 @@ app.include_router(auth_mobile.router, prefix="/mobile/auth", tags=["Protobuf(NO
 @app.get("/")
 async def index():
     cpu_load, ram_load = get_system_status()
-    return {"status": True, "api_ver": API_VER, "endpoints": {"storage": "/storage", "mobile": "/mobile/"}, "system_status": {"cpu": cpu_load, "ram": ram_load}}
+    return {"status": True, "api_ver": API_VER, "endpoints": {"storage": "/storage", "mobile": "/mobile/"},
+            "system_status": {"cpu": cpu_load, "ram": ram_load}}
 
 
 @app.get("/mobile")
 async def mobile_placeholder():
-    return {"status": True, "about": "This is an optimized version of our API for mobile devices. This version of the api completely repeats the behavior of the main version. The only difference is that in the main version we use the usual json as serialization, but in this version we use the buffers protocol. You can learn more in our documentation."}
+    return {"status": True,
+            "about": "This is an optimized version of our API for mobile devices.This version of the api completely repeats the behavior of the main version.The only difference is that in the main version we use the usual json as serialization, but in this version we use the buffers protocol.You can learn more in our documentation."}
+
 
 @app.on_event("startup")
 async def startup():
     await database.connect()
-    
+
 
 @app.on_event("shutdown")
 async def shutdown():
     await database.disconnect()
-
 
 
 if __name__ == "__main__":

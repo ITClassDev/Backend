@@ -1,17 +1,18 @@
 from db.users import users
 from .base import BaseRepository
-from models.user import User, UserIn
+from models.user import User, UserIn, UserUpdate
 from typing import List
 from sqlalchemy import select
+
 
 class UserRepository(BaseRepository):
     async def get_user_info(self, id: int) -> User:
         query = users.select().where(users.c.id == id)
         user = await self.database.fetch_one(query)
-        if user is None:
+        if not user:
             return None
-        return User.parse_obj(user)
 
+        return User.parse_obj(user)
 
     async def get_all_users(self) -> List[User]:
         query = select(users.c.id, users.c.firstName, users.c.lastName, users.c.userAvatarPath)
@@ -20,9 +21,13 @@ class UserRepository(BaseRepository):
     async def get_user_by_email(self, email: str) -> User:
         query = users.select().where(users.c.email == email)
         user = await self.database.fetch_one(query)
-        if user is None:
-            return None
+        if not user: return None
         return User.parse_obj(user)
+
+    async def update(self, id: int, user_data: UserUpdate) -> None:
+        upd_values = {**user_data.dict()}
+        query = users.update().where(users.c.id == id).values(**upd_values)
+        await self.database.execute(query)
 
     async def update_avatar(self, id: int, avatar: str) -> User:
         query = users.update().where(users.c.id == id).values(
@@ -34,8 +39,11 @@ class UserRepository(BaseRepository):
         await self.database.execute(query)
 
     async def get_top(self, count: int) -> List[User]:
-        query = select(users.c.id, users.c.firstName, users.c.lastName, users.c.userAvatarPath, users.c.rating).order_by(users.c.rating.desc()).limit(count)
+        query = select(users.c.id, users.c.firstName, users.c.lastName, users.c.userAvatarPath,
+                       users.c.rating).order_by(users.c.rating.desc()).limit(count)
         return await self.database.fetch_all(query)
 
     async def create(self, user: UserIn):
         pass
+
+

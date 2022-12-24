@@ -1,6 +1,5 @@
 import sqlalchemy
-from .base import metadata, engine
-import datetime
+from .base import metadata
 from sqlalchemy.types import ARRAY
 
 users = sqlalchemy.Table(
