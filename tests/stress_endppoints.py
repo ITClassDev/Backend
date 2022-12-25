@@ -18,9 +18,9 @@ class Stresser:
     
     def m_threaded_wrapper(self, endpoint, each_thread, threads_cnt):
         for _ in range(threads_cnt):
-            threading.Thread(target= lambda: self.stress_thread(endpoint, each_thread)).start()
+            threading.Thread(target = lambda: self.stress_thread(endpoint, each_thread)).start()
 
 
 if __name__ == "__main__":
     stress = Stresser()
-    stress.m_threaded_wrapper("/users/1/info", 100, 100)
+    stress.m_threaded_wrapper("/auth/me", 100, 1)

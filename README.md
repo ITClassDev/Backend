@@ -26,7 +26,6 @@ Tech-Stack
 9. Docker + Docker compose
 10. Pipenv
 
-
 <a name="req_handling"></a>
 ## How we Handle HTTP Requests
 <p>Our API supports 2 types of data serialization: JSON(we use in our React client) and ProtocolBuffer(we use in our Java Android client).<p>

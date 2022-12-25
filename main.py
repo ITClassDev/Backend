@@ -11,7 +11,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from core.config import USERS_STORAGE, API_VER
 from core.utils.system import get_system_status
-import core.security
 
 app = FastAPI(title="ITC REST API", version=API_VER)
 app.mount("/storage", StaticFiles(directory=USERS_STORAGE), name="storage")  # User data storage(local)
