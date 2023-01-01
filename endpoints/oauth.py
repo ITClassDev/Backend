@@ -19,7 +19,9 @@ async def get_app_info(app_id: int, apps: AppsRepository = Depends(get_apps_repo
 
 # generate temp token to access some user endpoints with another prefix
 @router.post("/provide_access")
-async def provide_access(app_info: ProvideAccessRequest, current_user: User = Depends(get_current_user), apps: AppsRepository = Depends(get_apps_repository), tokens: OAuthTokensRepository = Depends(get_oauth_tokens_repository)):
+async def provide_access(app_info: ProvideAccessRequest, current_user: User = Depends(get_current_user),
+                         apps: AppsRepository = Depends(get_apps_repository),
+                         tokens: OAuthTokensRepository = Depends(get_oauth_tokens_repository)):
     if current_user:
         app_config = await apps.get_by_id(app_info.app_id)
         access_token = create_oauth_access_token(
@@ -27,15 +29,17 @@ async def provide_access(app_info: ProvideAccessRequest, current_user: User = De
         token_object = OauthToken(token=access_token, app_id=app_info.app_id, to_user=current_user.id)
         await tokens.save_token(token_object)
 
-        return {"status": True, "oauth_access_token": access_token, "redirect_to": f"{app_config.redirect_url}?access_token={access_token}"}
+        return {"status": True, "oauth_access_token": access_token,
+                "redirect_to": f"{app_config.redirect_url}?access_token={access_token}"}
     else:
         return {"status": False}
+
 
 @router.get("/get_user/{token}")
 async def get_user(token: str, tokens: OAuthTokensRepository = Depends(get_oauth_tokens_repository)):
     token_data = await tokens.get_by_token(token)
     if token_data:
-        await tokens.expire_token(token) # Delete token after use
+        await tokens.expire_token(token)  # Delete token after use
         # TODO
         # PREVENT GARBAGE FLOOD TOKENS
         # FOR EXAMPLE DELETE OLD TOKENS (1h) before generate new

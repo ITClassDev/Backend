@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends, Request, UploadFile
+from fastapi import APIRouter, Depends, UploadFile
 from repositories.users import UserRepository
+from repositories.apps import  AppsRepository
 from models.user import User, UserIn, AboutText, UserUpdate
-from .depends import get_user_repository, get_current_user
+from .depends import get_user_repository, get_current_user, get_apps_repository
 from core.utils.variables import NON_AUTH_PACKET
 from core.utils.files import upload_file
 from core.config import USERS_STORAGE
@@ -69,3 +70,11 @@ async def update_avatar(about_text: AboutText, current_user: User = Depends(get_
 @router.get("/get_leaderboard")
 async def get_leaderboard(limit: int = 10, users: UserRepository = Depends(get_user_repository)):
     return await users.get_top(limit)
+
+
+@router.get("/my_apps")
+async def get_my_apps(current_user: User = Depends(get_current_user), apps: AppsRepository = Depends(get_apps_repository)):
+    if current_user:
+        return await apps.get_for_user(current_user.id)
+
+    return NON_AUTH_PACKET

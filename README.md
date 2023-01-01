@@ -46,3 +46,11 @@ Tech-Stack
 0 - Base student
 1 - Teacher
 2 - Super Admin - Have access to all features
+
+
+## Dev notes
+// Notifications types
+// 0 - achievement moderated true
+achievemnt id
+// 1 - achievement moderated rejected
+// 2 - new local(school) event added
