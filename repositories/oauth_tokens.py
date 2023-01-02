@@ -16,3 +16,7 @@ class OAuthTokensRepository(BaseRepository):
     async def expire_token(self, token: str) -> None:
         query = oauth_tokens.delete().where(oauth_tokens.c.token == token)
         await self.database.execute(query)
+
+    async def expire_all(self, app_id: int) -> None:
+        query = oauth_tokens.delete().where(oauth_tokens.c.app_id == app_id)
+        await self.database.execute(query)

@@ -24,6 +24,11 @@ async def provide_access(app_info: ProvideAccessRequest, current_user: User = De
                          tokens: OAuthTokensRepository = Depends(get_oauth_tokens_repository)):
     if current_user:
         app_config = await apps.get_by_id(app_info.app_id)
+        # Expire all old tokens from this app
+        # TODO
+        # Optionaly add time filter(1h for ex)
+        # await tokens.expire_all(app_info.app_id)
+
         access_token = create_oauth_access_token(
             current_user.id, app_info.app_id)  # generate token string
         token_object = OauthToken(token=access_token, app_id=app_info.app_id, to_user=current_user.id)
@@ -39,10 +44,7 @@ async def provide_access(app_info: ProvideAccessRequest, current_user: User = De
 async def get_user(token: str, tokens: OAuthTokensRepository = Depends(get_oauth_tokens_repository)):
     token_data = await tokens.get_by_token(token)
     if token_data:
-        await tokens.expire_token(token)  # Delete token after use
-        # TODO
-        # PREVENT GARBAGE FLOOD TOKENS
-        # FOR EXAMPLE DELETE OLD TOKENS (1h) before generate new
+        await tokens.expire_token(token)
         return {"status": True, "user_id": token_data.to_user}
     else:
         return {"status": False, "detail": "Please provide working token"}

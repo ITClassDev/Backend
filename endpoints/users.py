@@ -76,5 +76,4 @@ async def get_leaderboard(limit: int = 10, users: UserRepository = Depends(get_u
 async def get_my_apps(current_user: User = Depends(get_current_user), apps: AppsRepository = Depends(get_apps_repository)):
     if current_user:
         return await apps.get_for_user(current_user.id)
-
     return NON_AUTH_PACKET

@@ -30,7 +30,8 @@ async def getOAuthedUser(token: str, api: str="http://localhost:8080/oauth/get_u
 app = FastAPI() 
 
 # endpoint to login (redirect url)
-@app.get("/login_with_shtp")
+# in our case it is root endpoint
+@app.get("/")
 async def login_with_shtp(access_token: str): # get param -> access token
     print("[DEBUG] New login with token:", access_token)
     status = "FAIL"
