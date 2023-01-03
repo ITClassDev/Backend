@@ -45,3 +45,5 @@ class UserRepository(BaseRepository):
 
     async def create(self, user: UserIn):
         pass
+
+

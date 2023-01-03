@@ -26,8 +26,8 @@ async def provide_access(app_info: ProvideAccessRequest, current_user: User = De
         app_config = await apps.get_by_id(app_info.app_id)
         # Expire all old tokens from this app
         # TODO
-        # Optionaly add time filter(1h for ex)
-        # await tokens.expire_all(app_info.app_id)
+        # Optionaly add time filter(1h for example)
+        await tokens.expire_all(app_info.app_id)
 
         access_token = create_oauth_access_token(
             current_user.id, app_info.app_id)  # generate token string

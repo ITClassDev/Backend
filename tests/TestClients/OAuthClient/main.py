@@ -33,6 +33,7 @@ app = FastAPI()
 # in our case it is root endpoint
 @app.get("/")
 async def login_with_shtp(access_token: str): # get param -> access token
+    # For extra security you can check the domain/ip address of requester, to be sure, 
     print("[DEBUG] New login with token:", access_token)
     status = "FAIL"
     shtp_user_id = await getOAuthedUser(token=access_token)
