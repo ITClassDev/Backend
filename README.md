@@ -48,7 +48,7 @@ Tech-Stack
 2 - Super Admin - Have access to all features
 
 
-## Dev notes
+## Dev notes (remove later)
 // Notifications types
 // 0 - achievement moderated true
 Ваше достижение {name} прошло модерацию! Начислено {points} баллов 
