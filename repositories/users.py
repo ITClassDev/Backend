@@ -15,7 +15,7 @@ class UserRepository(BaseRepository):
         return User.parse_obj(user)
 
     async def get_all_users(self) -> List[User]:
-        query = select(users.c.id, users.c.firstName, users.c.lastName, users.c.userAvatarPath)
+        query = select(users.c.id, users.c.firstName, users.c.lastName, users.c.userAvatarPath).order_by(users.c.id.asc())
         return await self.database.fetch_all(query)
 
     async def get_user_by_email(self, email: str) -> User:

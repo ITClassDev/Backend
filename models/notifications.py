@@ -5,4 +5,5 @@ class Notification(BaseModel):
     id: Optional[int] = None
     to_user: int
     type: int
+    viewed: bool
     data: dict
