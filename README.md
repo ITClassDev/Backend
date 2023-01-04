@@ -51,6 +51,14 @@ Tech-Stack
 ## Dev notes
 // Notifications types
 // 0 - achievement moderated true
-achievemnt id
+Ваше достижение {name} прошло модерацию! Начислено {points} баллов 
+points; achievemnt name
 // 1 - achievement moderated rejected
+Ваше достижение {name} отклонено!
+name
 // 2 - new local(school) event added
+Добавлено новое школьное событие - {name}
+event name
+// 3 - new medal
+Вы получили новую {medal type} медаль!
+medal type

@@ -2,6 +2,7 @@ from repositories.users import UserRepository
 from repositories.achievements import AchievementRepository
 from repositories.apps import AppsRepository
 from repositories.oauth_tokens import OAuthTokensRepository
+from repositories.notifications import NotificationRepository
 from db.base import database
 from fastapi import Depends, HTTPException, status
 from core.security import JWTBearer, decode_access_token
@@ -19,6 +20,9 @@ def get_apps_repository() -> AppsRepository:
     
 def get_oauth_tokens_repository() -> OAuthTokensRepository:
     return OAuthTokensRepository(database)
+
+def get_notification_repository() -> NotificationRepository:
+    return NotificationRepository(database)
 
 async def get_current_user(
     users: UserRepository = Depends(get_user_repository),

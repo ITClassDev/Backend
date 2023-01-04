@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends, UploadFile
 from repositories.users import UserRepository
 from repositories.apps import  AppsRepository
+from repositories.notifications import NotificationRepository
 from models.user import User, UserIn, AboutText, UserUpdate
-from .depends import get_user_repository, get_current_user, get_apps_repository
+from .depends import get_user_repository, get_current_user, get_apps_repository, get_notification_repository
 from core.utils.variables import NON_AUTH_PACKET
 from core.utils.files import upload_file
 from core.config import USERS_STORAGE
@@ -77,3 +78,8 @@ async def get_my_apps(current_user: User = Depends(get_current_user), apps: Apps
     if current_user:
         return await apps.get_for_user(current_user.id)
     return NON_AUTH_PACKET
+
+@router.get("/my_notifications")
+async def get_my_notifications(current_user: User = Depends(get_current_user), notifications: NotificationRepository = Depends(get_notification_repository)):
+    data = await notifications.get_all_for_user(current_user.id)
+    return data
