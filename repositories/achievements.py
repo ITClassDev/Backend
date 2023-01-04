@@ -36,7 +36,8 @@ class AchievementRepository(BaseRepository):
         values.pop("id", None)
         values.pop("accepted_by", None)
         query = achievements.insert().values(**values)
-        return await self.database.execute(query)
+        achievement_final = await self.database.execute(query)
+        return achievement_final
     
     async def accept(self, achievement_id: int, accepted_by: int, points: int):
         # TODO

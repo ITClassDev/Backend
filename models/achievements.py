@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional
 import datetime
-
+import json
 
 class Achievement(BaseModel):
     id: Optional[int] = None
@@ -18,6 +18,16 @@ class AchievementIn(BaseModel):
     type: int
     title: str
     description: str
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate_to_json
+
+    @classmethod
+    def validate_to_json(cls, value):
+        if isinstance(value, str):
+            return cls(**json.loads(value))
+        return value
+
 
 class AchievementModerate(BaseModel):
     id: int

@@ -1,9 +1,14 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, UploadFile, Form, File
 from .depends import get_current_user, get_achievement_repository, get_user_repository
 from models.user import User
 from models.achievements import AchievementIn, AchievementModerate
 from repositories.achievements import AchievementRepository
 from repositories.users import UserRepository
+from core.utils.files import upload_file
+import os
+from core.config import USERS_STORAGE
+
+
 
 router = APIRouter()
 
@@ -15,10 +20,11 @@ async def get_my_achievements(current_user: User = Depends(get_current_user), ac
     return {"status": True, "achievements": res}
 
 @router.post("/add")
-async def add_achievement(achievement: AchievementIn, current_user: User = Depends(get_current_user), achievements: AchievementRepository = Depends(get_achievement_repository)):
-    if current_user:
-        res = await achievements.add(achievement, current_user.id)
-        return {"status": True}
+async def add_achievement(achievement: AchievementIn, file: UploadFile, current_user: User = Depends(get_current_user), achievements: AchievementRepository = Depends(get_achievement_repository)):
+    achievement_id = await achievements.add(achievement, current_user.id)
+    uploaded_image = await upload_file(file, ["png", "jpg", "pdf"], os.path.join(USERS_STORAGE, "achievements"),
+                                            custom_name=f"{achievement_id}_confirmation_file")
+    return {"status": True}
 
 @router.post("/moderate")
 async def accept_achievement(achievement_data: AchievementModerate, current_user: User = Depends(get_current_user), achievements: AchievementRepository = Depends(get_achievement_repository)):
@@ -35,10 +41,9 @@ async def accept_achievement(achievement_data: AchievementModerate, current_user
 
 @router.get("/my_queue")
 async def get_moderation_queue_for_one(current_user: User = Depends(get_current_user), achievements: AchievementRepository = Depends(get_achievement_repository)):
-    if current_user:
-        return await achievements.get_moderation_queue_for_one(current_user.id)
+    return await achievements.get_moderation_queue_for_one(current_user.id)
 
 @router.get("/queu")
-async def get_moderation_queue_for_one(current_user: User = Depends(get_current_user), achievements: AchievementRepository = Depends(get_achievement_repository)):
+async def get_moderation_queue_for_all(current_user: User = Depends(get_current_user), achievements: AchievementRepository = Depends(get_achievement_repository)):
     if current_user.userRole > 0: # for users with status: 1 2 = teachers and super admins
         return await achievements.get_moderation_queue_for_all()
