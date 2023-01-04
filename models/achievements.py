@@ -18,3 +18,8 @@ class AchievementIn(BaseModel):
     type: int
     title: str
     description: str
+
+class AchievementModerate(BaseModel):
+    id: int
+    status: int
+    points: Optional[int] = 0

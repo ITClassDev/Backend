@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from .depends import get_current_user, get_achievement_repository, get_user_repository
 from models.user import User
-from models.achievements import AchievementIn
+from models.achievements import AchievementIn, AchievementModerate
 from repositories.achievements import AchievementRepository
 from repositories.users import UserRepository
 
@@ -20,9 +20,18 @@ async def add_achievement(achievement: AchievementIn, current_user: User = Depen
         res = await achievements.add(achievement, current_user.id)
         return {"status": True}
 
-@router.get("/accept/{achievement_id}")
-async def accepr_achievement(achievement_id: int, current_user: User = Depends(get_current_user)):
-    pass
+@router.post("/moderate")
+async def accept_achievement(achievement_data: AchievementModerate, current_user: User = Depends(get_current_user), achievements: AchievementRepository = Depends(get_achievement_repository)):
+    # Statuses
+    # 0 - reject
+    # 1 - accept
+    if current_user.userRole > 0:
+        if achievement_data.status:
+            await achievements.accept(achievement_data.id, current_user.id, achievement_data.points)
+        else:
+            await achievements.delete(achievement_data.id)
+    return {"status": True}
+        
 
 @router.get("/my_queue")
 async def get_moderation_queue_for_one(current_user: User = Depends(get_current_user), achievements: AchievementRepository = Depends(get_achievement_repository)):

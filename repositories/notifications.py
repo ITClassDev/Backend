@@ -12,3 +12,6 @@ class NotificationRepository(BaseRepository):
     async def check_active_notifications(self, user_id: int) -> bool:
         query = notifications.select().where(notifications.c.to_user == user_id, notifications.c.viewed == False)
         return len(await self.database.fetch_all(query)) > 0
+
+    async def send_notification(self, user_id, notification_id, data):
+        pass
