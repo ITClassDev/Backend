@@ -9,6 +9,7 @@ class Achievement(BaseModel):
     accepted_by: Optional[int] = None
     type: int
     title: str
+    attachment_file_name: str
     description: str
     points: int
     received_at: datetime.datetime
@@ -18,6 +19,7 @@ class AchievementIn(BaseModel):
     type: int
     title: str
     description: str
+    # Patch for file upload and pydantic in one endpoint
     @classmethod
     def __get_validators__(cls):
         yield cls.validate_to_json

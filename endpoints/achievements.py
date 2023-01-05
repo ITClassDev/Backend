@@ -21,9 +21,9 @@ async def get_my_achievements(current_user: User = Depends(get_current_user), ac
 
 @router.post("/add")
 async def add_achievement(achievement: AchievementIn, file: UploadFile, current_user: User = Depends(get_current_user), achievements: AchievementRepository = Depends(get_achievement_repository)):
-    achievement_id = await achievements.add(achievement, current_user.id)
-    uploaded_image = await upload_file(file, ["png", "jpg", "pdf"], os.path.join(USERS_STORAGE, "achievements"),
-                                            custom_name=f"{achievement_id}_confirmation_file")
+    uploaded_image = await upload_file(file, ["png", "jpg", "pdf"], os.path.join(USERS_STORAGE, "achievements"))
+    achievement_id = await achievements.add(achievement, current_user.id, uploaded_image)
+    
     return {"status": True}
 
 @router.post("/moderate")

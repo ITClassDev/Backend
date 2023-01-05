@@ -23,14 +23,15 @@ class AchievementRepository(BaseRepository):
         return data
 
 
-    async def add(self, achievement: AchievementIn, to_user_id: int) -> Achievement:
+    async def add(self, achievement: AchievementIn, to_user_id: int, uploaded_image: dict) -> Achievement:
         achievement_final = Achievement(
             to_user=to_user_id,
             type=achievement.type,
             title=achievement.title,
             description=achievement.description,
             points=0,
-            received_at=datetime.datetime.now()
+            received_at=datetime.datetime.now(),
+            attachment_file_name=uploaded_image["file_name"]
         )
         values = {**achievement_final.dict()}
         values.pop("id", None)
@@ -41,7 +42,7 @@ class AchievementRepository(BaseRepository):
     
     async def accept(self, achievement_id: int, accepted_by: int, points: int):
         # TODO
-        # Check if achievement already accepted by another moder
+        # Check if achievement already accepted by another moderator
         query = achievements.select().where(achievements.c.id == achievement_id)
         to_user_id = await self.database.fetch_one(query)
         to_user_id = to_user_id.to_user

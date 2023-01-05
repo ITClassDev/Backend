@@ -9,6 +9,7 @@ achievements = sqlalchemy.Table(
     sqlalchemy.Column("accepted_by", sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id')),
     sqlalchemy.Column("type", sqlalchemy.Integer),
     sqlalchemy.Column("title", sqlalchemy.String),
+    sqlalchemy.Column("attachment_file_name", sqlalchemy.String),
     sqlalchemy.Column("description", sqlalchemy.String),
     sqlalchemy.Column("points", sqlalchemy.Integer),
     sqlalchemy.Column("received_at", sqlalchemy.DateTime)
