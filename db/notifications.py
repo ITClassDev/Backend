@@ -8,5 +8,5 @@ notifications = sqlalchemy.Table(
     sqlalchemy.Column("to_user", sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'), nullable=False),
     sqlalchemy.Column("type", sqlalchemy.Integer),
     sqlalchemy.Column("viewed", sqlalchemy.Boolean, default=False),
-    sqlalchemy.Column("data", sqlalchemy.JSON),
+    sqlalchemy.Column("data", sqlalchemy.PickleType),
 )

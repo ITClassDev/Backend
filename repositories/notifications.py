@@ -2,6 +2,8 @@ from db.notifications import notifications
 from .base import BaseRepository
 from models.notifications import Notification
 from typing import List
+import json
+from sqlalchemy import insert
 
 
 class NotificationRepository(BaseRepository):
@@ -13,5 +15,9 @@ class NotificationRepository(BaseRepository):
         query = notifications.select().where(notifications.c.to_user == user_id, notifications.c.viewed == False)
         return len(await self.database.fetch_all(query)) > 0
 
-    async def send_notification(self, user_id, notification_id, data):
-        pass
+    async def send_notification(self, user_id, notification_type, data):
+        notification = Notification(to_user=user_id, type=notification_type, viewed=False, data=data)
+        values = {**notification.dict()}
+        values.pop("id", None)
+        query = notifications.insert().values(**values)
+        return await self.database.execute(query)
