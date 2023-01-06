@@ -3,8 +3,10 @@
 ## Table of contents
 1. [ General ](#general) 
 2. [ Handling requests ](#req_handling) 
-3. [ Deployment ](#deployment) 
-4. [ Testing all API ](#tests)
+3. [ Tasks organization ](#tasks_organization) 
+4. [ OAuth scheme ](#oauth_scheme)
+5. [ Deployment ](#deployment) 
+6. [ Testing all API ](#tests)
 
 
 <a name="general"></a>
@@ -35,6 +37,20 @@ Tech-Stack
 <img src="https://raw.githubusercontent.com/ITClassDev/Backend/master/docs/images/req_flow.png">
 </p>
 
+<a name="tasks_organization"></a>
+## Tasks_organization (backend level)
+<p>Look at image</p>
+<p>
+<img src="https://raw.githubusercontent.com/ITClassDev/Backend/master/docs/images/tasks_organization.png">
+</p>
+
+<a name="oauth_scheme"></a>
+## OAuth scheme
+<p>I know, this is not a classic OAuth. It is low privileged shit, but it works and it is secure by design! So, shut up and use it!</p>
+<p>
+<img src="https://raw.githubusercontent.com/ITClassDev/Backend/master/docs/images/oauth.png">
+</p>
+
 <a name="tests"></a>
 ## Why self-written tests?!?!?!
 <p>Why did we invent the wheel and write a system for api test from scratch?<p>
@@ -44,7 +60,7 @@ Tech-Stack
 ## Extra
 ### User roles:
 0 - Base student
-1 - Teacher
+1 - Teacher - Now have access to all features, but we will fix it later
 2 - Super Admin - Have access to all features
 
 
