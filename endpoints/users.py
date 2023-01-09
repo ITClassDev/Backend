@@ -22,7 +22,7 @@ async def get_user_info(user_id: int, users: UserRepository = Depends(get_user_r
                        "email": data.email, "rating": data.rating, "userRole": data.userRole,
                        "userTelegram": data.userTelegram, "userGithub": data.userGithub, "userStepik": data.userStepik,
                        "userKaggle": data.userKaggle, "userAvatarPath": data.userAvatarPath,
-                       "userAboutText": data.userAboutText, "learningClass": data.learningClass}
+                       "userAboutText": data.userAboutText, "learningClass": data.learningClass, "techStack": data.techStack}
     return return_data
 
 
@@ -66,6 +66,8 @@ async def update_avatar(about_text: AboutText, current_user: User = Depends(get_
         await users.update_about_text(current_user.id, about_text.about_text)
         return {"status": True, "new_about": about_text.about_text}
     return NON_AUTH_PACKET
+
+#@router.post("/update_info")
 
 
 @router.get("/get_leaderboard")

@@ -24,5 +24,6 @@ users = sqlalchemy.Table(
     sqlalchemy.Column("userAboutText", sqlalchemy.String),
     sqlalchemy.Column("userAvatarPath", sqlalchemy.String,
                       default="default.png"),
-    sqlalchemy.Column("systemAchievements", ARRAY(sqlalchemy.Integer))
+    sqlalchemy.Column("systemAchievements", ARRAY(sqlalchemy.Integer)),
+    sqlalchemy.Column("techStack", sqlalchemy.String)
 )

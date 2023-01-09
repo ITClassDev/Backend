@@ -19,6 +19,7 @@ class User(BaseModel):
     userAboutText: str
     userAvatarPath: str
     systemAchievements: Optional[List]
+    techStack: Optional[str]
 
 
 class UserIn(BaseModel):

@@ -1,4 +1,6 @@
 # Test OAuth app using FastAPI
+# This is simple 'raw' example
+# But you can check our PyAPI wrapper for SHTP API
 
 from fastapi import FastAPI
 import uvicorn
@@ -33,7 +35,7 @@ app = FastAPI()
 # in our case it is root endpoint
 @app.get("/")
 async def login_with_shtp(access_token: str): # get param -> access token
-    # For extra security you can check the domain/ip address of requester, to be sure, 
+    # For extra security you can check the domain/ip address of requester, to be sure
     print("[DEBUG] New login with token:", access_token)
     status = "FAIL"
     shtp_user_id = await getOAuthedUser(token=access_token)
