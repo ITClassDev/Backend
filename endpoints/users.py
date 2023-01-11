@@ -36,7 +36,7 @@ async def create_user(new_user: UserIn, current_user: User = Depends(get_current
         return NON_AUTH_PACKET
 
 
-@router.post("/upload_avatar")
+@router.patch("/upload_avatar")
 async def upload_file_test(current_user: User = Depends(get_current_user), file: UploadFile = None,
                            users: UserRepository = Depends(get_user_repository)):
     if current_user:
@@ -51,7 +51,7 @@ async def upload_file_test(current_user: User = Depends(get_current_user), file:
     return NON_AUTH_PACKET
 
 
-@router.post("/{user_id}/update_profile")
+@router.patch("/{user_id}/update_profile")
 async def update_user_info(update_data: UserUpdate, current_user: User = Depends(get_current_user), users: UserRepository = Depends(get_user_repository)):
     if current_user:
         await users.update(current_user.id, update_data)
@@ -60,7 +60,7 @@ async def update_user_info(update_data: UserUpdate, current_user: User = Depends
     return NON_AUTH_PACKET
 
 
-@router.post("/update_about_text")
+@router.patch("/update_about_text")
 async def update_avatar(about_text: AboutText, current_user: User = Depends(get_current_user),
                         users: UserRepository = Depends(get_user_repository)):
     if current_user:

@@ -20,7 +20,7 @@ async def get_all_users(current_user: User = Depends(get_current_user),
         return LOW_PRIVILEGES_MESSAGE
 
 
-@router.post("/update_user/{user_id}")
+@router.patch("/update_user/{user_id}")
 async def update_user(user_id: int, user_data: UserUpdate, current_user: User = Depends(get_current_user), users: UserRepository = Depends(get_user_repository)):
     if current_user.userRole > 0:  # 1 || 2
         await users.update(user_id, user_data)
