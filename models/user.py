@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, validator
 from typing import Optional, List
 
 
@@ -9,28 +9,33 @@ class User(BaseModel):
     firstName: str
     lastName: str
     middleName: Optional[str]
-    rating: int
+    rating: Optional[int]
     userRole: int
     learningClass: int
     userTelegram: Optional[str]
     userGithub: Optional[str]
     userStepik: Optional[str]
     userKaggle: Optional[str]
-    userAboutText: str
-    userAvatarPath: str
+    userAboutText: Optional[str]
+    userAvatarPath: Optional[str]
     systemAchievements: Optional[List]
-    techStack: Optional[str]
+    techStack: Optional[str] = None
     groupId: int
+
+    # @validator('techStack')
+    # def set_name(cls, name):
+    #     return name or ""
+
 
 
 class UserIn(BaseModel):
     email: EmailStr
-    hashedPassword: str
     firstName: str
     lastName: str
-    rating: int
     userRole: int
+    password: str
     learningClass: int
+    groupId: int
 
 
 class UserUpdate(BaseModel):

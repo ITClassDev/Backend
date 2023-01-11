@@ -4,6 +4,8 @@ from .base import BaseRepository
 from models.user import User, UserIn, UserUpdate
 from typing import List
 from sqlalchemy import select
+from core.security import hash_password
+
 
 
 class UserRepository(BaseRepository):
@@ -45,6 +47,11 @@ class UserRepository(BaseRepository):
         return await self.database.fetch_all(query)
 
     async def create(self, user: UserIn):
-        pass
+        userObj = User(email=user.email, firstName=user.firstName, lastName=user.lastName, userRole=user.userRole, hashedPassword=hash_password(user.password), learningClass=user.learningClass, groupId=user.groupId, rating=0, userAvatarPath="default.png")
+        values = {**userObj.dict()}
+        values.pop("id", None)
+        query = users.insert().values(**values)
+        user_id = await self.database.execute(query)
+        return user_id
 
 

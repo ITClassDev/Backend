@@ -13,7 +13,7 @@ users = sqlalchemy.Table(
     sqlalchemy.Column("firstName", sqlalchemy.String),
     sqlalchemy.Column("lastName", sqlalchemy.String),
     sqlalchemy.Column("middleName", sqlalchemy.String),
-    sqlalchemy.Column("rating", sqlalchemy.Integer),
+    sqlalchemy.Column("rating", sqlalchemy.Integer, default=0),
     sqlalchemy.Column("userRole", sqlalchemy.Integer,
                       default=0),  # Default non admin user
     sqlalchemy.Column("learningClass", sqlalchemy.Integer),

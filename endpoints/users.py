@@ -26,11 +26,12 @@ async def get_user_info(user_id: int, users: UserRepository = Depends(get_user_r
     return return_data
 
 
-@router.post("/create_user")
+@router.put("/create_user")
 async def create_user(new_user: UserIn, current_user: User = Depends(get_current_user),
                       users: UserRepository = Depends(get_user_repository)):
-    if current_user.userRole == 1:  # Is admin
-        return await users.create(u=new_user)
+    if current_user.userRole > 0:  # Is admin
+        created_user_id = await users.create(new_user)
+        return {"user_id": created_user_id}
     else:
         return NON_AUTH_PACKET
 
