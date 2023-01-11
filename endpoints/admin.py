@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends
 from repositories.users import UserRepository
 from repositories.achievements import AchievementRepository
+from repositories.user_groups import UserGroupsRepository
 from models.user import User, UserUpdate
-from .depends import get_user_repository, get_current_user, get_achievement_repository
+from .depends import get_user_repository, get_current_user, get_achievement_repository, get_user_groups_repository
 
 router = APIRouter()
 
@@ -10,10 +11,11 @@ LOW_PRIVILEGES_MESSAGE = {"status": False, "detail": "Rejected; Not enough privi
 
 @router.get("/all_users")
 async def get_all_users(current_user: User = Depends(get_current_user),
-                        users: UserRepository = Depends(get_user_repository)):
+                        users: UserRepository = Depends(get_user_repository), user_groups: UserGroupsRepository = Depends(get_user_groups_repository)):
     if current_user.userRole > 0:  # 1 || 2
         all_users = await users.get_all_users()
-        return all_users
+        all_user_groups = await user_groups.get_all()
+        return {"users": all_users, "user_groups": all_user_groups}
     else:
         return LOW_PRIVILEGES_MESSAGE
 

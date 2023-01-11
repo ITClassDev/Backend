@@ -20,6 +20,7 @@ class User(BaseModel):
     userAvatarPath: str
     systemAchievements: Optional[List]
     techStack: Optional[str]
+    groupId: int
 
 
 class UserIn(BaseModel):

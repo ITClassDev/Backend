@@ -1,5 +1,6 @@
 from repositories.users import UserRepository
 from repositories.achievements import AchievementRepository
+from repositories.user_groups import UserGroupsRepository
 from repositories.apps import AppsRepository
 from repositories.oauth_tokens import OAuthTokensRepository
 from repositories.notifications import NotificationRepository
@@ -23,6 +24,9 @@ def get_oauth_tokens_repository() -> OAuthTokensRepository:
 
 def get_notification_repository() -> NotificationRepository:
     return NotificationRepository(database)
+
+def get_user_groups_repository() -> UserGroupsRepository:
+    return UserGroupsRepository(database)
 
 async def get_current_user(
     users: UserRepository = Depends(get_user_repository),

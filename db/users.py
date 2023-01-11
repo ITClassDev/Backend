@@ -25,5 +25,6 @@ users = sqlalchemy.Table(
     sqlalchemy.Column("userAvatarPath", sqlalchemy.String,
                       default="default.png"),
     sqlalchemy.Column("systemAchievements", ARRAY(sqlalchemy.Integer)),
-    sqlalchemy.Column("techStack", sqlalchemy.String)
+    sqlalchemy.Column("techStack", sqlalchemy.String),
+    sqlalchemy.Column("groupId", sqlalchemy.Integer, sqlalchemy.ForeignKey('user_groups.id'))
 )

@@ -1,4 +1,5 @@
 from db.users import users
+from db.user_groups import user_groups
 from .base import BaseRepository
 from models.user import User, UserIn, UserUpdate
 from typing import List
@@ -15,7 +16,7 @@ class UserRepository(BaseRepository):
         return User.parse_obj(user)
 
     async def get_all_users(self) -> List[User]:
-        query = select(users.c.id, users.c.firstName, users.c.lastName, users.c.userAvatarPath).order_by(users.c.id.asc())
+        query = select(users.c.id, users.c.firstName, users.c.lastName, users.c.userAvatarPath, users.c.groupId, user_groups.c.name.label("groupName")).where(user_groups.c.id == users.c.groupId).order_by(users.c.id.asc())
         return await self.database.fetch_all(query)
 
     async def get_user_by_email(self, email: str) -> User:
