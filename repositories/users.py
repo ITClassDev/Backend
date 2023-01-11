@@ -1,7 +1,7 @@
 from db.users import users
 from db.user_groups import user_groups
 from .base import BaseRepository
-from models.user import User, UserIn, UserUpdate
+from models.user import User, UserIn, UserUpdate, SocialLinksIn
 from typing import List
 from sqlalchemy import select
 from core.security import hash_password
@@ -35,6 +35,17 @@ class UserRepository(BaseRepository):
     async def update_avatar(self, id: int, avatar: str) -> User:
         query = users.update().where(users.c.id == id).values(
             {"userAvatarPath": avatar})
+        await self.database.execute(query)
+    
+    async def update_social_links(self, social_links: SocialLinksIn, user_id: int) -> None:
+        data = {
+            "userGithub": social_links.github,
+            "userTelegram": social_links.telegram,
+            "userStepik": social_links.stepik,
+            "userKaggle": social_links.kaggle,
+            "userWebsite": social_links.website
+        }
+        query = users.update().where(users.c.id == user_id).values(**data)
         await self.database.execute(query)
 
     async def update_about_text(self, id: int, new_about_text: str) -> None:

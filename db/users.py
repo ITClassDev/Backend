@@ -21,6 +21,7 @@ users = sqlalchemy.Table(
     sqlalchemy.Column("userGithub", sqlalchemy.String),
     sqlalchemy.Column("userStepik", sqlalchemy.String),
     sqlalchemy.Column("userKaggle", sqlalchemy.String),
+    sqlalchemy.Column("userWebsite", sqlalchemy.String),
     sqlalchemy.Column("userAboutText", sqlalchemy.String),
     sqlalchemy.Column("userAvatarPath", sqlalchemy.String,
                       default="default.png"),

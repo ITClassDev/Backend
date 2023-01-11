@@ -16,6 +16,7 @@ class User(BaseModel):
     userGithub: Optional[str]
     userStepik: Optional[str]
     userKaggle: Optional[str]
+    userWebsite: Optional[str]
     userAboutText: Optional[str]
     userAvatarPath: Optional[str]
     systemAchievements: Optional[List]
@@ -48,6 +49,13 @@ class UserUpdate(BaseModel):
     userAboutText: str
 
 
-
 class AboutText(BaseModel):
     about_text: str
+
+
+class SocialLinksIn(BaseModel):
+    github: Optional[str]
+    telegram: Optional[str]
+    stepik: Optional[str]
+    kaggle: Optional[str]
+    website: Optional[str]
