@@ -2,7 +2,7 @@ from fastapi import FastAPI
 import uvicorn
 from core.config import SERVER_HOST, SERVER_PORT
 from db.base import database
-from endpoints import users, auth, achievements, oauth, admin, notifications
+from endpoints import users, auth, achievements, oauth, admin, notifications, programming_tasks
 from endpoints.mobile import (
     users as users_mobile,
     auth as auth_mobile
@@ -32,6 +32,7 @@ app.include_router(auth.router, prefix="/auth", tags=["auth"])
 app.include_router(achievements.router, prefix="/achievements", tags=["achievements"])
 app.include_router(oauth.router, prefix="/oauth", tags=["oauth"])
 app.include_router(admin.router, prefix="/admin", tags=["admin"])
+app.include_router(programming_tasks.router, prefix="/programming_tasks", tags=["programming_checker"])
 #app.include_router(notifications.router, prefix="/notifications", tags=["notifications"])
 
 # Mobile Protocol buffer API

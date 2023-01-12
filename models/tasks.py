@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 import datetime
 
 class Task(BaseModel):
@@ -10,7 +10,7 @@ class Task(BaseModel):
     time_limit: int
     memory_limit: int
     is_day_challenge: bool
-    tests: dict
+    tests: List[dict]
 
 class TaskIn(BaseModel):
     title: str
@@ -18,4 +18,4 @@ class TaskIn(BaseModel):
     time_limit: int
     memory_limit: int
     is_day_challenge: bool
-    tests: dict
+    tests: List[dict]
