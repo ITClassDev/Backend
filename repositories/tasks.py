@@ -15,4 +15,7 @@ class TasksRepository(BaseRepository):
         query = tasks.insert().values(**values)
         task_id = await self.database.execute(query)
         return task_id
-
+    
+    async def get_day_challenge(self) -> dict:
+        query = tasks.select().where(tasks.c.is_day_challenge == True)
+        return await self.database.fetch_one(query)
