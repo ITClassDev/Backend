@@ -115,10 +115,14 @@ Now we have to import database struct to our database. We use alembic, so we can
 ```
 alembic upgrade head
 ```
+If it fails, you can delete migrations directory - `./alembic/versions` </br>
+And then, rerun upgrade command. It will succeed in 100%. </br>
 After all done, try to run backend, via
 ```
 python3 main.py
 ```
+Than, if you want to add superadmin user, you have to add it manualy in database manager(like `Dbeaver`). It will be `users` table. </br>
+`useRole` - `2` </br>
 It will run! With default config, it will be `localhost:8080`
 <a name="tests"></a>
 ## Why self-written tests?!?!?!
