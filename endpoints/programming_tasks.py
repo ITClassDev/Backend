@@ -22,3 +22,7 @@ async def get_task_info(task_data: TaskIn, tasks: TasksRepository = Depends(get_
 @router.get("/day_challenge/current")
 async def get_day_challenge(tasks: TasksRepository = Depends(get_tasks_repository)):
     return await tasks.get_day_challenge()
+
+@router.post("/day_challenge/submit")
+async def get_day_challenge(tasks: TasksRepository = Depends(get_tasks_repository), current_user: User = Depends(get_current_user)):
+    pass

@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 
 class Submit(BaseModel):
     id: Optional[int] = None
@@ -10,14 +10,14 @@ class Submit(BaseModel):
     refer_to: Optional[int] = None
     git_commit_id: Optional[str] = None
     solved: bool
-    tests_results: dict
+    tests_results: Optional[List[dict]] = None
 
     
-class SubmitIn(BaseModel):
-    status: int
-    task_id: int
-    source: str
-    refer_to: Optional[int] = None
-    git_commit_id: Optional[str] = None
-    solved: bool
-    tests_results: dict
+# class SubmitIn(BaseModel):
+#     status: int
+#     task_id: int
+#     source: str
+#     refer_to: Optional[int] = None
+#     git_commit_id: Optional[str] = None
+#     solved: bool
+#     tests_results: dict
