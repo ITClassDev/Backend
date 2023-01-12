@@ -2,11 +2,12 @@ from fastapi import APIRouter, Depends, UploadFile
 from repositories.users import UserRepository
 from repositories.apps import  AppsRepository
 from repositories.notifications import NotificationRepository
-from models.user import User, UserIn, AboutText, UserUpdate, SocialLinksIn
+from models.user import User, UserIn, AboutText, UserUpdate, SocialLinksIn, UpdatePassword
 from .depends import get_user_repository, get_current_user, get_apps_repository, get_notification_repository
 from core.utils.variables import NON_AUTH_PACKET
 from core.utils.files import upload_file
 from core.config import USERS_STORAGE
+from core.security import verify_password
 import os
 
 router = APIRouter()
@@ -68,6 +69,16 @@ async def update_social(social_links: SocialLinksIn, current_user: User = Depend
     await users.update_social_links(social_links, current_user.id)
     return {"status": "True"}
 
+@router.patch("/update/password")
+async def update_password(update_password: UpdatePassword, current_user: User = Depends(get_current_user), users: UserRepository = Depends(get_user_repository)):
+    if verify_password(update_password.current_password, current_user.hashedPassword):
+        if update_password.new_password == update_password.confirm_password:
+            return {"status": True}
+        else:
+            return {"status": False, "details": "Confirmation password doesn't match"}
+        
+    else:
+        return {"status": Falses, "details": "Invalid current password"}
 
 @router.get("/get_leaderboard")
 async def get_leaderboard(limit: int = 10, users: UserRepository = Depends(get_user_repository)):

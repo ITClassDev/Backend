@@ -18,8 +18,7 @@ async def get_task_info(task_data: TaskIn, tasks: TasksRepository = Depends(get_
         task_id = await tasks.add(task_data, current_user.id)
         return {"task_id": task_id}
 
-### Day Challenge
-
+### Day Challenge ###
 @router.get("/day_challenge/current")
 async def get_day_challenge(tasks: TasksRepository = Depends(get_tasks_repository)):
     return await tasks.get_day_challenge()

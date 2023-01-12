@@ -59,3 +59,9 @@ class SocialLinksIn(BaseModel):
     stepik: Optional[str]
     kaggle: Optional[str]
     website: Optional[str]
+
+class UpdatePassword(BaseModel):
+    current_password: str
+    new_password: str
+    confirm_password: str
+    

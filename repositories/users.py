@@ -65,4 +65,6 @@ class UserRepository(BaseRepository):
         user_id = await self.database.execute(query)
         return user_id
 
+    async def update_password(new_password):
+        pass
 

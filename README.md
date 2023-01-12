@@ -51,6 +51,75 @@ Tech-Stack
 <img src="https://raw.githubusercontent.com/ITClassDev/Backend/master/docs/images/oauth.png">
 </p>
 
+<a name="deployment"></a>
+## Deployment
+<p>First of all, I want to say, that backend tested only on Linux system, and I think it will be difficult to run it on Windows (for example docker-compose with postgresql).</p>
+<p>We will build full docker-compose with all backend, to run it with one command, but it will be later, so for now, we support only native deployment.</p>
+
+### Steps
+Install docker and docker-compose in your system. Arch example.
+```
+sudo pacman -S docker docker-compose  # install
+sudo systemctl start docker.service   # run service
+```
+In root directory of Backend, execute command to run docker compose with postgresql. First run will download extra dependencies. You can change postgres version, database name, database auth data in `docker-compose.dev.yaml`.
+```
+sudo docker-compose -f docker-compose.dev.yaml up
+```
+You can send it in background, or open another shell. But don't stop it. </br>
+Then, we need to get this docker instance ip. </br>
+The easiest method, to do it is: </br>
+Get Container ID of our docker instance(CID):
+```
+docker ps
+```
+And then, execute this command (replacing CID with your container id):
+```
+docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' CID
+```
+After that you will get ip of your postgresql, it is local ip and works only on your pc. </br>
+Than in `.env` file(in root of Backend project) you can change postgresql access data: </br>
+```
+ITC_DATABASE_URL = postgresql://{USERNAME}:{PASSWORD}@{CONTAINER IP}:{PORT}/{DB_NAME}
+```
+```
+# params
+USERNAME = default is root
+PASSWORD = default is root
+CONTAINER IP - your container id, from previous step
+PORT = default is 5432
+DB_NAME = default itc_system
+```
+So, another variables, that you can change in `.env` file:
+```
+ITC_SERV_PORT = http port of your backend
+ITC_SERV_HOST = http host, listen from - 0.0.0.0 - to listen all hosts
+ITC_SECRET_KEY = CHANGE ON PRODACTION, this is sault for jwt hashes
+ITC_ACCESS_TOKEN_EXPIRE_MINUTES = jwt tokens life time in minutes, 1440 minutes = 24 hours
+ITC_USERS_STORAGE = PATH to file storage directory; user uploads here
+ITC_API_VER = version of your project
+```
+Now, we have to jump into virtual enviroment. In this project we use pipenv. Install it, if you don't have it yet. (Arch example)
+'''
+sudo pacman -S python-pipenv # or via pip - pip install pipenv
+'''
+Than, activate shell, via (do it in root directory of backend):
+```
+pipenv shell
+```
+Install all dependencies (one off methods)
+```
+pipenv install Pipfile
+```
+Now we have to import database struct to our database. We use alembic, so we can try, to use migrations
+```
+alembic upgrade head
+```
+After all done, try to run backend, via
+```
+python3 main.py
+```
+It will run! With default config, it will be `localhost:8080`
 <a name="tests"></a>
 ## Why self-written tests?!?!?!
 <p>Why did we invent the wheel and write a system for api test from scratch?<p>
