@@ -73,12 +73,12 @@ async def update_social(social_links: SocialLinksIn, current_user: User = Depend
 async def update_password(update_password: UpdatePassword, current_user: User = Depends(get_current_user), users: UserRepository = Depends(get_user_repository)):
     if verify_password(update_password.current_password, current_user.hashedPassword):
         if update_password.new_password == update_password.confirm_password:
+            await users.update_password(current_user.id, update_password.new_password)
             return {"status": True}
         else:
             return {"status": False, "details": "Confirmation password doesn't match"}
-        
     else:
-        return {"status": Falses, "details": "Invalid current password"}
+        return {"status": False, "details": "Invalid current password"}
 
 @router.get("/get_leaderboard")
 async def get_leaderboard(limit: int = 10, users: UserRepository = Depends(get_user_repository)):

@@ -57,7 +57,7 @@ class UserRepository(BaseRepository):
                        users.c.rating).order_by(users.c.rating.desc()).limit(count)
         return await self.database.fetch_all(query)
 
-    async def create(self, user: UserIn):
+    async def create(self, user: UserIn) -> int:
         userObj = User(email=user.email, firstName=user.firstName, lastName=user.lastName, userRole=user.userRole, hashedPassword=hash_password(user.password), learningClass=user.learningClass, groupId=user.groupId, rating=0, userAvatarPath="default.png")
         values = {**userObj.dict()}
         values.pop("id", None)
@@ -65,6 +65,7 @@ class UserRepository(BaseRepository):
         user_id = await self.database.execute(query)
         return user_id
 
-    async def update_password(new_password):
-        pass
+    async def update_password(self, user_id: int, new_password: str) -> None:
+        query = users.update().where(users.c.id == user_id).values(hashedPassword=hash_password(new_password))
+        return await self.database.execute(query)
 
