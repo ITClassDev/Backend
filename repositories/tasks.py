@@ -11,6 +11,9 @@ class TasksRepository(BaseRepository):
         return await self.database.fetch_one(query)
 
     async def add(self, task_data: TaskIn, author_id: int) -> int:
+        if task_data.is_day_challenge:
+            query = tasks.update().values(is_day_challenge=False)
+            await self.database.execute(query)
         task_obj = Task(**dict(task_data), author_id=author_id)
         values = {**task_obj.dict()}
         values.pop("id", None)
@@ -23,8 +26,10 @@ class TasksRepository(BaseRepository):
         return await self.database.fetch_one(query)
 
     async def submit_day_challenge(self, user_id: int, source_path: str) -> Submit:
-        task_id = self.get_day_challenge()
-        submit = Submit(user_id=user_id, status=0, task_id=task_id, source=f"file:{source_path}", refer_to=None, git_commit_id=None, solved=False, tests_results=[])
+        task_id = await self.get_day_challenge()
+        submit = Submit(user_id=user_id, status=0, task_id=task_id.id, source=f"file:{source_path}", refer_to=None, git_commit_id=None, solved=False, tests_results=[])
         values = {**submit.dict()}
+        values.pop("id", None)
         query = submits.insert().values(**values)
-        return await self.database.execute(query)
+        submit_id = await self.database.execute(query)
+        return submit_id
