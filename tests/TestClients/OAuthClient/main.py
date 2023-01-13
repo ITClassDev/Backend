@@ -12,7 +12,7 @@ from fastapi.responses import HTMLResponse
 # Fake database as json to store shtp_id and real user id
 # Real user id's are differ from shtp to demonstrate OAuth scheme
 FAKE_DB_USERS = [
-    {"id": 123, "name": "Stephan Zhdanov", "shtp_id": 1},
+    {"id": 123, "name": "Stephan Zhdanov", "shtp_id": 6},
     {"id": 232, "name": "Test user", "shtp_id": 2}
 ]
 
@@ -40,7 +40,7 @@ async def login_with_shtp(access_token: str): # get param -> access token
     # For extra security you can check the domain/ip address of requester, to be sure
     print("[DEBUG] New login with token:", access_token)
     status = "FAIL"
-    shtp_user_id = await getOAuthedUser(token=access_token)
+    shtp_user_id = await getOAuthedUser(token=access_token, api="http://10.12.0.84:8080/oauth/get_user")
     real_user_id = "FAIL"
     user_real_name= "FAIL"
     if shtp_user_id != -1:
@@ -75,4 +75,4 @@ async def login_with_shtp(access_token: str): # get param -> access token
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", port=3456, host="localhost", reload=True) # run async web server
+    uvicorn.run("main:app", port=3456, host="0.0.0.0", reload=True) # run async web server
