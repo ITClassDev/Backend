@@ -28,12 +28,10 @@ class Checker:
         language = {"py": 0, "cpp": 1}[source_file_name.split(".")[-1]]
         if language == 0: # python
             files = [{'name': 'main.py', 'content': test_code}]
-            
             tests_statuses = []
             tests_passed = 0
             for test in tests:
                 result = epicbox.run('python', 'python3 main.py', files=files, limits=limits, stdin=test["input"])
-                print(result)
                 test_status = result["stdout"].decode("utf-8").strip() == test["output"]
                 tests_passed += test_status
                 tests_statuses.append({"status": test_status, "error_info": result["stderr"], "duration": result["duration"], "timeout": result["timeout"], "memoryout": result["oom_killed"]})

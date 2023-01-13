@@ -28,6 +28,10 @@ class TasksRepository(BaseRepository):
         query = tasks.insert().values(**values)
         task_id = await self.database.execute(query)
         return task_id
+
+    async def get_all(self, limit: int = 20) -> List[Task]:
+        query = select(tasks.c.id, tasks.c.author_id, tasks.c.title, tasks.c.text, tasks.c.time_limit, tasks.c.memory_limit, tasks.c.is_day_challenge).limit(limit).order_by(tasks.c.id.desc())
+        return await self.database.fetch_all(query)
     
     async def get_day_challenge(self) -> dict:
         query = tasks.select().where(tasks.c.is_day_challenge == True)

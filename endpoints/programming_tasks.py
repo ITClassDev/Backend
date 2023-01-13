@@ -25,6 +25,14 @@ async def get_task_info(task_data: TaskIn, tasks: TasksRepository = Depends(get_
         task_id = await tasks.add(task_data, current_user.id)
         return {"task_id": task_id}
 
+@router.get("/tasks/all") # All tasks
+async def get_all_tasks(tasks: TasksRepository = Depends(get_tasks_repository), current_user: User = Depends(get_current_user)):
+    if current_user.userRole > 0:
+        return await tasks.get_all()
+    else:
+        return {"status": False}
+
+
 ### Day Challenge ###
 @router.get("/day_challenge/current")
 async def get_day_challenge(tasks: TasksRepository = Depends(get_tasks_repository)):
