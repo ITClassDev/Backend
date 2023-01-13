@@ -7,18 +7,12 @@ from .depends import get_tasks_repository, get_current_user
 from core.utils.files import upload_file
 import os
 from core.config import USERS_STORAGE
-#import sys
-#sys.path.append("../")
-from fastapi.concurrency import run_in_threadpool
-
 import PyChecker.checker as CheckerBase
 
 router = APIRouter()
 
 # Create checker object
 Checker = CheckerBase.Checker()
-
-
 
 ### Tasks ###
 @router.get("/task/{task_id}")

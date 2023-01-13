@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional, List
+import datetime
 
 class Submit(BaseModel):
     id: Optional[int] = None
@@ -11,7 +12,7 @@ class Submit(BaseModel):
     git_commit_id: Optional[str] = None
     solved: bool
     tests_results: Optional[List[dict]] = None
-
+    send_date: datetime.datetime
     
 
 # class SubmitIn(BaseModel):

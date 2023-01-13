@@ -12,5 +12,6 @@ submits = sqlalchemy.Table(
     sqlalchemy.Column("refer_to", sqlalchemy.Integer), # contest id Optional
     sqlalchemy.Column("git_commit_id", sqlalchemy.String), # git Optional    
     sqlalchemy.Column("solved", sqlalchemy.Boolean), 
+    sqlalchemy.Column("send_date", sqlalchemy.DateTime), 
     sqlalchemy.Column("tests_results", sqlalchemy.PickleType),
 )

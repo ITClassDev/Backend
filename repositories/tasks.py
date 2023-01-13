@@ -10,6 +10,7 @@ import pickle
 from core.config import USERS_STORAGE
 import asyncio
 import threading
+import datetime
 
 
 class TasksRepository(BaseRepository):
@@ -33,7 +34,6 @@ class TasksRepository(BaseRepository):
         return await self.database.fetch_one(query)
 
     def checker_callback(self, data, loop):
-        print("Callback")
         solved, tests_results_log, submit_id = data
         query = submits.update().where(submits.c.id == submit_id).values(status=2, solved=solved, tests_results=tests_results_log)
         loop.create_task(self.database.execute(query))
@@ -43,7 +43,7 @@ class TasksRepository(BaseRepository):
     async def submit_day_challenge(self, user_id: int, source_path: str, checker) -> Submit:
         # Create submit
         task_id = await self.get_day_challenge()
-        submit = Submit(user_id=user_id, status=0, task_id=task_id.id, source=f"file:{source_path['file_name']}", refer_to=None, git_commit_id=None, solved=False, tests_results=[])
+        submit = Submit(user_id=user_id, status=0, task_id=task_id.id, source=f"file:{source_path['file_name']}", refer_to=None, git_commit_id=None, solved=False, tests_results=[], send_date=datetime.datetime.now())
         values = {**submit.dict()}
         values.pop("id", None)
         query = submits.insert().values(**values)

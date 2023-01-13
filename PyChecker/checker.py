@@ -31,7 +31,7 @@ class Checker:
             test_status = result["stdout"].decode("utf-8").strip() == test["output"]
             tests_passed += test_status
             tests_statuses.append({"status": test_status, "error_info": result["stderr"], "duration": result["duration"], "timeout": result["timeout"], "memoryout": result["oom_killed"]})
-        print("Checker finished")
+        #print("Checker finished")
         callback((tests_passed == len(tests), tests_statuses, submit_id), loop)
 
 
@@ -47,12 +47,13 @@ if __name__ == "__main__":
     parser.add_argument('--tests', type=str,
                     help='Path to tests json file')
     args = parser.parse_args()
+    # LEGACY
     with open(args.source_code, "rb") as test_code_fd:
         test_code = test_code_fd.read()
 
     with open(args.tests) as test_fd:
         tests = json.load(test_fd)
-
+    # LEGACY
     checker = Checker()
     checker.check_one_task(test_code, tests, process_checker_result)
     while True:
