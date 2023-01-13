@@ -38,3 +38,7 @@ class TasksRepository(BaseRepository):
     async def get_task_submits(self, user_id: int, task_id: int) -> List[Submit]:
         query = submits.select().where(submits.c.user_id == user_id, submits.c.task_id == task_id)
         return await self.database.fetch_all(query)
+
+    async def get_day_challenge_submits(self, user_id: int):
+        day_challenge = await self.get_day_challenge()
+        return await self.get_task_submits(user_id, day_challenge.id)
