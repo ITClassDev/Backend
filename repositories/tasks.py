@@ -5,6 +5,7 @@ from models.tasks import Task, TaskIn
 from models.submits import Submit
 from sqlalchemy import select
 from typing import List
+from PyChecker import checker
 
 class TasksRepository(BaseRepository):
     async def get_by_id(self, task_id: int) -> Task:
@@ -36,7 +37,7 @@ class TasksRepository(BaseRepository):
         return submit_id
 
     async def get_task_submits(self, user_id: int, task_id: int) -> List[Submit]:
-        query = submits.select().where(submits.c.user_id == user_id, submits.c.task_id == task_id)
+        query = submits.select().where(submits.c.user_id == user_id, submits.c.task_id == task_id).order_by(submits.c.id.desc())
         return await self.database.fetch_all(query)
 
     async def get_day_challenge_submits(self, user_id: int):

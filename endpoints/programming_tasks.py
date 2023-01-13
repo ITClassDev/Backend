@@ -46,3 +46,6 @@ async def submit_day_challenge(file: UploadFile, tasks: TasksRepository = Depend
 async def get_my_submits(task_id: int, current_user: User = Depends(get_current_user), tasks: TasksRepository = Depends(get_tasks_repository)):
     submits = await tasks.get_task_submits(current_user.id, task_id)
     return submits
+
+
+### Contest ###

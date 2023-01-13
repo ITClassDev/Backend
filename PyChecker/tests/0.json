@@ -1,0 +1,13 @@
+{
+  "env": {
+    "profile": "python" ,
+    "real_time_limit": 5,
+    "cpu_time_limit": 5,
+    "memory_limit": 128
+  },
+  "tests": [
+    { "input": "Hello", "output": "olleH" },
+    { "input": "Code", "output": "edoC" },
+    { "input": "test", "output": "tset" }
+  ]
+}
