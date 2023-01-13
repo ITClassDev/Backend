@@ -7,8 +7,16 @@ from .depends import get_tasks_repository, get_current_user
 from core.utils.files import upload_file
 import os
 from core.config import USERS_STORAGE
+#import sys
+#sys.path.append("../")
+import PyChecker.checker as CheckerBase
 
 router = APIRouter()
+
+# Create checker object
+Checker = CheckerBase.Checker()
+
+
 
 ### Tasks ###
 @router.get("/task/{task_id}")
@@ -39,7 +47,7 @@ async def get_day_challenge(tasks: TasksRepository = Depends(get_tasks_repositor
 async def submit_day_challenge(file: UploadFile, tasks: TasksRepository = Depends(get_tasks_repository), current_user: User = Depends(get_current_user)):
     allowed_extensions = ["cpp", "py"]  # c++ files and python files
     uploaded_source = await upload_file(file, allowed_extensions, os.path.join(USERS_STORAGE, "tasks_source_codes"))
-    submit_id = await tasks.submit_day_challenge(current_user.id, uploaded_source)
+    submit_id = await tasks.submit_day_challenge(current_user.id, uploaded_source, Checker)
     return {"submit_id": submit_id}
 
 @router.get("/task/my_submits/{task_id}")

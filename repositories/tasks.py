@@ -5,7 +5,11 @@ from models.tasks import Task, TaskIn
 from models.submits import Submit
 from sqlalchemy import select
 from typing import List
-from PyChecker import checker
+import os
+import pickle
+from core.config import USERS_STORAGE
+
+
 
 class TasksRepository(BaseRepository):
     async def get_by_id(self, task_id: int) -> Task:
@@ -27,8 +31,20 @@ class TasksRepository(BaseRepository):
         query = tasks.select().where(tasks.c.is_day_challenge == True)
         return await self.database.fetch_one(query)
 
-    async def submit_day_challenge(self, user_id: int, source_path: str) -> Submit:
+    async def checker_callback(self, data):
+        solved, tests_results_log, task_id = data
+        #query = submits.update().
+        
+
+    async def submit_day_challenge(self, user_id: int, source_path: str, checker) -> Submit:
         task_id = await self.get_day_challenge()
+        task_data = await self.database.fetch_one(tasks.select().where(tasks.c.id == task_id.id)) # Get task data
+        tests = pickle.loads(task_data.tests)
+
+        with open(os.path.join(USERS_STORAGE, "tasks_source_codes", source_path["file_name"]), "rb") as source_file:
+            source = source_file.read()
+            print(source)
+            checker.check_one_task(source, tests, lambda res: print(res), int(task_id.id))
         submit = Submit(user_id=user_id, status=0, task_id=task_id.id, source=f"file:{source_path['file_name']}", refer_to=None, git_commit_id=None, solved=False, tests_results=[])
         values = {**submit.dict()}
         values.pop("id", None)
