@@ -8,7 +8,7 @@ from typing import List
 import os
 import pickle
 from core.config import USERS_STORAGE
-
+import asyncio
 
 
 class TasksRepository(BaseRepository):
@@ -32,24 +32,27 @@ class TasksRepository(BaseRepository):
         return await self.database.fetch_one(query)
 
     async def checker_callback(self, data):
-        solved, tests_results_log, task_id = data
-        #query = submits.update().
-        
+        print("Callback")
+        solved, tests_results_log, submit_id = data
+        query = submits.update().where(submits.c.id == submit_id).values(status=2, solved=solved, tests_results=tests_results_log)
+        await self.database.execute(query)
 
     async def submit_day_challenge(self, user_id: int, source_path: str, checker) -> Submit:
+        # Create submit
         task_id = await self.get_day_challenge()
-        task_data = await self.database.fetch_one(tasks.select().where(tasks.c.id == task_id.id)) # Get task data
-        tests = pickle.loads(task_data.tests)
-
-        with open(os.path.join(USERS_STORAGE, "tasks_source_codes", source_path["file_name"]), "rb") as source_file:
-            source = source_file.read()
-            print(source)
-            checker.check_one_task(source, tests, lambda res: print(res), int(task_id.id))
         submit = Submit(user_id=user_id, status=0, task_id=task_id.id, source=f"file:{source_path['file_name']}", refer_to=None, git_commit_id=None, solved=False, tests_results=[])
         values = {**submit.dict()}
         values.pop("id", None)
         query = submits.insert().values(**values)
         submit_id = await self.database.execute(query)
+        
+        task_data = await self.database.fetch_one(tasks.select().where(tasks.c.id == task_id.id)) # Get task data
+        tests = pickle.loads(task_data.tests)
+
+        # Start checker process
+        with open(os.path.join(USERS_STORAGE, "tasks_source_codes", source_path["file_name"]), "rb") as source_file:
+            source = source_file.read()
+            asyncio.get_event_loop().create_task(checker.check_one_task_thread(source, tests, lambda res: self.checker_callback(res), submit_id))
         return submit_id
 
     async def get_task_submits(self, user_id: int, task_id: int) -> List[Submit]:

@@ -22,14 +22,14 @@ class Checker:
         tasks_active = 0
         task_pending = 0
    
-    def check_one_task(self, test_code: str, tests: List[dict], callback, task_id: int) -> None:
+    def check_one_task(self, test_code: str, tests: List[dict], callback, submit_id: int) -> None:
         #print(test_code, tests, callback, task_id)
         #process = Process(target=lambda: self.check_one_task_thread())
         #process = Process(target=self.check_one_task_thread, args=(test_code, tests, callback, 1, ))
-        process = threading.Thread(target=self.check_one_task_thread, args=(test_code, tests, callback, task_id,  ))
+        process = threading.Thread(target=self.check_one_task_thread, args=(test_code, tests, callback, submit_id,  ))
         process.start()
 
-    def check_one_task_thread(self, test_code, tests, callback, task_id) -> None:
+    async def check_one_task_thread(self, test_code, tests, callback, submit_id) -> None:
         #env = tests["env"]
         env = {"cpu_time_limit": 1, "memory_limit": 1000, "real_time_limit": 2}
         files = [{'name': 'main.py', 'content': test_code}]
@@ -41,7 +41,8 @@ class Checker:
             test_status = result["stdout"].decode("utf-8").strip() == test["output"]
             tests_passed += test_status
             tests_statuses.append({"status": test_status, "error_info": result["stderr"], "duration": result["duration"], "timeout": result["timeout"], "memoryout": result["oom_killed"]})
-        callback((tests_passed == len(tests), tests_statuses, task_id))
+        print("Checker finished")
+        await callback((tests_passed == len(tests), tests_statuses, submit_id))
 
     def check_multiple_tasks(self):
         pass
