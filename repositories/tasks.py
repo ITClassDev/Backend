@@ -54,13 +54,10 @@ class TasksRepository(BaseRepository):
         # Start checker process; async loop
         with open(os.path.join(USERS_STORAGE, "tasks_source_codes", source_path["file_name"]), "rb") as source_file:
             source = source_file.read()
-            #asyncio.create_task(checker.check_one_task_thread(source, tests, env, lambda res: self.checker_callback(res), submit_id))
             loop = asyncio.get_event_loop()
-            thread = threading.Thread(target=lambda: checker.check_one_task_thread(source, tests, env, self.checker_callback, submit_id, loop))
+            thread = threading.Thread(target=lambda: checker.check_one_task_thread(source, source_path["file_name"], tests, env, self.checker_callback, submit_id, loop))
             thread.start()
-            #loop = asyncio.get_running_loop()
-            #await loop.run_in_executor(None, lambda: checker.check_one_task_thread(source, tests, env, lambda res: self.checker_callback(res), submit_id))
-
+            
         return submit_id
 
     async def get_task_submits(self, user_id: int, task_id: int) -> List[Submit]:
