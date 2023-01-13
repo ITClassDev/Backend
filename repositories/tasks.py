@@ -9,6 +9,7 @@ import os
 import pickle
 from core.config import USERS_STORAGE
 import asyncio
+import threading
 
 
 class TasksRepository(BaseRepository):
@@ -31,12 +32,14 @@ class TasksRepository(BaseRepository):
         query = tasks.select().where(tasks.c.is_day_challenge == True)
         return await self.database.fetch_one(query)
 
-    async def checker_callback(self, data):
+    def checker_callback(self, data, loop):
         print("Callback")
         solved, tests_results_log, submit_id = data
         query = submits.update().where(submits.c.id == submit_id).values(status=2, solved=solved, tests_results=tests_results_log)
-        await self.database.execute(query)
+        loop.create_task(self.database.execute(query))
+        #loop.close()
 
+     
     async def submit_day_challenge(self, user_id: int, source_path: str, checker) -> Submit:
         # Create submit
         task_id = await self.get_day_challenge()
@@ -45,14 +48,19 @@ class TasksRepository(BaseRepository):
         values.pop("id", None)
         query = submits.insert().values(**values)
         submit_id = await self.database.execute(query)
-        
         task_data = await self.database.fetch_one(tasks.select().where(tasks.c.id == task_id.id)) # Get task data
         tests = pickle.loads(task_data.tests)
-
-        # Start checker process
+        env = {"cpu_time_limit": task_data.time_limit, "memory_limit": task_data.memory_limit, "real_time_limit": task_data.time_limit}
+        # Start checker process; async loop
         with open(os.path.join(USERS_STORAGE, "tasks_source_codes", source_path["file_name"]), "rb") as source_file:
             source = source_file.read()
-            asyncio.get_event_loop().create_task(checker.check_one_task_thread(source, tests, lambda res: self.checker_callback(res), submit_id))
+            #asyncio.create_task(checker.check_one_task_thread(source, tests, env, lambda res: self.checker_callback(res), submit_id))
+            loop = asyncio.get_event_loop()
+            thread = threading.Thread(target=lambda: checker.check_one_task_thread(source, tests, env, self.checker_callback, submit_id, loop))
+            thread.start()
+            #loop = asyncio.get_running_loop()
+            #await loop.run_in_executor(None, lambda: checker.check_one_task_thread(source, tests, env, lambda res: self.checker_callback(res), submit_id))
+
         return submit_id
 
     async def get_task_submits(self, user_id: int, task_id: int) -> List[Submit]:

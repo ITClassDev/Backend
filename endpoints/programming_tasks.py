@@ -9,6 +9,8 @@ import os
 from core.config import USERS_STORAGE
 #import sys
 #sys.path.append("../")
+from fastapi.concurrency import run_in_threadpool
+
 import PyChecker.checker as CheckerBase
 
 router = APIRouter()
