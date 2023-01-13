@@ -1,8 +1,10 @@
 from db.tasks import tasks
 from db.submits import submits
+from db.contests import contests
 from .base import BaseRepository
 from models.tasks import Task, TaskIn
 from models.submits import Submit
+from models.contests import Contest, ContestIn
 from sqlalchemy import select
 from typing import List
 import os
@@ -71,3 +73,19 @@ class TasksRepository(BaseRepository):
     async def get_day_challenge_submits(self, user_id: int):
         day_challenge = await self.get_day_challenge()
         return await self.get_task_submits(user_id, day_challenge.id)
+
+    async def create_contest(self, contest_data: ContestIn, user_id: int):
+        contest_obj = Contest(author_id = user_id, **dict(contest_data))
+        values = {**dict(contest_obj)}
+        values.pop("id", None)
+        query = contests.insert().values(**values)
+        contest_id = await self.database.execute(query)
+
+    async def get_contest_tasks():
+        pass
+
+    async def submit_contest():
+        pass
+    
+
+        

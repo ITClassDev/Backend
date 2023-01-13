@@ -3,6 +3,7 @@ from repositories.users import UserRepository
 from repositories.tasks import TasksRepository
 from models.tasks import TaskIn
 from models.user import User
+from models.contests import ContestIn
 from .depends import get_tasks_repository, get_current_user
 from core.utils.files import upload_file
 import os
@@ -32,7 +33,6 @@ async def get_all_tasks(tasks: TasksRepository = Depends(get_tasks_repository), 
     else:
         return {"status": False}
 
-
 ### Day Challenge ###
 @router.get("/day_challenge/current")
 async def get_day_challenge(tasks: TasksRepository = Depends(get_tasks_repository)):
@@ -61,3 +61,9 @@ async def get_my_submits(task_id: int, current_user: User = Depends(get_current_
 
 
 ### Contest ###
+@router.put("/homework/create")
+async def create_homework(contest_data: ContestIn, current_user: User = Depends(get_current_user), tasks: TasksRepository = Depends(get_tasks_repository)):
+    if current_user.userRole > 0:
+        contest_id = await tasks.create_contest(contest_data, current_user.id)
+    else:
+        return {"status": False}
