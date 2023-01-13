@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from repositories.apps import AppsRepository
 from repositories.oauth_tokens import OAuthTokensRepository
 from .depends import get_apps_repository, get_current_user, get_oauth_tokens_repository
-from models.apps import ProvideAccessRequest
+from models.apps import ProvideAccessRequest, AppIn
 from models.oauth_tokens import OauthToken
 from models.user import User
 from core.security import create_oauth_access_token
@@ -16,6 +16,10 @@ async def get_app_info(app_id: int, apps: AppsRepository = Depends(get_apps_repo
     data = await apps.get_by_id(app_id)
     return data
 
+@router.put("/create_app")
+async def create_app(app_data: AppIn, apps: AppsRepository = Depends(get_apps_repository), current_user: User = Depends(get_current_user)):
+    created_app_id = await apps.create_app(app_data, current_user.id)
+    return {"app_id": created_app_id}
 
 # generate temp token to access some user endpoints with another prefix
 @router.post("/provide_access")

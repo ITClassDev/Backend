@@ -4,7 +4,7 @@ import datetime
 
 class App(BaseModel):
     id: Optional[int] = None
-    owner_id: id
+    owner_id: int
     name: str
     permission_level: int
     verified: bool
@@ -13,3 +13,7 @@ class App(BaseModel):
 
 class ProvideAccessRequest(BaseModel):
     app_id: int
+
+class AppIn(BaseModel):
+    name: str
+    redirect_url: str

@@ -14,7 +14,6 @@ class UserRepository(BaseRepository):
         user = await self.database.fetch_one(query)
         if not user:
             return None
-
         return User.parse_obj(user)
 
     async def get_all_users(self) -> List[User]:
