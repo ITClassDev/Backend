@@ -100,3 +100,10 @@ async def send_submit(submit_data: SubmitContest, current_user: User =  Depends(
 @router.get("/homework/get_task_submits")
 async def get_task_submits(task_id: int, contest_id: int, current_user: User = Depends(get_current_user), tasks: TasksRepository = Depends(get_tasks_repository)):
     return await tasks.get_contest_task_submits(task_id, contest_id)
+
+@router.get("/submission/details")
+async def submission_details(submission_id: int, tasks: TasksRepository = Depends(get_tasks_repository)):
+    data = await tasks.get_submission_details(submission_id)
+    with open(os.path.join(USERS_STORAGE, "tasks_source_codes", data.source.split(":")[1]), "r") as file:
+        source = file.read()
+    return {"task": data, "source": source}

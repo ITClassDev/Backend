@@ -105,3 +105,7 @@ class TasksRepository(BaseRepository):
             values.pop("id", None)
             query = submits.insert().values(**values)
             submit_id = await self.database.execute(query)
+
+    async def get_submission_details(self, submission_id: int):
+        submission = submits.select().where(submits.c.id == submission_id)
+        return await self.database.fetch_one(submission)
