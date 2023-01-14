@@ -20,6 +20,10 @@ class TasksRepository(BaseRepository):
         query = select(tasks.c.id, tasks.c.author_id, tasks.c.title, tasks.c.text, tasks.c.time_limit, tasks.c.memory_limit, tasks.c.is_day_challenge).where(tasks.c.id == task_id)
         return await self.database.fetch_one(query)
 
+    async def get_by_id_full(self, task_id: int) -> Task:
+        query = tasks.select().where(tasks.c.id == task_id)
+        return await self.database.fetch_one(query)
+
     async def add(self, task_data: TaskIn, author_id: int) -> int:
         if task_data.is_day_challenge:
             query = tasks.update().values(is_day_challenge=False)

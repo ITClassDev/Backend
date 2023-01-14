@@ -18,7 +18,16 @@ Checker = CheckerBase.Checker()
 ### Tasks ###
 @router.get("/task/{task_id}")
 async def get_task_info(task_id: int, tasks: TasksRepository = Depends(get_tasks_repository)):
-    return await tasks.get_by_id(task_id)
+    task_data = await tasks.get_by_id_full(task_id)
+    tests_data_dict = {**task_data}
+    demo_tests = []
+    ind = 0
+    for test in tests_data_dict["tests"]:
+        if "demo" in test and test["demo"]:
+            demo_tests.append({**test, "key": ind})
+            ind += 1
+    tests_data_dict["tests"] = demo_tests
+    return tests_data_dict
 
 @router.put("/task/add") # Teacher level
 async def get_task_info(task_data: TaskIn, tasks: TasksRepository = Depends(get_tasks_repository), current_user: User = Depends(get_current_user)):
@@ -72,5 +81,14 @@ async def create_homework(contest_data: ContestIn, current_user: User = Depends(
 @router.get("/homework/get")
 async def get_homework(contest_id: int, tasks: TasksRepository = Depends(get_tasks_repository)):
     res = await tasks.get_contest_tasks(contest_id)
-    return res
+    task_data = await tasks.get_by_id_full(contest_id)
+    tests_data_dict = {**task_data}
+    demo_tests = []
+    ind = 0
+    for test in tests_data_dict["tests"]:
+        if "demo" in test and test["demo"]:
+            demo_tests.append({**test, "key": ind})
+            ind += 1
+    tests_data_dict["tests"] = demo_tests
+    return {**tests_data_dict, "tests": demo_tests, "tasks": res.tasks_ids_list}
     
