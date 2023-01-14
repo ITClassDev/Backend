@@ -65,5 +65,12 @@ async def get_my_submits(task_id: int, current_user: User = Depends(get_current_
 async def create_homework(contest_data: ContestIn, current_user: User = Depends(get_current_user), tasks: TasksRepository = Depends(get_tasks_repository)):
     if current_user.userRole > 0:
         contest_id = await tasks.create_contest(contest_data, current_user.id)
+        return {"contest_id": contest_id}
     else:
         return {"status": False}
+
+@router.get("/homework/get")
+async def get_homework(contest_id: int, tasks: TasksRepository = Depends(get_tasks_repository)):
+    res = await tasks.get_contest_tasks(contest_id)
+    return res
+    

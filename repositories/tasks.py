@@ -80,9 +80,14 @@ class TasksRepository(BaseRepository):
         values.pop("id", None)
         query = contests.insert().values(**values)
         contest_id = await self.database.execute(query)
+        return contest_id
 
-    async def get_contest_tasks():
-        pass
+    async def get_contest_tasks(self, contest_id: int):
+        query = contests.select().where(contests.c.id == contest_id)
+        contest_tasks = await self.database.fetch_one(query)
+        #contest_tasks = contest_tasks.tasks_ids_list
+        return contest_tasks
+
 
     async def submit_contest():
         pass
