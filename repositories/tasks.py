@@ -92,9 +92,16 @@ class TasksRepository(BaseRepository):
         #contest_tasks = contest_tasks.tasks_ids_list
         return contest_tasks
 
+    async def get_contest_task_submits(self, task_id, contest_id):
+        query = submits.select().where(submits.c.task_id == task_id, submits.c.refer_to == contest_id)
+        return await self.database.fetch_all(query)
 
-    async def submit_contest():
-        pass
-    
 
-        
+    async def submit_contest(self, contest_id: int, git_url: str, user_id: int, language: str):
+        tasks_all = await self.get_contest_tasks(contest_id)
+        for task in tasks_all.tasks_ids_list:
+            submit = Submit(user_id=user_id, status=0, task_id=task, source=f"git:{git_url}", refer_to=contest_id, git_commit_id="testst", solved=False, tests_results=[], send_date=datetime.datetime.now())
+            values = {**submit.dict()}
+            values.pop("id", None)
+            query = submits.insert().values(**values)
+            submit_id = await self.database.execute(query)

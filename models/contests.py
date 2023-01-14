@@ -14,3 +14,8 @@ class ContestIn(BaseModel):
     description: str
     tasks_ids_list: List[int]
     users_ids_tags: List[int]
+
+class SubmitContest(BaseModel):
+    git_url: str
+    contest_id: int
+    language: str

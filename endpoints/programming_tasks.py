@@ -3,7 +3,7 @@ from repositories.users import UserRepository
 from repositories.tasks import TasksRepository
 from models.tasks import TaskIn
 from models.user import User
-from models.contests import ContestIn
+from models.contests import ContestIn, SubmitContest
 from .depends import get_tasks_repository, get_current_user
 from core.utils.files import upload_file
 import os
@@ -80,7 +80,7 @@ async def create_homework(contest_data: ContestIn, current_user: User = Depends(
 
 @router.get("/homework/get")
 async def get_homework(contest_id: int, tasks: TasksRepository = Depends(get_tasks_repository)):
-    res = await tasks.get_contest_tasks(contest_id)
+    contest_data = await tasks.get_contest_tasks(contest_id)
     task_data = await tasks.get_by_id_full(contest_id)
     tests_data_dict = {**task_data}
     demo_tests = []
@@ -90,5 +90,13 @@ async def get_homework(contest_id: int, tasks: TasksRepository = Depends(get_tas
             demo_tests.append({**test, "key": ind})
             ind += 1
     tests_data_dict["tests"] = demo_tests
-    return {**tests_data_dict, "tests": demo_tests, "tasks": res.tasks_ids_list}
+    return contest_data
     
+@router.post("/homework/submit")
+async def send_submit(submit_data: SubmitContest, current_user: User =  Depends(get_current_user), tasks: TasksRepository = Depends(get_tasks_repository)):
+    submit_id = await tasks.submit_contest(submit_data.contest_id, submit_data.git_url, current_user.id, submit_data.language)
+    return {"submit_id": submit_id}
+
+@router.get("/homework/get_task_submits")
+async def get_task_submits(task_id: int, contest_id: int, current_user: User = Depends(get_current_user), tasks: TasksRepository = Depends(get_tasks_repository)):
+    return await tasks.get_contest_task_submits(task_id, contest_id)
