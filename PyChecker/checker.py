@@ -6,7 +6,9 @@ import time
 import os
 from typing import List
 import asyncio
-
+import string
+import random
+import shutil
 
 class Checker:
     def __init__(self):
@@ -18,6 +20,12 @@ class Checker:
             }
         )
         self.tasks_queue = []
+        self.temp_workspace = "/home/stephan/Progs/ItClassDevelopment/Backend/PyChecker/tmp/"
+
+    def name_gen(self, length=10):
+        letters = string.ascii_lowercase
+        result_str = ''.join(random.choice(letters) for i in range(length))
+        return result_str;
 
     def get_tasks_stat(self):
         tasks_active = 0
@@ -67,25 +75,20 @@ class Checker:
                 else:
                     callback((False, [], submit_id), loop)
 
-    def get_github_tests(self, path):
-        os.system("cd /home/stephan/Progs/ItClassDevelopment/Backend/PyChecker/tmp")
-        os.system("git clone " + path + ".git")
-
-
-
+    def fetch_git(self, git_path):
+        fetch_path = os.path.join(self.temp_workspace, self.name_gen())
+        os.system(f"git clone {git_path} {fetch_path}")
+        return fetch_path
 
     def check_multiple_tasks(self, git_path, tests, env, callback, submit_id, loop):
-        #self.get_github_tests(git_path)
-
-        with open("/home/stephan/Progs/ItClassDevelopment/Backend/PyChecker/tmp/header.h", "rb") as header_fd:
+        source_path = self.fetch_git(git_path)
+        with open(os.path.join(source_path, "header.h"), "rb") as header_fd:
             header_code = header_fd.read()
-        with open("/home/stephan/Progs/ItClassDevelopment/Backend/PyChecker/tmp/funcs.cpp", "rb") as funcs_fd:
+        with open(os.path.join(source_path, "funcs.cpp"), "rb") as funcs_fd:
             funcs_code = funcs_fd.read()
-
             for test_func in tests:
                 test_func_statuses = []
-                print()
-                base = '#include <iostream>\n#include "header.h"\nint main(){\n   '
+                base = '#include <iostream>\n#include <string.h>\n#include "header.h"\nint main(){\n'
                 arg_counter = 0
                 for arg in range(len(list(test_func.values())[0][0]["input"])):
                     arg_type = {str: "string", int: "int"}[type(list(test_func.values())[0][0]["input"][arg])]
@@ -111,10 +114,11 @@ class Checker:
                         test_set = list(test_func.values())[0]
                         for test in test_set:
                             #print("\n".join(test["input"]))
-                            stdin_ = ''.join(str(x) for x in test["input"]).encode("utf-8")
+                            stdin_ = '\n'.join(str(x) for x in test["input"]).encode("utf-8")
                             result = epicbox.run('gcc', './main', stdin=stdin_,
                                                 limits=env,
                                                 workdir=workdir)
+                            print(result)
                             test_status = result["stdout"].decode("utf-8").strip() == str(test["output"])
                             tests_passed += test_status
                             tests_statuses.append({"status": test_status, "error_info": result["stderr"]})
@@ -124,21 +128,24 @@ class Checker:
                             loop)  # send result data, to callback
                     else:
                         callback((False, [], submit_id), loop)
-
-def process_checker_result(res):
-    print("Checker result:", res)
-
+        shutil.rmtree(source_path)
 
 if __name__ == "__main__":
     checker = Checker()
     tests = [
-        {"a": [
-            {"input": [123], "output": 123},
-            {"input": [345], "output": 123},
-            {"input": [5532], "output": 123}
+        {"sum": [
+            {"input": [100, 120], "output": "220"},
+            {"input": [20, 43], "output": 63},
+            {"input": [7, 123], "output": 130}
+        ]},
+        {"concat": [
+            {"input": ["a", "b"], "output": "ab"},
+            {"input": ["Hello", ",world!"], "output": "Hello,world!"},
+            {"input": ["Result", "string"], "output": "Resultstring"}
         ]}
     ]
     checker.check_multiple_tasks("https://github.com/ITClassDev/TestSolutions/", tests, {'cputime': 2, 'memory': 200, 'realtime': 200}, lambda x, y: print(x), 100, None)
+    #print(checker.name_gen())
     # parser = argparse.ArgumentParser(description='Check task cli')
     # parser.add_argument('--source_code', type=str, help='Path to test file')
     # parser.add_argument('--tests', type=str, help='Path to tests json file')
