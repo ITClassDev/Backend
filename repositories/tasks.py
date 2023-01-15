@@ -99,12 +99,17 @@ class TasksRepository(BaseRepository):
 
     async def submit_contest(self, contest_id: int, git_url: str, user_id: int, language: str):
         tasks_all = await self.get_contest_tasks(contest_id)
+        checker_payload = []
         for task in tasks_all.tasks_ids_list:
-            submit = Submit(user_id=user_id, status=0, task_id=task, source=f"git:{git_url}", refer_to=contest_id, git_commit_id="testst", solved=False, tests_results=[], send_date=datetime.datetime.now())
-            values = {**submit.dict()}
-            values.pop("id", None)
-            query = submits.insert().values(**values)
-            submit_id = await self.database.execute(query)
+            task_data = await self.get_by_id_full(task)
+            tests = pickle.loads(task_data.tests)
+            types = task_data.input_types
+            print(tests, types)
+            # submit = Submit(user_id=user_id, status=0, task_id=task, source=f"git:{git_url}", refer_to=contest_id, git_commit_id="testst", solved=False, tests_results=[], send_date=datetime.datetime.now())
+            # values = {**submit.dict()}
+            # values.pop("id", None)
+            # query = submits.insert().values(**values)
+            # submit_id = await self.database.execute(query)
 
     async def get_submission_details(self, submission_id: int):
         submission = submits.select().where(submits.c.id == submission_id)

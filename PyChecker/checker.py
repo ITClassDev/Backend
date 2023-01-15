@@ -80,71 +80,67 @@ class Checker:
         os.system(f"git clone {git_path} {fetch_path}")
         return fetch_path
 
-    def check_multiple_tasks(self, git_path, tests, env, callback, submit_id, loop):
+    def check_multiple_tasks(self, git_path, tests, env, callback, loop):
+        final_callback_data = {}
         source_path = self.fetch_git(git_path)
         with open(os.path.join(source_path, "header.h"), "rb") as header_fd:
             header_code = header_fd.read()
         with open(os.path.join(source_path, "funcs.cpp"), "rb") as funcs_fd:
             funcs_code = funcs_fd.read()
-            for test_func in tests:
-                test_func_statuses = []
-                base = '#include <iostream>\n#include <string.h>\n#include "header.h"\nint main(){\n'
-                arg_counter = 0
-                for arg in range(len(list(test_func.values())[0][0]["input"])):
-                    arg_type = {str: "string", int: "int"}[type(list(test_func.values())[0][0]["input"][arg])]
-                    base += f"{arg_type} a{arg};\n    std::cin >> a{arg};\n    "
-                    arg_counter += 1
+            
+        for test_func in tests:
+            base = '#include <iostream>\n#include <string.h>\n#include "header.h"\nint main(){\n'
+            arg_counter = 0
+            for arg in range(len(list(test_func.values())[0]["tests"][0]["input"])):
+                arg_type = ["int", "string"][list(test_func.values())[0]["types"][arg]]
+                base += f"{arg_type} a{arg};\n    std::cin >> a{arg};\n    "
+                arg_counter += 1
 
-                main_code = base + f"std::cout << {list(test_func.keys())[0]}(" 
-                for i in range(arg_counter-1):
-                    main_code += f"a{i},"
-                main_code += f"a{arg_counter-1});\n"
-                main_code += "}"
-                with epicbox.working_directory() as workdir:
-                    files = [{'name': 'main.cpp', 'content': main_code.encode("utf-8")}, {'name': 'header.h', 'content': header_code}, {'name': 'funcs.cpp', 'content': funcs_code}]
-                    compile_res = epicbox.run('gcc', 'g++ -pipe -O2 -static -o main main.cpp funcs.cpp',
-                                        files=files,
-                                        workdir=workdir,
-                                        limits={'cputime': 10, 'memory': 2048, 'realtime': 10})  # static build limits
-                    if compile_res['exit_code'] == 0:
-                        tests_statuses = []
-                        tests_passed = 0
-
-                        # iterate over tests
-                        test_set = list(test_func.values())[0]
-                        for test in test_set:
-                            #print("\n".join(test["input"]))
-                            stdin_ = '\n'.join(str(x) for x in test["input"]).encode("utf-8")
-                            result = epicbox.run('gcc', './main', stdin=stdin_,
-                                                limits=env,
-                                                workdir=workdir)
-                            print(result)
-                            test_status = result["stdout"].decode("utf-8").strip() == str(test["output"])
-                            tests_passed += test_status
-                            tests_statuses.append({"status": test_status, "error_info": result["stderr"]})
-                        test_func_statuses.append(tests_statuses)
-
-                        callback((tests_passed == len(test_set), tests_statuses, submit_id),
-                            loop)  # send result data, to callback
-                    else:
-                        callback((False, [], submit_id), loop)
+            main_code = base + f"std::cout << {list(test_func.keys())[0]}(" 
+            for i in range(arg_counter-1):
+                main_code += f"a{i},"
+            main_code += f"a{arg_counter-1});\n"
+            main_code += "}"
+            with epicbox.working_directory() as workdir:
+                files = [{'name': 'main.cpp', 'content': main_code.encode("utf-8")}, {'name': 'header.h', 'content': header_code}, {'name': 'funcs.cpp', 'content': funcs_code}]
+                compile_res = epicbox.run('gcc', 'g++ -pipe -O2 -static -o main main.cpp funcs.cpp',
+                                    files=files,
+                                    workdir=workdir,
+                                    limits={'cputime': 10, 'memory': 2048, 'realtime': 10})  # static build limits
+                if compile_res['exit_code'] == 0:
+                    tests_statuses = []
+                    tests_passed = 0
+                    # iterate over tests
+                    test_set = list(test_func.values())[0]["tests"]
+                    for test in test_set:
+                        stdin_ = '\n'.join(str(x) for x in test["input"]).encode("utf-8")
+                        result = epicbox.run('gcc', './main', stdin=stdin_,
+                                            limits=env,
+                                            workdir=workdir)
+                        test_status = result["stdout"].decode("utf-8").strip() == str(test["output"])
+                        tests_passed += test_status
+                        tests_statuses.append({"status": test_status, "error_info": result["stderr"], "duration": result["duration"],
+                        "timeout": result["timeout"], "memoryout": result["oom_killed"]})
+                    final_callback_data[list(test_func.values())[0]["submit_id"]] = ((tests_passed == len(test_set), tests_statuses))
+                else:
+                    callback((False, [], None), loop)
+        callback(final_callback_data, None,
+                loop)  # send result data, to callback
         shutil.rmtree(source_path)
 
 if __name__ == "__main__":
     checker = Checker()
     tests = [
-        {"sum": [
+        {"sum": {"tests": [
             {"input": [100, 120], "output": "220"},
             {"input": [20, 43], "output": 63},
             {"input": [7, 123], "output": 130}
-        ]},
-        {"concat": [
-            {"input": ["a", "b"], "output": "ab"},
+        ], "submit_id": 100, "types": [0, 0]}},
+        {"concat": {"tests": [{"input": ["a", "b"], "output": "ab"},
             {"input": ["Hello", ",world!"], "output": "Hello,world!"},
-            {"input": ["Result", "string"], "output": "Resultstring"}
-        ]}
+            {"input": ["Result", "string"], "output": "Resultstring"}], "submit_id": 111, "types": [1, 1]}}
     ]
-    checker.check_multiple_tasks("https://github.com/ITClassDev/TestSolutions/", tests, {'cputime': 2, 'memory': 200, 'realtime': 200}, lambda x, y: print(x), 100, None)
+    checker.check_multiple_tasks("https://github.com/ITClassDev/TestSolutions/", tests, {'cputime': 2, 'memory': 200, 'realtime': 200}, lambda x, y, z: print(x), None)
     #print(checker.name_gen())
     # parser = argparse.ArgumentParser(description='Check task cli')
     # parser.add_argument('--source_code', type=str, help='Path to test file')
