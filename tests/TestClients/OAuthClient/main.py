@@ -13,7 +13,7 @@ from fastapi.responses import HTMLResponse
 # Real user id's are differ from shtp to demonstrate OAuth scheme
 FAKE_DB_USERS = [
     {"id": 123, "name": "Stephan Zhdanov", "shtp_id": 6},
-    {"id": 232, "name": "Test user", "shtp_id": 2}
+    {"id": 232, "name": "Test user", "shtp_id": 7}
 ]
 
 # Like sql select function (utility)
