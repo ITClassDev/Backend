@@ -68,26 +68,24 @@ class Checker:
                     callback((False, [], submit_id), loop)
 
     def get_github_tests(self, path):
-        os.system("cd /home/sadm/ItClassDev/Backend/PyChecker/LocalCache")
+        os.system("cd /home/stephan/Progs/ItClassDevelopment/Backend/PyChecker/tmp")
         os.system("git clone " + path + ".git")
 
 
 
 
     def check_multiple_tasks(self, git_path, tests, env, callback, submit_id, loop):
-        self.get_github_tests(git_path)
+        #self.get_github_tests(git_path)
 
-        with open("/home/sadm/ItClassDev/Backend/PyChecker/LocalCache/header.h", "rb") as header_fd:
+        with open("/home/stephan/Progs/ItClassDevelopment/Backend/PyChecker/tmp/header.h", "rb") as header_fd:
             header_code = header_fd.read()
-        with open("/home/sadm/ItClassDev/Backend/PyChecker/LocalCache/funcs.cpp", "rb") as funcs_fd:
+        with open("/home/stephan/Progs/ItClassDevelopment/Backend/PyChecker/tmp/funcs.cpp", "rb") as funcs_fd:
             funcs_code = funcs_fd.read()
 
-        with epicbox.working_directory() as workdir:
-
             for test_func in tests:
-
                 test_func_statuses = []
-
+                print()
+                base = '#include <iostream>\n#include "header.h"\nint main(){\n   '
                 arg_counter = 0
                 for arg in range(len(list(test_func.values())[0][0]["input"])):
                     arg_type = {str: "string", int: "int"}[type(list(test_func.values())[0][0]["input"][arg])]
@@ -99,32 +97,38 @@ class Checker:
                     main_code += f"a{i},"
                 main_code += f"a{arg_counter-1});\n"
                 main_code += "}"
+                with epicbox.working_directory() as workdir:
+                    # files=[{'name': 'main.py ', 'content': b"import os; print(os.listdir())"}, 
+                    #                             {'name': 'main.cpp', 'content': main_code.encode("utf-8")},
+                    #                             {'name': 'header.h', 'content': header_code}],
+                    # result = epicbox.run('python', 'python3 main.py', files=files, workdir=workdir)
+                    # print(result)
+                    files = [{'name': 'main.py', 'content': b"print('Hi')"}, {'name': 'main.cpp', 'content': main_code.encode("utf-8")}, {'name': 'header.h', 'content': header_code}, {'name': 'funcs.cpp', 'content': funcs_code}]
 
-                compile_res = epicbox.run('gcc', 'g++ -pipe -O2 -static main.cpp funcs.cpp -o main',
-                                      files=[{'name': 'main.cpp', 'content': main_code},
-                                             {'name': 'funcs.cpp ', 'content': funcs_code},
-                                             {'name': 'header.h', 'content': header_code}],
-                                      workdir=workdir,
-                                      limits={'cputime': 10, 'memory': 2048, 'realtime': 10})  # static build limits
+                    compile_res = epicbox.run('gcc', 'g++ -pipe -O2 -static -o main main.cpp funcs.cpp',
+                                        files=files,
+                                        workdir=workdir,
+                                        limits={'cputime': 10, 'memory': 2048, 'realtime': 10})  # static build limits
 
-                if compile_res['exit_code'] == 0:
-                    tests_statuses = []
-                    tests_passed = 0
+                    print(compile_res)
+                    # if compile_res['exit_code'] == 0:
+                    #     tests_statuses = []
+                    #     tests_passed = 0
 
-                     # iterate over tests
-                    for test in range(len(test_func)):
-                        result = epicbox.run('gcc', './main', stdin=test_func[test]["input"],
-                                            limits=limits,
-                                            workdir=workdir)
-                        test_status = result["stdout"].decode("utf-8").strip() == test_func[test]["output"]
-                        tests_passed += test_status
-                        tests_statuses.append({"status": test_status, "error_info": result["stderr"]})
-                    test_func_statuses.append(tests_statuses)
+                    #     # iterate over tests
+                    #     for test in range(len(test_func)):
+                    #         result = epicbox.run('gcc', './main', stdin=test_func[test]["input"],
+                    #                             limits=limits,
+                    #                             workdir=workdir)
+                    #         test_status = result["stdout"].decode("utf-8").strip() == test_func[test]["output"]
+                    #         tests_passed += test_status
+                    #         tests_statuses.append({"status": test_status, "error_info": result["stderr"]})
+                    #     test_func_statuses.append(tests_statuses)
 
-                    callback((tests_passed == len(tests), tests_statuses, submit_id),
-                         loop)  # send result data, to callback
-                else:
-                    callback((False, [], submit_id), loop)
+                    #     callback((tests_passed == len(tests), tests_statuses, submit_id),
+                    #         loop)  # send result data, to callback
+                    # else:
+                    #     callback((False, [], submit_id), loop)
 
 
 
@@ -135,7 +139,7 @@ def process_checker_result(res):
 
 if __name__ == "__main__":
     checker = Checker()
-    checker.check_multiple_tasks("https://github.com/ITClassDev/TestSolutions/", {})
+    checker.check_multiple_tasks("https://github.com/ITClassDev/TestSolutions/", [{"a": [{"input": [123], "output": 123}]}], {'cputime': 2, 'memory': 200, 'realtime': 200}, lambda x, y: print(x), 100, None)
     # parser = argparse.ArgumentParser(description='Check task cli')
     # parser.add_argument('--source_code', type=str, help='Path to test file')
     # parser.add_argument('--tests', type=str, help='Path to tests json file')
