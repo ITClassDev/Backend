@@ -47,9 +47,12 @@ class TasksRepository(BaseRepository):
         solved, tests_results_log, submit_id = data
         query = submits.update().where(submits.c.id == submit_id).values(status=2, solved=solved, tests_results=tests_results_log)
         loop.create_task(self.database.execute(query))
-        #loop.close()
 
-     
+    def checker_homework_callback(self, data, loop):
+        for submission in data:
+            query = submits.update().where(submits.c.id == submission).values(status=2, solved=data[submission][0], tests_results=data[submission][1])
+            loop.create_task(self.database.execute(query))
+
     async def submit_day_challenge(self, user_id: int, source_path: str, checker) -> Submit:
         # Create submit
         task_id = await self.get_day_challenge()
@@ -83,6 +86,7 @@ class TasksRepository(BaseRepository):
         values = {**dict(contest_obj)}
         values.pop("id", None)
         query = contests.insert().values(**values)
+
         contest_id = await self.database.execute(query)
         return contest_id
 
@@ -97,19 +101,26 @@ class TasksRepository(BaseRepository):
         return await self.database.fetch_all(query)
 
 
-    async def submit_contest(self, contest_id: int, git_url: str, user_id: int, language: str):
+    async def submit_contest(self, contest_id: int, git_url: str, user_id: int, language: str, checker):
         tasks_all = await self.get_contest_tasks(contest_id)
         checker_payload = []
         for task in tasks_all.tasks_ids_list:
             task_data = await self.get_by_id_full(task)
             tests = pickle.loads(task_data.tests)
             types = task_data.input_types
-            print(tests, types)
-            # submit = Submit(user_id=user_id, status=0, task_id=task, source=f"git:{git_url}", refer_to=contest_id, git_commit_id="testst", solved=False, tests_results=[], send_date=datetime.datetime.now())
-            # values = {**submit.dict()}
-            # values.pop("id", None)
-            # query = submits.insert().values(**values)
-            # submit_id = await self.database.execute(query)
+            func_name = task_data.func_name
+            submit = Submit(user_id=user_id, status=0, task_id=task, source=f"git:{git_url}", refer_to=contest_id, git_commit_id="testst", solved=False, tests_results=[], send_date=datetime.datetime.now())
+            values = {**submit.dict()}
+            values.pop("id", None)
+            query = submits.insert().values(**values)
+            submit_id = await self.database.execute(query)
+            env = {"cpu_time_limit": task_data.time_limit, "memory_limit": task_data.memory_limit, "real_time_limit": task_data.time_limit}
+            checker_payload.append({func_name: {"tests": tests, "submit_id": submit_id, "types": types, "env": env}})
+        loop = asyncio.get_event_loop()
+        thread = threading.Thread(target=lambda: checker.check_multiple_tasks(git_url, checker_payload, lambda data, loop: self.checker_homework_callback(data, loop), loop))
+        thread.start()
+
+            
 
     async def get_submission_details(self, submission_id: int):
         submission = submits.select().where(submits.c.id == submission_id)

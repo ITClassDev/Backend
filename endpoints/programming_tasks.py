@@ -94,7 +94,7 @@ async def get_homework(contest_id: int, tasks: TasksRepository = Depends(get_tas
     
 @router.post("/homework/submit")
 async def send_submit(submit_data: SubmitContest, current_user: User =  Depends(get_current_user), tasks: TasksRepository = Depends(get_tasks_repository)):
-    submit_id = await tasks.submit_contest(submit_data.contest_id, submit_data.git_url, current_user.id, submit_data.language)
+    submit_id = await tasks.submit_contest(submit_data.contest_id, submit_data.git_url, current_user.id, submit_data.language, Checker)
     return {"submit_id": submit_id}
 
 @router.get("/homework/get_task_submits")

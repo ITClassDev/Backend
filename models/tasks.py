@@ -11,7 +11,6 @@ class Task(BaseModel):
     memory_limit: int
     is_day_challenge: bool
     tests: List[dict]
-    input_types: Optional[List[int]]
 
 class TaskIn(BaseModel):
     title: str
@@ -20,4 +19,3 @@ class TaskIn(BaseModel):
     memory_limit: int
     is_day_challenge: bool
     tests: List[dict]
-    input_types: Optional[List[int]]
