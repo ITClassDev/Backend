@@ -119,7 +119,6 @@ class Checker:
                         result = epicbox.run('gcc', './main', stdin=stdin_,
                                             limits={'cputime': 2, 'memory': 200, 'realtime': 200}, #FIXIT NON STATIC
                                             workdir=workdir)
-                        #print(result)
                         test_status = result["stdout"].decode("utf-8").strip() == str(test["output"])
                         tests_passed += test_status
                         tests_statuses.append({"status": test_status, "error_info": result["stderr"], "duration": result["duration"],

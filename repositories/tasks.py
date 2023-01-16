@@ -97,7 +97,7 @@ class TasksRepository(BaseRepository):
         return contest_tasks
 
     async def get_contest_task_submits(self, task_id, contest_id):
-        query = submits.select().where(submits.c.task_id == task_id, submits.c.refer_to == contest_id)
+        query = submits.select().where(submits.c.task_id == task_id, submits.c.refer_to == contest_id).order_by(submits.c.id.desc())
         return await self.database.fetch_all(query)
 
 

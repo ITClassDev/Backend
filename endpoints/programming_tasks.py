@@ -81,15 +81,21 @@ async def create_homework(contest_data: ContestIn, current_user: User = Depends(
 @router.get("/homework/get")
 async def get_homework(contest_id: int, tasks: TasksRepository = Depends(get_tasks_repository)):
     contest_data = await tasks.get_contest_tasks(contest_id)
-    task_data = await tasks.get_by_id_full(contest_id)
-    tests_data_dict = {**task_data}
-    demo_tests = []
-    ind = 0
-    for test in tests_data_dict["tests"]:
-        if "demo" in test and test["demo"]:
-            demo_tests.append({**test, "key": ind})
-            ind += 1
-    tests_data_dict["tests"] = demo_tests
+    tasks_titles = []
+    for task in contest_data.tasks_ids_list:
+        task_data = await tasks.get_by_id_full(task)
+        tasks_titles.append(task_data.title)
+    contest_data = {**contest_data}
+    # 
+    # tests_data_dict = {**task_data}
+    # demo_tests = []
+    # ind = 0
+    # for test in tests_data_dict["tests"]:
+    #     if "demo" in test and test["demo"]:
+    #         demo_tests.append({**test, "key": ind})
+    #         ind += 1
+    # tests_data_dict["tests"] = demo_tests
+    contest_data["tasks_titles"] = tasks_titles
     return contest_data
     
 @router.post("/homework/submit")
