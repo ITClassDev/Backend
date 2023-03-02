@@ -21,6 +21,8 @@ termcolor = "*"
 python-multipart = "*"
 psutil = "*"
 asyncpg = "*"
+epicbox = "*"
+
 [dev-packages]
 
 [requires]

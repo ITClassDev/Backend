@@ -7,6 +7,7 @@
 4. [ OAuth scheme ](#oauth_scheme)
 5. [ Deployment ](#deployment) 
 6. [ Testing all API ](#tests)
+7. [ Easy-Deploy ](#easy_deploy)
 
 
 <a name="general"></a>
@@ -129,6 +130,9 @@ It will run! With default config, it will be `localhost:8080`
 <p>Why did we invent the wheel and write a system for api test from scratch?<p>
 <p>The main problem is support for protobuf. We don't use them in the context of grpc, we use them as a separate tool for serializing packages. It makes no sense to get into the code of ready-made autotests - it is very long and inconvenient. It's faster to write your own test system and not fool around.</p>
 
+<a name="easy_deploy"></a>
+## Docker based env
+<p>We are working on building ecosystem with ready to use Docker images and Docker compose. Now we are working on Backend. Dockerfile not ready</p>
 
 ## Extra
 ### User roles:
