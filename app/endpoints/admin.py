@@ -32,3 +32,7 @@ async def update_user(user_id: int, user_data: UserUpdate, current_user: User = 
 async def get_moderation_queue(current_user: User = Depends(get_current_user), achievements: AchievementRepository = Depends(get_achievement_repository)):
     if current_user.userRole > 0:
         return await achievements.get_moderation_queue_for_all()
+
+@router.post("/create_admin")
+async def create_admin(new_user_data):
+    pass

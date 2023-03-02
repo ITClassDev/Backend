@@ -16,3 +16,4 @@ termcolor
 python-multipart
 psutil
 epicbox
+pydantic[email]

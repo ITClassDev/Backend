@@ -13,12 +13,12 @@ COPY ./app /api/app
 # Hardcoded
 #CMD ["source", "/api/app/.env"]
 
-ENV ITC_DATABASE_URL="postgresql://root:root@172.20.0.2:5432/itc_system"
+ENV ITC_DATABASE_URL="postgresql://root:root@db:5432/itc_system"
 ENV ITC_SERV_PORT=8080
 ENV ITC_SERV_HOST="0.0.0.0"
 ENV ITC_SECRET_KEY="hasyadyfysdyfsdfsdu723772s"
 ENV ITC_ACCESS_TOKEN_EXPIRE_MINUTES=1440
-ENV ITC_USERS_STORAGE="./static/users_data/uploads/"
+ENV ITC_USERS_STORAGE="/api/app/static/users_data/uploads/"
 ENV ITC_API_VER="0.0.2"
 
 

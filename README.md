@@ -132,7 +132,7 @@ It will run! With default config, it will be `localhost:8080`
 
 <a name="easy_deploy"></a>
 ## Docker based env
-<p>We are working on building ecosystem with ready to use Docker images and Docker compose. Now we are working on Backend. Dockerfile not ready</p>
+<p>We are working on building ecosystem with ready to use Docker images and Docker compose. Now we are working on Backend. Dockerfile for backend + postgres ready!</p>
 
 ## Extra
 ### User roles:
