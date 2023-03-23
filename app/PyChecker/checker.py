@@ -107,7 +107,7 @@ class Checker:
                 compile_res = epicbox.run('gcc', 'g++ -pipe -O2 -static -o main main.cpp funcs.cpp',
                                     files=files,
                                     workdir=workdir,
-                                    limits={'cputime': 10, 'memory': 2048, 'realtime': 10})  # static build limits
+                                    limits={'cputime': 10, 'memory': 2048, 'realtime': 10})  # static build limits FIXIT
                 #print(compile_res["stderr"].decode("utf-8"))
                 if compile_res['exit_code'] == 0:
                     tests_statuses = []
