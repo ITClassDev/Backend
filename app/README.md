@@ -13,7 +13,7 @@
 ## General
 <p>This is a repository with a ShTP backend. To demonstrate and interact with the API, you can use swagger by building the repository locally (/docs).</p> 
 <p>
-<img src="https://raw.githubusercontent.com/ITClassDev/Backend/master/docs/images/swagger_openapi.png">
+<img src="https://raw.githubusercontent.com/ITClassDev/Backend/master/app/docs/images/swagger_openapi.png">
 </p>
 Tech-Stack
 
@@ -34,21 +34,21 @@ Tech-Stack
 <p>The use of protocol buffers can significantly speed up the work of a mobile application due to efficient binary serialization. And the main difficulty in implementing the buffer protocol is the beauty of the architecture of the final application.</p>
 <p>So, we have a routing that accepts an input as a pydantic object or a json, it is convenient to work with it, there is no need to worry about parsing inputs from the request. Routing returns a pythonic dictionary or also a pydantic object, which in our case is the same. In our project, everything is simple - there is a wrapper above the usual json routings, which converts the received input from the protobuffers into the one necessary for the endpoint and similarly works on the result of the endpoint, converting it into a protobuffer. More detailed diagram in the image below.</p>
 <p>
-<img src="https://raw.githubusercontent.com/ITClassDev/Backend/master/docs/images/req_flow.png">
+<img src="https://raw.githubusercontent.com/ITClassDev/Backend/master/app/docs/images/req_flow.png">
 </p>
 
 <a name="tasks_organization"></a>
 ## Tasks_organization (backend level)
 <p>Look at image</p>
 <p>
-<img src="https://raw.githubusercontent.com/ITClassDev/Backend/master/docs/images/tasks_organization.png">
+<img src="https://raw.githubusercontent.com/ITClassDev/Backend/master/app/docs/images/tasks_organization.png">
 </p>
 
 <a name="oauth_scheme"></a>
 ## OAuth scheme
 <p>I know, this is not a classic OAuth. It is low privileged shit, but it works and it is secure by design! So, shut up and use it!</p>
 <p>
-<img src="https://raw.githubusercontent.com/ITClassDev/Backend/master/docs/images/oauth.png">
+<img src="https://raw.githubusercontent.com/ITClassDev/Backend/master/app/docs/images/oauth.png">
 </p>
 
 <a name="deployment"></a>
