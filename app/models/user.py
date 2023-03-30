@@ -64,4 +64,6 @@ class UpdatePassword(BaseModel):
     current_password: str
     new_password: str
     confirm_password: str
-    
+
+class UpdateTechStack(BaseModel):
+    tech_stack: list

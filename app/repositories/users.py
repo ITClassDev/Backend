@@ -68,3 +68,7 @@ class UserRepository(BaseRepository):
         query = users.update().where(users.c.id == user_id).values(hashedPassword=hash_password(new_password))
         return await self.database.execute(query)
 
+    async def update_tech_stack(self, user_id: int, new_tech_stack: list) -> None:
+        new_tech_stack_string = ",".join(new_tech_stack)
+        query = users.update().where(users.c.id == user_id).values(techStack=new_tech_stack_string)
+        return await self.database.execute(query)

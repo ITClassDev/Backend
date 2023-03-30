@@ -24,5 +24,8 @@ async def check_auth(current_user: User = Depends(get_current_user), notificatio
     if current_user:
         user = dict(current_user)
         user["new_notifications"] = await notifications.check_active_notifications(current_user.id)
-        return {"status": True, "user": user}
+        user_data = user
+        user_data.pop("hashedPassword")
+        user_data.pop("email")
+        return {"status": True, "user": user_data}
     return {"status": False}
