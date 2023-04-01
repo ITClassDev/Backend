@@ -10,7 +10,7 @@ from .config import ACCESS_TOKEN_EXPIRE_MINUTES, SECRET_KEY, ALGORITHM
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-
+# random.randint(10 ** 6, 10 ** 10)
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
 
