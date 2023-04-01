@@ -4,6 +4,7 @@ from repositories.user_groups import UserGroupsRepository
 from repositories.apps import AppsRepository
 from repositories.oauth_tokens import OAuthTokensRepository
 from repositories.notifications import NotificationRepository
+from repositories.polls import PollsRepository
 from repositories.tasks import TasksRepository
 from db.base import database
 from fastapi import Depends, HTTPException, status
@@ -31,6 +32,9 @@ def get_user_groups_repository() -> UserGroupsRepository:
 
 def get_tasks_repository() -> TasksRepository:
     return TasksRepository(database)
+
+def get_polls_repository() -> PollsRepository:
+    return PollsRepository(database)
 
 async def get_current_user(
     users: UserRepository = Depends(get_user_repository),

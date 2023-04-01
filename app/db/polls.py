@@ -4,7 +4,7 @@ from .base import engine, metadata
 polls = sqlalchemy.Table(
     "polls",
     metadata,
-    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True, autoincrement=True, unique=True),
+    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True, unique=True),
     sqlalchemy.Column("owner_id", sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'), nullable=False),
     sqlalchemy.Column("title", sqlalchemy.String),
     sqlalchemy.Column("description", sqlalchemy.String),

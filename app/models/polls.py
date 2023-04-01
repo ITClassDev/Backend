@@ -12,11 +12,12 @@ class Poll(BaseModel):
     created_at: datetime
     expire_at: datetime
 
-class CreatePoll(BaseModel):
+class PollIn(BaseModel):
     title: str
     description: str
     auth_required: bool
     entries: List[dict]
+    expire_at: datetime
 
 # class PollEntry(BaseModel):
 #     id: Optional[int] = None
