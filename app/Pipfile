@@ -22,6 +22,8 @@ python-multipart = "*"
 psutil = "*"
 asyncpg = "*"
 epicbox = "*"
+pandas = "*"
+openpyxl = "*"
 
 [dev-packages]
 
