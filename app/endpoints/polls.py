@@ -11,8 +11,8 @@ async def get_all(offset: int = 0, limit: int = 50, polls: PollsRepository = Dep
     return await polls.get_all(offset, limit)
 
 @router.get("/{poll_id}/answers")
-async def poll_answers(poll_id: int):
-    pass
+async def poll_answers(poll_id: int, offset: int = 0, limit: int = 100, polls: PollsRepository = Depends(get_polls_repository)):
+    return await polls.get_answers(poll_id, offset, limit)
 
 @router.get("/{poll_id}")
 async def poll_info(poll_id: int, polls: PollsRepository = Depends(get_polls_repository)):
@@ -35,9 +35,9 @@ async def create_poll(poll_data: PollIn, current_user: User = Depends(get_curren
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                         detail="Not enought permissions to execute this API endpoint")
 
-@router.put("/submit")
+@router.put("/{poll_id}/submit/")
 async def submit_poll_answer(poll_id: int, poll_data: dict, polls: PollsRepository = Depends(get_polls_repository)): # FIXIT; handle current user for auth_required polls
-    # FIXIT check reuired questions answers
+    # FIXIT check reuired questions answers; Check trello
     if polls.get_by_id(poll_id):
         answers_id = await polls.submit_answers(poll_id, poll_data)
         return {"answers_id": answers_id}

@@ -24,6 +24,7 @@ class PollAnswer(BaseModel):
     poll_id: int
     user_id: Optional[int] = None
     answers: dict
+    answer_date: datetime
 
 
 # class PollEntry(BaseModel):

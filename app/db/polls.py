@@ -21,4 +21,5 @@ polls_answers = sqlalchemy.Table(
     sqlalchemy.Column("poll_id", sqlalchemy.Integer),
     sqlalchemy.Column("user_id", sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'), nullable=True),
     sqlalchemy.Column("answers", sqlalchemy.PickleType),
+    sqlalchemy.Column("answer_date", sqlalchemy.DateTime),
 )

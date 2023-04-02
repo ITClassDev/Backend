@@ -22,8 +22,11 @@ class PollsRepository(BaseRepository):
         return values["id"]
 
     async def submit_answers(self, id: int, answers: dict, user_id: int = None) -> int:
-        poll_answers_obj = PollAnswer(poll_id=id, user_id=user_id, answers=answers)
+        poll_answers_obj = PollAnswer(poll_id=id, user_id=user_id, answers=answers, answer_date=datetime.datetime.now())
         values = {**poll_answers_obj.dict()}
         values.pop("id", None)
         query = polls_answers.insert().values(**values)
         return await self.database.execute(query)
+    
+    async def get_answers(self, id: int, offset: int = 0, limit: int = 100) -> List[PollAnswer]:
+        return await self.database.fetch_all(polls_answers.select().where(polls_answers.c.poll_id == id).offset(offset).limit(limit).order_by())
