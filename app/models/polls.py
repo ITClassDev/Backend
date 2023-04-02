@@ -7,17 +7,24 @@ class Poll(BaseModel):
     owner_id: int
     title: str
     description: str
-    auth_required: bool
+    auth_required: Optional[bool] = False
     entries: List[dict]
     created_at: datetime
-    expire_at: datetime
+    expire_at: Optional[datetime] = None
 
 class PollIn(BaseModel):
     title: str
     description: str
-    auth_required: bool
+    auth_required: Optional[bool] = False
     entries: List[dict]
-    expire_at: datetime
+    expire_at: Optional[datetime] = None
+
+class PollAnswer(BaseModel):
+    id: Optional[int] = None
+    poll_id: int
+    user_id: Optional[int] = None
+    answers: dict
+
 
 # class PollEntry(BaseModel):
 #     id: Optional[int] = None

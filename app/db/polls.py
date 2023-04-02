@@ -13,3 +13,12 @@ polls = sqlalchemy.Table(
     sqlalchemy.Column("created_at", sqlalchemy.DateTime),
     sqlalchemy.Column("expire_at", sqlalchemy.DateTime),
 )
+
+polls_answers = sqlalchemy.Table(
+    "polls_answers",
+    metadata,
+    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True, unique=True, autoincrement=True),
+    sqlalchemy.Column("poll_id", sqlalchemy.Integer),
+    sqlalchemy.Column("user_id", sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'), nullable=True),
+    sqlalchemy.Column("answers", sqlalchemy.PickleType),
+)
