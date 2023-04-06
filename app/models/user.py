@@ -21,7 +21,7 @@ class User(BaseModel):
     userAvatarPath: Optional[str]
     systemAchievements: Optional[List]
     techStack: Optional[str] = None
-    groupId: int
+    groupId: Optional[int] = None
 
     # @validator('techStack')
     # def set_name(cls, name):
@@ -36,7 +36,7 @@ class UserIn(BaseModel):
     userRole: int
     password: str
     learningClass: int
-    groupId: int
+    groupId: Optional[int] = None
 
 
 class UserUpdate(BaseModel):

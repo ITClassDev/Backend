@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import StreamingResponse
 from models.polls import PollIn
 from models.user import User
 from .depends import get_current_user, get_polls_repository
 from repositories.polls import PollsRepository
 import pandas as pd
+from io import BytesIO
 
 router = APIRouter()
 
@@ -22,16 +24,25 @@ async def poll_answers(poll_id: int, offset: int = 0, limit: int = 100, polls: P
                             detail="Not enought permissions to execute this API endpoint")
 
 
-@router.get("/{pol_id}/answers/xlsx")
+@router.get("/{poll_id}/answers/xlsx")
 async def poll_answers_xlsx(poll_id: int, polls: PollsRepository = Depends(get_polls_repository), current_user: User = Depends(get_current_user)):
     if current_user.userRole == 2:  # TODO; only for admin now
         poll_questions = [i["text"] for i in dict(await polls.get_by_id(poll_id))["entries"]]
         all_answers_data = await polls.get_answers(poll_id, 0, 100000)
         all_answers = [dict(zip(poll_questions, list(dict(u)["answers"].values())))
                        for u in all_answers_data]  # const max limit
+
+        buffer = BytesIO()
         print(all_answers)
-        pd.DataFrame.from_dict(all_answers).to_excel("/tmp/output.xlsx")
-        
+        with pd.ExcelWriter(buffer) as writer:
+            pd.DataFrame.from_dict(all_answers).to_excel(writer, index=False)
+        buffer.seek(0)
+        return StreamingResponse(
+            buffer,
+            media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            headers={"Content-Disposition": f"attachment; filename=data.xlsx"}
+        )
+
     else:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail="Not enought permissions to execute this API endpoint")
@@ -65,7 +76,7 @@ async def create_poll(poll_data: PollIn, current_user: User = Depends(get_curren
 # FIXIT; handle current user for auth_required polls
 async def submit_poll_answer(poll_id: int, poll_data: dict, polls: PollsRepository = Depends(get_polls_repository)):
     # FIXIT check reuired questions answers; Check trello
-    if polls.get_by_id(poll_id):
+    if await polls.get_by_id(poll_id):
         answers_id = await polls.submit_answers(poll_id, poll_data)
         return {"answers_id": answers_id}
     else:
