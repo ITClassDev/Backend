@@ -20,7 +20,7 @@ ENV ITC_SECRET_KEY="hasyadyfysdyfsdfsdu723772s"
 ENV ITC_ACCESS_TOKEN_EXPIRE_MINUTES=1440
 ENV ITC_USERS_STORAGE="/api/app/static/users_data/uploads/"
 ENV ITC_API_VER="0.0.2"
-
+ENV ITC_SETUP_MODE=0
 
 # Run
 #CMD ["python3", "/api/app/main.py"]
