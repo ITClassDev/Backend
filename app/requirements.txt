@@ -18,3 +18,4 @@ psutil
 epicbox
 pydantic[email]
 openpyxl
+pandas
