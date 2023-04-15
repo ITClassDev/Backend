@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, UploadFile, HTTPException, status
+from repositories.user_groups import UserGroupsRepository
 from repositories.users import UserRepository
 from repositories.apps import AppsRepository
 from repositories.notifications import NotificationRepository
 from models.user import User, UserIn, AboutText, UserUpdate, SocialLinksIn, UpdatePassword, UpdateTechStack
-from .depends import get_user_repository, get_current_user, get_apps_repository, get_notification_repository
+from .depends import get_user_repository, get_current_user, get_apps_repository, get_notification_repository, get_user_groups_repository
 from core.utils.files import upload_file
 from core.config import USERS_STORAGE, ERROR_TEXTS
 from core.security import verify_password
@@ -12,7 +13,7 @@ import os
 router = APIRouter()
 
 
-@router.get("/{user_id}/info")
+@router.get("/{user_id}")
 async def get_user_info(user_id: int, users: UserRepository = Depends(get_user_repository)):
     data = await users.get_user_info(int(user_id))
     if data:
@@ -27,7 +28,16 @@ async def get_user_info(user_id: int, users: UserRepository = Depends(get_user_r
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="No user with such id")
 
-@router.delete("/{user_id}/delete")
+@router.get("/")
+async def get_all(current_user: User = Depends(get_current_user), users: UserRepository = Depends(get_user_repository), user_groups: UserGroupsRepository = Depends(get_user_groups_repository)):
+    if current_user.userRole > 0:
+        all_users = await users.get_all_users()
+        all_user_groups = await user_groups.get_all()
+        return {"users": all_users, "user_groups": all_user_groups}
+    else:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=ERROR_TEXTS.low_permissions)
+
+@router.delete("/{user_id}")
 async def delete_user(user_id: int, current_user: User = Depends(get_current_user), users: UserRepository = Depends(get_user_repository)):
     if current_user.userRole == 2: # Only for super admin
         await users.delete(user_id)
@@ -103,6 +113,9 @@ async def update_password(update_password: UpdatePassword, current_user: User = 
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail="Invalid current password")
 
+@router.put("/groups/add")
+async def add_groups(current_user: User = Depends(get_current_user)):
+    pass
 
 
 @router.patch("/update/tech_stack")
