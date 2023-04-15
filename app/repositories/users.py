@@ -5,7 +5,7 @@ from models.user import User, UserIn, UserUpdate, SocialLinksIn
 from typing import List
 from sqlalchemy import select
 from core.security import hash_password
-
+import asyncpg
 
 
 class UserRepository(BaseRepository):
@@ -72,3 +72,17 @@ class UserRepository(BaseRepository):
         new_tech_stack_string = ",".join(new_tech_stack)
         query = users.update().where(users.c.id == user_id).values(techStack=new_tech_stack_string)
         return await self.database.execute(query)
+
+    async def create_multiple(self, users_list: list) -> List[int]:
+        created_ids = []
+        failed_to_create = []
+        for user in users_list:
+            userObj = User(firstName=user[0], lastName=user[1], email=user[2], userRole=user[3], hashedPassword=hash_password(user[4]), learningClass=user[5], groupId=user[6])
+            values = {**userObj.dict()}
+            values.pop("id", None)
+            query = users.insert().values(**values)
+            try:
+                created_ids.append(await self.database.execute(query))
+            except asyncpg.exceptions.UniqueViolationError:
+                failed_to_create.append(user[2])
+        return created_ids, failed_to_create

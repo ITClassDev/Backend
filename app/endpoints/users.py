@@ -10,6 +10,8 @@ from core.config import USERS_STORAGE
 from core.security import verify_password
 import os
 
+
+
 router = APIRouter()
 
 
@@ -36,7 +38,18 @@ async def create_user(new_user: UserIn, current_user: User = Depends(get_current
         created_user_id = await users.create(new_user)
         return {"user_id": created_user_id}
     else:
-        return NON_AUTH_PACKET
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not enought permissions to execute this API endpoint") # FIXIT MAKE text mapping
+
+@router.put("/from_csv")
+async def multiple_users_create(file: UploadFile, users: UserRepository = Depends(get_user_repository), current_user: User = Depends(get_current_user)):
+    if current_user.userRole > 0:
+        csv_content = await upload_file(file, ["csv"], write=False)
+        csv_content = csv_content["file_content"].decode("utf-8")
+        users_data = [list(map(str.strip, x.split(','))) for x in csv_content.split('\n')[1:-1]]
+        created, skipped = await users.create_multiple(users_data)
+        return {"created": created, "skipped": skipped}
+    else:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not enought permissions to execute this API endpoint") # FIXIT MAKE text mapping
 
 
 @router.patch("/upload_avatar")

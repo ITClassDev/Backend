@@ -9,7 +9,7 @@ class User(BaseModel):
     firstName: str
     lastName: str
     middleName: Optional[str]
-    rating: Optional[int]
+    rating: Optional[int] = 0
     userRole: int
     learningClass: int
     userTelegram: Optional[str]
@@ -18,7 +18,7 @@ class User(BaseModel):
     userKaggle: Optional[str]
     userWebsite: Optional[str]
     userAboutText: Optional[str]
-    userAvatarPath: Optional[str]
+    userAvatarPath: Optional[str] = "default.png"
     systemAchievements: Optional[List]
     techStack: Optional[str] = None
     groupId: Optional[int] = None

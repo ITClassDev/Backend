@@ -19,15 +19,18 @@ async def generate_filename(file_ext, prefix="itc_upl_", custom_name=None):
     return f"{base_name}.{file_ext}"
 
 
-async def upload_file(file, allowed_extensions, upload_path, custom_name=None):
+async def upload_file(file, allowed_extensions, upload_path=None, custom_name=None, write=True):
     if file:
         file_ext = await get_file_extension(file.filename)
         if file_ext and file_ext in allowed_extensions:
             contents = file.file.read()
             file_name = await generate_filename(file_ext, custom_name=custom_name)
-            with open(os.path.join(upload_path, file_name), "wb") as file_descr:
-                file_descr.write(contents)
-            return {"status": True, "file_name": file_name}
+            if write:
+                with open(os.path.join(upload_path, file_name), "wb") as file_descr:
+                    file_descr.write(contents)
+                return {"status": True, "file_name": file_name}
+            else:
+                return {"status": True, "file_content": contents}
         else:
             return {"status": False, "info": "Files with such extensions are forbidden"}
     else:
