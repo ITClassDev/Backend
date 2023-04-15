@@ -10,3 +10,5 @@ SECRET_KEY = config("ITC_SECRET_KEY", cast=str, default="212646234g2634234f23642
 USERS_STORAGE = config("ITC_USERS_STORAGE", cast=str)
 API_VER = config("ITC_API_VER", cast=str)
 SETUP_MODE = config("ITC_SETUP_MODE", cast=bool)
+class ERROR_TEXTS:
+    low_permissions = "Not enought permissions to execute this API endpoint"

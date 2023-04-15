@@ -86,3 +86,6 @@ class UserRepository(BaseRepository):
             except asyncpg.exceptions.UniqueViolationError:
                 failed_to_create.append(user[2])
         return created_ids, failed_to_create
+    
+    async def delete(self, id: int) -> None:
+        await self.database.execute(users.delete().where(users.c.id == id)) 

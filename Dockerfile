@@ -11,7 +11,7 @@ COPY ./app /api/app
 
 # Import env vars
 # Hardcoded
-#CMD ["source", "/api/app/.env"]
+# CMD ["source", "/api/app/.env"]
 
 ENV ITC_DATABASE_URL="postgresql://root:root@db:5432/itc_system"
 ENV ITC_SERV_PORT=8080

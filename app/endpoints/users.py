@@ -4,13 +4,10 @@ from repositories.apps import AppsRepository
 from repositories.notifications import NotificationRepository
 from models.user import User, UserIn, AboutText, UserUpdate, SocialLinksIn, UpdatePassword, UpdateTechStack
 from .depends import get_user_repository, get_current_user, get_apps_repository, get_notification_repository
-from core.utils.variables import NON_AUTH_PACKET
 from core.utils.files import upload_file
-from core.config import USERS_STORAGE
+from core.config import USERS_STORAGE, ERROR_TEXTS
 from core.security import verify_password
 import os
-
-
 
 router = APIRouter()
 
@@ -30,6 +27,14 @@ async def get_user_info(user_id: int, users: UserRepository = Depends(get_user_r
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="No user with such id")
 
+@router.delete("/{user_id}/delete")
+async def delete_user(user_id: int, current_user: User = Depends(get_current_user), users: UserRepository = Depends(get_user_repository)):
+    if current_user.userRole == 2: # Only for super admin
+        await users.delete(user_id)
+    else:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail=ERROR_TEXTS.low_permissions)
+
 
 @router.put("/create_user")
 async def create_user(new_user: UserIn, current_user: User = Depends(get_current_user),
@@ -38,10 +43,10 @@ async def create_user(new_user: UserIn, current_user: User = Depends(get_current
         created_user_id = await users.create(new_user)
         return {"user_id": created_user_id}
     else:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not enought permissions to execute this API endpoint") # FIXIT MAKE text mapping
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=ERROR_TEXTS.low_permissions) # FIXIT MAKE text mapping
 
 @router.put("/from_csv")
-async def multiple_users_create(file: UploadFile, users: UserRepository = Depends(get_user_repository), current_user: User = Depends(get_current_user)):
+async def multiple_users_creation(file: UploadFile, users: UserRepository = Depends(get_user_repository), current_user: User = Depends(get_current_user)):
     if current_user.userRole > 0:
         csv_content = await upload_file(file, ["csv"], write=False)
         csv_content = csv_content["file_content"].decode("utf-8")
@@ -49,11 +54,11 @@ async def multiple_users_create(file: UploadFile, users: UserRepository = Depend
         created, skipped = await users.create_multiple(users_data)
         return {"created": created, "skipped": skipped}
     else:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not enought permissions to execute this API endpoint") # FIXIT MAKE text mapping
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=ERROR_TEXTS.low_permissions)
 
 
 @router.patch("/upload_avatar")
-async def upload_file_test(current_user: User = Depends(get_current_user), file: UploadFile = None,
+async def upload_file_test(file: UploadFile, current_user: User = Depends(get_current_user),
                            users: UserRepository = Depends(get_user_repository)):
     allowed_extensions = ["png", "jpg"]  # no gifs for now
     uploaded_avatar = await upload_file(file, allowed_extensions, os.path.join(USERS_STORAGE, "avatars"),
@@ -99,6 +104,7 @@ async def update_password(update_password: UpdatePassword, current_user: User = 
                             detail="Invalid current password")
 
 
+
 @router.patch("/update/tech_stack")
 async def update_tech_stack(new_tech_stack: UpdateTechStack, current_user: User = Depends(get_current_user), users: UserRepository = Depends(get_user_repository)):
     await users.update_tech_stack(current_user.id, new_tech_stack.tech_stack)
@@ -119,3 +125,5 @@ async def get_my_apps(current_user: User = Depends(get_current_user), apps: Apps
 async def get_my_notifications(current_user: User = Depends(get_current_user), notifications: NotificationRepository = Depends(get_notification_repository)):
     data = await notifications.get_all_for_user(current_user.id)
     return data
+
+
