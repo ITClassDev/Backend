@@ -7,15 +7,6 @@ from core.config import SETUP_MODE, ERROR_TEXTS
 
 router = APIRouter()
 
-
-@router.patch("/update_user/{user_id}")
-async def update_user(user_id: int, user_data: UserUpdate, current_user: User = Depends(get_current_user), users: UserRepository = Depends(get_user_repository)):
-    if current_user.userRole > 0:  # 1 || 2
-        await users.update(user_id, user_data)
-        return {"status": True}
-    else:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=ERROR_TEXTS.low_permissions)
-
 @router.get("/moderation_queue")
 async def get_moderation_queue(current_user: User = Depends(get_current_user), achievements: AchievementRepository = Depends(get_achievement_repository)):
     if current_user.userRole > 0:

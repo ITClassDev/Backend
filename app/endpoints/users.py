@@ -12,6 +12,8 @@ import os
 
 router = APIRouter()
 
+
+
 @router.get("/")
 async def get_all_users(current_user: User = Depends(get_current_user), users: UserRepository = Depends(get_user_repository), user_groups: UserGroupsRepository = Depends(get_user_groups_repository)):
     if current_user.userRole > 0:
@@ -22,20 +24,6 @@ async def get_all_users(current_user: User = Depends(get_current_user), users: U
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=ERROR_TEXTS.low_permissions)
 
 
-@router.get("/{user_id}")
-async def get_user_info(user_id: int, users: UserRepository = Depends(get_user_repository)):
-    data = await users.get_user_info(int(user_id))
-    if data:
-        # Return only public data
-        return {"status": True, "firstName": data.firstName, "lastName": data.lastName,
-                "middleName": data.middleName, "rating": data.rating, "userRole": data.userRole,
-                "userTelegram": data.userTelegram, "userGithub": data.userGithub, "userStepik": data.userStepik,
-                "userKaggle": data.userKaggle, "userWebsite": data.userWebsite, "userAvatarPath": data.userAvatarPath,
-                "userAboutText": data.userAboutText, "learningClass": data.learningClass, "techStack": data.techStack}
-
-    else:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail="No user with such id")
 
 @router.delete("/{user_id}")
 async def delete_user(user_id: int, current_user: User = Depends(get_current_user), users: UserRepository = Depends(get_user_repository)):
@@ -67,10 +55,10 @@ async def multiple_users_creation(file: UploadFile, users: UserRepository = Depe
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=ERROR_TEXTS.low_permissions)
 
 
-@router.patch("/upload_avatar")
+@router.patch("/avatar")
 async def upload_file_test(file: UploadFile, current_user: User = Depends(get_current_user),
                            users: UserRepository = Depends(get_user_repository)):
-    allowed_extensions = ["png", "jpg"]  # no gifs for now
+    allowed_extensions = ["png", "jpg", "gif"]
     uploaded_avatar = await upload_file(file, allowed_extensions, os.path.join(USERS_STORAGE, "avatars"),
                                         custom_name=f"{current_user.id}_avatar")
     if uploaded_avatar["status"]:
@@ -88,44 +76,9 @@ async def update_user_info(update_data: UserUpdate, current_user: User = Depends
     else:
         return {"status": True}
 
-
-@router.patch("/update/about")
-async def update_avatar(about_text: AboutText, current_user: User = Depends(get_current_user),
-                        users: UserRepository = Depends(get_user_repository)):
-
-    await users.update_about_text(current_user.id, about_text.about_text)
-    return {"status": True, "newAbout": about_text.about_text}
-
-
-@router.patch("/update/social")
-async def update_social(social_links: SocialLinksIn, current_user: User = Depends(get_current_user), users: UserRepository = Depends(get_user_repository)):
-    await users.update_social_links(social_links, current_user.id)
-    return {"status": "True"}
-
-
-# @router.patch("/update/password")
-# async def update_password(update_password: UpdatePassword, current_user: User = Depends(get_current_user), users: UserRepository = Depends(get_user_repository)):
-#     if verify_password(update_password.current_password, current_user.hashedPassword):
-#         if update_password.new_password == update_password.confirm_password:
-#             await users.update_password(current_user.id, update_password.new_password)
-#             return {"status": True}
-#         else:
-#             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-#                                 detail="Confirmation password doesn't match")
-#     else:
-#         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-#                             detail="Invalid current password")
-
-@router.put("/groups/add")
-async def add_groups(current_user: User = Depends(get_current_user)):
-    pass
-
-
-@router.patch("/update/tech_stack")
-async def update_tech_stack(new_tech_stack: UpdateTechStack, current_user: User = Depends(get_current_user), users: UserRepository = Depends(get_user_repository)):
-    await users.update_tech_stack(current_user.id, new_tech_stack.tech_stack)
-    return {"status": True}
-
+# @router.put("/groups/add")
+# async def add_groups(current_user: User = Depends(get_current_user)):
+#     pass
 
 @router.get("/get_leaderboard")
 async def get_leaderboard(limit: int = 10, users: UserRepository = Depends(get_user_repository)):
@@ -143,3 +96,17 @@ async def get_my_notifications(current_user: User = Depends(get_current_user), n
     return data
 
 
+@router.get("/{user_id}")
+async def get_user_info(user_id: int, users: UserRepository = Depends(get_user_repository)):
+    data = await users.get_user_info(int(user_id))
+    if data:
+        # Return only public data
+        return {"status": True, "firstName": data.firstName, "lastName": data.lastName,
+                "middleName": data.middleName, "rating": data.rating, "userRole": data.userRole,
+                "userTelegram": data.userTelegram, "userGithub": data.userGithub, "userStepik": data.userStepik,
+                "userKaggle": data.userKaggle, "userWebsite": data.userWebsite, "userAvatarPath": data.userAvatarPath,
+                "userAboutText": data.userAboutText, "learningClass": data.learningClass, "techStack": data.techStack}
+
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="No user with such id")
