@@ -7,10 +7,19 @@ from models.user import User, UserIn, AboutText, UserUpdate, SocialLinksIn, Upda
 from .depends import get_user_repository, get_current_user, get_apps_repository, get_notification_repository, get_user_groups_repository
 from core.utils.files import upload_file
 from core.config import USERS_STORAGE, ERROR_TEXTS
-from core.security import verify_password
+
 import os
 
 router = APIRouter()
+
+@router.get("/")
+async def get_all_users(current_user: User = Depends(get_current_user), users: UserRepository = Depends(get_user_repository), user_groups: UserGroupsRepository = Depends(get_user_groups_repository)):
+    if current_user.userRole > 0:
+        all_users = await users.get_all_users()
+        all_user_groups = await user_groups.get_all()
+        return {"users": all_users, "userGroups": all_user_groups}
+    else:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=ERROR_TEXTS.low_permissions)
 
 
 @router.get("/{user_id}")
@@ -28,15 +37,6 @@ async def get_user_info(user_id: int, users: UserRepository = Depends(get_user_r
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="No user with such id")
 
-@router.get("/")
-async def get_all(current_user: User = Depends(get_current_user), users: UserRepository = Depends(get_user_repository), user_groups: UserGroupsRepository = Depends(get_user_groups_repository)):
-    if current_user.userRole > 0:
-        all_users = await users.get_all_users()
-        all_user_groups = await user_groups.get_all()
-        return {"users": all_users, "user_groups": all_user_groups}
-    else:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=ERROR_TEXTS.low_permissions)
-
 @router.delete("/{user_id}")
 async def delete_user(user_id: int, current_user: User = Depends(get_current_user), users: UserRepository = Depends(get_user_repository)):
     if current_user.userRole == 2: # Only for super admin
@@ -46,12 +46,12 @@ async def delete_user(user_id: int, current_user: User = Depends(get_current_use
                             detail=ERROR_TEXTS.low_permissions)
 
 
-@router.put("/create_user")
+@router.put("/")
 async def create_user(new_user: UserIn, current_user: User = Depends(get_current_user),
                       users: UserRepository = Depends(get_user_repository)):
     if current_user.userRole > 0:  # Is admin
         created_user_id = await users.create(new_user)
-        return {"user_id": created_user_id}
+        return {"userId": created_user_id}
     else:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=ERROR_TEXTS.low_permissions) # FIXIT MAKE text mapping
 
@@ -80,10 +80,13 @@ async def upload_file_test(file: UploadFile, current_user: User = Depends(get_cu
         return {"status": False, "info": uploaded_avatar["info"]}
 
 
-@router.patch("/{user_id}/update_profile")
+@router.patch("/")
 async def update_user_info(update_data: UserUpdate, current_user: User = Depends(get_current_user), users: UserRepository = Depends(get_user_repository)):
-    await users.update(current_user.id, update_data)
-    return {"status": True}
+    result = await users.update(current_user, update_data)
+    if "raise" in result:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=result["raise"])
+    else:
+        return {"status": True}
 
 
 @router.patch("/update/about")
@@ -91,7 +94,7 @@ async def update_avatar(about_text: AboutText, current_user: User = Depends(get_
                         users: UserRepository = Depends(get_user_repository)):
 
     await users.update_about_text(current_user.id, about_text.about_text)
-    return {"status": True, "new_about": about_text.about_text}
+    return {"status": True, "newAbout": about_text.about_text}
 
 
 @router.patch("/update/social")
@@ -100,18 +103,18 @@ async def update_social(social_links: SocialLinksIn, current_user: User = Depend
     return {"status": "True"}
 
 
-@router.patch("/update/password")
-async def update_password(update_password: UpdatePassword, current_user: User = Depends(get_current_user), users: UserRepository = Depends(get_user_repository)):
-    if verify_password(update_password.current_password, current_user.hashedPassword):
-        if update_password.new_password == update_password.confirm_password:
-            await users.update_password(current_user.id, update_password.new_password)
-            return {"status": True}
-        else:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                                detail="Confirmation password doesn't match")
-    else:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                            detail="Invalid current password")
+# @router.patch("/update/password")
+# async def update_password(update_password: UpdatePassword, current_user: User = Depends(get_current_user), users: UserRepository = Depends(get_user_repository)):
+#     if verify_password(update_password.current_password, current_user.hashedPassword):
+#         if update_password.new_password == update_password.confirm_password:
+#             await users.update_password(current_user.id, update_password.new_password)
+#             return {"status": True}
+#         else:
+#             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+#                                 detail="Confirmation password doesn't match")
+#     else:
+#         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+#                             detail="Invalid current password")
 
 @router.put("/groups/add")
 async def add_groups(current_user: User = Depends(get_current_user)):

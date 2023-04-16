@@ -4,7 +4,7 @@ from .base import BaseRepository
 from models.user import User, UserIn, UserUpdate, SocialLinksIn
 from typing import List
 from sqlalchemy import select
-from core.security import hash_password
+from core.security import hash_password, verify_password
 import asyncpg
 
 
@@ -26,10 +26,33 @@ class UserRepository(BaseRepository):
         if not user: return None
         return User.parse_obj(user)
 
-    async def update(self, id: int, user_data: UserUpdate) -> None:
-        upd_values = {**user_data.dict()}
-        query = users.update().where(users.c.id == id).values(**upd_values)
-        await self.database.execute(query)
+    async def update(self, user: User, user_data: UserUpdate) -> None:
+        upd_values = {}
+        if user_data.aboutText:
+            upd_values["userAboutText"] = user_data.aboutText
+        if user_data.socialLinks:
+            for link in dict(user_data.socialLinks):
+                value = dict(user_data.socialLinks)[link]
+                if value:
+                    upd_values[link] = value
+        if user_data.techStack:
+            upd_values["techStack"] = ",".join(user_data.techStack)
+        if user_data.password:
+            if verify_password(user_data.password.currentPassword, user.hashedPassword):
+                if user_data.password.newPassword == user_data.password.confirmPassword:
+                    upd_values["hashedPassword"] = hash_password(user_data.password.newPassword)
+                else:
+                    return {"raise": "Confirmation password doesn't match"}
+            else:
+                return {"raise": "Invalid current password"}
+        
+        if upd_values:
+            query = users.update().where(users.c.id == user.id).values(**upd_values)
+            await self.database.execute(query)
+        else:
+            return {"raise": "Nothing to update"}
+        
+        return {}
 
     async def update_avatar(self, id: int, avatar: str) -> User:
         query = users.update().where(users.c.id == id).values(

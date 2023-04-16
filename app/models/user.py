@@ -39,15 +39,32 @@ class UserIn(BaseModel):
     groupId: Optional[int] = None
 
 
-class UserUpdate(BaseModel):
-    email: EmailStr
-    firstName: str
-    lastName: str
-    rating: int
-    userRole: int
-    learningClass: int
-    userAboutText: str
+class SocialLinks(BaseModel):
+    userGithub: Optional[str]
+    userTelegram: Optional[str]
+    userStepik: Optional[str]
+    userKaggle: Optional[str]
+    userWebsite: Optional[str]
 
+
+class UpdatePassword(BaseModel):
+    currentPassword: str
+    newPassword: str
+    confirmPassword: str
+
+class UserUpdateAdmin(BaseModel):
+    firstName: Optional[str]
+    lastName: Optional[str]
+    middleName: Optional[str]
+    rating: Optional[int]
+    learningClass: Optional[int]
+
+class UserUpdate(BaseModel):
+    aboutText: Optional[str]
+    socialLinks: Optional[SocialLinks]
+    techStack: Optional[List[str]]
+    password: Optional[UpdatePassword]
+    admin: Optional[UserUpdateAdmin]
 
 class AboutText(BaseModel):
     about_text: str
@@ -59,11 +76,5 @@ class SocialLinksIn(BaseModel):
     stepik: Optional[str]
     kaggle: Optional[str]
     website: Optional[str]
-
-class UpdatePassword(BaseModel):
-    current_password: str
-    new_password: str
-    confirm_password: str
-
 class UpdateTechStack(BaseModel):
     tech_stack: list
