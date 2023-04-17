@@ -7,3 +7,9 @@ class UserGroupsRepository(BaseRepository):
     async def get_all(self) -> List[UserGroup]:
         query = user_groups.select()
         return await self.database.fetch_all(query)
+
+    async def create(self, name: str) -> int:
+        values = {**UserGroup(name=name).dict()}
+        values.pop("id", None)
+        query = user_groups.insert().values(**values)
+        return await self.database.execute(query)

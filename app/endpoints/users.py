@@ -3,7 +3,8 @@ from repositories.user_groups import UserGroupsRepository
 from repositories.users import UserRepository
 from repositories.apps import AppsRepository
 from repositories.notifications import NotificationRepository
-from models.user import User, UserIn, AboutText, UserUpdate, SocialLinksIn, UpdatePassword, UpdateTechStack
+from models.user import User, UserIn, UserUpdate
+from models.user_groups import UserGroupIn
 from .depends import get_user_repository, get_current_user, get_apps_repository, get_notification_repository, get_user_groups_repository
 from core.utils.files import upload_file
 from core.config import USERS_STORAGE, ERROR_TEXTS
@@ -76,9 +77,12 @@ async def update_user_info(update_data: UserUpdate, current_user: User = Depends
     else:
         return {"status": True}
 
-# @router.put("/groups/add")
-# async def add_groups(current_user: User = Depends(get_current_user)):
-#     pass
+@router.put("/groups")
+async def add_group(group: UserGroupIn, current_user: User = Depends(get_current_user), user_groups: UserGroupsRepository = Depends(get_user_groups_repository)):
+    if current_user.userRole == 2:
+        return {"groupId": await user_groups.create(group.name)}
+    else: 
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=ERROR_TEXTS.low_permissions)
 
 @router.get("/get_leaderboard")
 async def get_leaderboard(limit: int = 10, users: UserRepository = Depends(get_user_repository)):
