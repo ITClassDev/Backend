@@ -9,7 +9,7 @@ from .depends import get_user_repository, get_current_user, get_notification_rep
 router = APIRouter()
 
 
-@router.post("/login", response_model=Token)
+@router.post("/login/", response_model=Token)
 async def auth_login(login: Login, users: UserRepository = Depends(get_user_repository)):
     user = await users.get_user_by_email(login.email)
     if user is None or not verify_password(login.password, user.hashedPassword):
@@ -19,7 +19,7 @@ async def auth_login(login: Login, users: UserRepository = Depends(get_user_repo
     return Token(accessToken=token, tokenType="Bearer")
 
 # Endpoint to get current user data by access token
-@router.get("/me")
+@router.get("/me/")
 async def check_auth(current_user: User = Depends(get_current_user), notifications: NotificationRepository = Depends(get_notification_repository)):
     if current_user:
         user = dict(current_user)
