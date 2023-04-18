@@ -61,7 +61,8 @@ async def upload_file_test(file: UploadFile, current_user: User = Depends(get_cu
                            users: UserRepository = Depends(get_user_repository)):
     allowed_extensions = ["png", "jpg", "gif", "jpeg"]
     try:
-        os.remove(os.path.join(USERS_STORAGE, "avatars", current_user.userAvatarPath))
+        if current_user.userAvatarPath != "default.png":
+            os.remove(os.path.join(USERS_STORAGE, "avatars", current_user.userAvatarPath))
     except FileNotFoundError:
         pass
     uploaded_avatar = await upload_file(file, allowed_extensions, os.path.join(USERS_STORAGE, "avatars"),
