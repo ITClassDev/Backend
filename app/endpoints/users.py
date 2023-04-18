@@ -60,6 +60,10 @@ async def multiple_users_creation(file: UploadFile, users: UserRepository = Depe
 async def upload_file_test(file: UploadFile, current_user: User = Depends(get_current_user),
                            users: UserRepository = Depends(get_user_repository)):
     allowed_extensions = ["png", "jpg", "gif"]
+    try:
+        os.remove(os.path.join(USERS_STORAGE, "avatars", current_user.userAvatarPath))
+    except FileNotFoundError:
+        pass
     uploaded_avatar = await upload_file(file, allowed_extensions, os.path.join(USERS_STORAGE, "avatars"),
                                         custom_name=f"{current_user.id}_avatar")
     if uploaded_avatar["status"]:

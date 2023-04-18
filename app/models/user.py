@@ -60,7 +60,7 @@ class UserUpdateAdmin(BaseModel):
     learningClass: Optional[int]
 
 class UserUpdate(BaseModel):
-    aboutText: Optional[str]
+    aboutText: Optional[str] = None
     socialLinks: Optional[SocialLinks]
     techStack: Optional[List[str]]
     password: Optional[UpdatePassword]

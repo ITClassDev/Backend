@@ -28,14 +28,14 @@ class UserRepository(BaseRepository):
 
     async def update(self, user: User, user_data: UserUpdate) -> None:
         upd_values = {}
-        if user_data.aboutText:
+        if user_data.aboutText != None:
             upd_values["userAboutText"] = user_data.aboutText
         if user_data.socialLinks:
             for link in dict(user_data.socialLinks):
                 value = dict(user_data.socialLinks)[link]
-                if value:
+                if value != None:
                     upd_values[link] = value
-        if user_data.techStack:
+        if user_data.techStack != None:
             upd_values["techStack"] = ",".join(user_data.techStack)
         if user_data.password:
             if verify_password(user_data.password.currentPassword, user.hashedPassword):
