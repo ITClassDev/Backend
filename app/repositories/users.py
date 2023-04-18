@@ -52,7 +52,7 @@ class UserRepository(BaseRepository):
         else:
             return {"raise": "Nothing to update"}
         
-        return {}
+        return upd_values
 
     async def update_avatar(self, id: int, avatar: str) -> User:
         query = users.update().where(users.c.id == id).values(

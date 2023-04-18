@@ -59,7 +59,7 @@ async def multiple_users_creation(file: UploadFile, users: UserRepository = Depe
 @router.patch("/avatar/")
 async def upload_file_test(file: UploadFile, current_user: User = Depends(get_current_user),
                            users: UserRepository = Depends(get_user_repository)):
-    allowed_extensions = ["png", "jpg", "gif"]
+    allowed_extensions = ["png", "jpg", "gif", "jpeg"]
     try:
         os.remove(os.path.join(USERS_STORAGE, "avatars", current_user.userAvatarPath))
     except FileNotFoundError:
@@ -79,7 +79,7 @@ async def update_user_info(update_data: UserUpdate, current_user: User = Depends
     if "raise" in result:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=result["raise"])
     else:
-        return {"status": True}
+        return {**result}
 
 @router.put("/groups/")
 async def add_group(group: UserGroupIn, current_user: User = Depends(get_current_user), user_groups: UserGroupsRepository = Depends(get_user_groups_repository)):
