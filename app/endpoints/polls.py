@@ -15,7 +15,7 @@ async def get_all(offset: int = 0, limit: int = 50, polls: PollsRepository = Dep
     return await polls.get_all(offset, limit)
 
 
-@router.get("/{poll_id}/answers")
+@router.get("/{poll_id}/answers/")
 async def poll_answers(poll_id: int, offset: int = 0, limit: int = 100, polls: PollsRepository = Depends(get_polls_repository), current_user: User = Depends(get_current_user)):
     if current_user.userRole == 2:  # TODO; only for admins now; FIXIT
         return await polls.get_answers(poll_id, offset, limit)
@@ -24,7 +24,7 @@ async def poll_answers(poll_id: int, offset: int = 0, limit: int = 100, polls: P
                             detail="Not enought permissions to execute this API endpoint")
 
 
-@router.get("/{poll_id}/answers/xlsx")
+@router.get("/{poll_id}/answers/xlsx/")
 async def poll_answers_xlsx(poll_id: int, polls: PollsRepository = Depends(get_polls_repository), current_user: User = Depends(get_current_user)):
     if current_user.userRole == 2:  # TODO; only for admin now
         poll_questions = [i["text"] for i in dict(await polls.get_by_id(poll_id))["entries"]]
@@ -48,7 +48,7 @@ async def poll_answers_xlsx(poll_id: int, polls: PollsRepository = Depends(get_p
                             detail="Not enought permissions to execute this API endpoint")
 
 
-@router.get("/{poll_id}")
+@router.get("/{poll_id}/")
 async def poll_info(poll_id: int, polls: PollsRepository = Depends(get_polls_repository)):
     poll = await polls.get_by_id(poll_id)
     if poll:

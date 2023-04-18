@@ -11,18 +11,18 @@ import requests
 router = APIRouter()
 
 
-@router.get("/get_app/{app_id}")
+@router.get("/get_app/{app_id}/")
 async def get_app_info(app_id: int, apps: AppsRepository = Depends(get_apps_repository)):
     data = await apps.get_by_id(app_id)
     return data
 
-@router.put("/create_app")
+@router.put("/create_app/")
 async def create_app(app_data: AppIn, apps: AppsRepository = Depends(get_apps_repository), current_user: User = Depends(get_current_user)):
     created_app_id = await apps.create_app(app_data, current_user.id)
     return {"app_id": created_app_id}
 
 # generate temp token to access some user endpoints with another prefix
-@router.post("/provide_access")
+@router.post("/provide_access/")
 async def provide_access(app_info: ProvideAccessRequest, current_user: User = Depends(get_current_user),
                          apps: AppsRepository = Depends(get_apps_repository),
                          tokens: OAuthTokensRepository = Depends(get_oauth_tokens_repository)):
@@ -44,7 +44,7 @@ async def provide_access(app_info: ProvideAccessRequest, current_user: User = De
         return {"status": False}
 
 
-@router.get("/get_user/{token}")
+@router.get("/get_user/{token}/")
 async def get_user(token: str, tokens: OAuthTokensRepository = Depends(get_oauth_tokens_repository)):
     token_data = await tokens.get_by_token(token)
     if token_data:

@@ -26,7 +26,7 @@ async def get_all_users(current_user: User = Depends(get_current_user), users: U
 
 
 
-@router.delete("/{user_id}")
+@router.delete("/{user_id}/")
 async def delete_user(user_id: int, current_user: User = Depends(get_current_user), users: UserRepository = Depends(get_user_repository)):
     if current_user.userRole == 2: # Only for super admin
         await users.delete(user_id)
@@ -44,7 +44,7 @@ async def create_user(new_user: UserIn, current_user: User = Depends(get_current
     else:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=ERROR_TEXTS.low_permissions) # FIXIT MAKE text mapping
 
-@router.put("/from_csv")
+@router.put("/from_csv/")
 async def multiple_users_creation(file: UploadFile, users: UserRepository = Depends(get_user_repository), current_user: User = Depends(get_current_user)):
     if current_user.userRole > 0:
         csv_content = await upload_file(file, ["csv"], write=False)
@@ -56,7 +56,7 @@ async def multiple_users_creation(file: UploadFile, users: UserRepository = Depe
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=ERROR_TEXTS.low_permissions)
 
 
-@router.patch("/avatar")
+@router.patch("/avatar/")
 async def upload_file_test(file: UploadFile, current_user: User = Depends(get_current_user),
                            users: UserRepository = Depends(get_user_repository)):
     allowed_extensions = ["png", "jpg", "gif"]
@@ -77,30 +77,30 @@ async def update_user_info(update_data: UserUpdate, current_user: User = Depends
     else:
         return {"status": True}
 
-@router.put("/groups")
+@router.put("/groups/")
 async def add_group(group: UserGroupIn, current_user: User = Depends(get_current_user), user_groups: UserGroupsRepository = Depends(get_user_groups_repository)):
     if current_user.userRole == 2:
         return {"groupId": await user_groups.create(group.name)}
     else: 
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=ERROR_TEXTS.low_permissions)
 
-@router.get("/get_leaderboard")
+@router.get("/get_leaderboard/")
 async def get_leaderboard(limit: int = 10, users: UserRepository = Depends(get_user_repository)):
     return await users.get_top(limit)
 
 
-@router.get("/my_apps")
+@router.get("/my_apps/")
 async def get_my_apps(current_user: User = Depends(get_current_user), apps: AppsRepository = Depends(get_apps_repository)):
     return await apps.get_for_user(current_user.id)
 
 
-@router.get("/my_notifications")
+@router.get("/my_notifications/")
 async def get_my_notifications(current_user: User = Depends(get_current_user), notifications: NotificationRepository = Depends(get_notification_repository)):
     data = await notifications.get_all_for_user(current_user.id)
     return data
 
 
-@router.get("/{user_id}")
+@router.get("/{user_id}/")
 async def get_user_info(user_id: int, users: UserRepository = Depends(get_user_repository)):
     data = await users.get_user_info(int(user_id))
     if data:

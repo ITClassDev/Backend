@@ -12,21 +12,21 @@ from core.config import USERS_STORAGE
 
 router = APIRouter()
 
-@router.get("/get_my")
+@router.get("/")
 async def get_my_achievements(current_user: User = Depends(get_current_user), achievements: AchievementRepository = Depends(get_achievement_repository), users: UserRepository = Depends(get_user_repository)):
     res = {"base": await achievements.get_all_for_user(current_user.id)}
     system = await users.get_user_info(current_user.id)
     res["system"] = system.systemAchievements
     return {"status": True, "achievements": res}
 
-@router.put("/add")
+@router.put("/")
 async def add_achievement(achievement: AchievementIn, file: UploadFile, current_user: User = Depends(get_current_user), achievements: AchievementRepository = Depends(get_achievement_repository)):
     uploaded_image = await upload_file(file, ["png", "jpg", "pdf"], os.path.join(USERS_STORAGE, "achievements"))
     achievement_id = await achievements.add(achievement, current_user.id, uploaded_image)
     
     return {"status": True}
 
-@router.patch("/moderate")
+@router.patch("/moderate/")
 async def accept_achievement(achievement_data: AchievementModerate, current_user: User = Depends(get_current_user), achievements: AchievementRepository = Depends(get_achievement_repository)):
     # Statuses
     # 0 - reject
@@ -39,11 +39,11 @@ async def accept_achievement(achievement_data: AchievementModerate, current_user
     return {"status": True}
         
 
-@router.get("/my_queue")
+@router.get("/my_queue/")
 async def get_moderation_queue_for_one(current_user: User = Depends(get_current_user), achievements: AchievementRepository = Depends(get_achievement_repository)):
     return await achievements.get_moderation_queue_for_one(current_user.id)
 
-@router.get("/queu")
+@router.get("/queu/")
 async def get_moderation_queue_for_all(current_user: User = Depends(get_current_user), achievements: AchievementRepository = Depends(get_achievement_repository)):
     if current_user.userRole > 0: # for users with status: 1 2 = teachers and super admins
         return await achievements.get_moderation_queue_for_all()

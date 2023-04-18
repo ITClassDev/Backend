@@ -8,7 +8,7 @@ from core.config import SETUP_MODE, ERROR_TEXTS
 
 router = APIRouter()
 
-@router.get("/moderation_queue")
+@router.get("/moderation_queue/")
 async def get_moderation_queue(current_user: User = Depends(get_current_user), achievements: AchievementRepository = Depends(get_achievement_repository)):
     if current_user.userRole > 0:
         return await achievements.get_moderation_queue_for_all()
@@ -18,9 +18,9 @@ async def get_moderation_queue(current_user: User = Depends(get_current_user), a
 #    pass
 
 if SETUP_MODE:
-    @router.put("/setup")
+    @router.put("/setup/")
     async def create_admin(email: str, password: str, users: UserRepository = Depends(get_user_repository), user_groups: UserGroupsRepository = Depends(get_user_groups_repository)):
-        if 1:#SETUP_MODE:
+        if SETUP_MODE:
             group_id = await user_groups.create("Default")
             user_ = UserIn(email=email, firstName="ShTP", lastName="Admin", userRole=2, password=password, learningClass=100, groupId=group_id)
             user_id = await users.create(user_)
