@@ -13,8 +13,6 @@ from core.config import USERS_STORAGE, API_VER
 from core.utils.system import get_system_status
 
 app = FastAPI(title="ITC REST API", version=API_VER)
-#app.router.redirect_slashes = False 
-
 app.mount("/storage", StaticFiles(directory=USERS_STORAGE), name="storage")  # User data storage(local)
 
 # FIXIT Security ALERT; Remove on prod
