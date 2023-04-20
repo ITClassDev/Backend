@@ -11,6 +11,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from core.config import USERS_STORAGE, API_VER
 from core.utils.system import get_system_status
+import multiprocessing
+import socket
 
 app = FastAPI(title="ITC REST API", version=API_VER)
 app.mount("/storage", StaticFiles(directory=USERS_STORAGE), name="storage")  # User data storage(local)
@@ -40,6 +42,23 @@ app.include_router(users_mobile.router, prefix="/mobile/users", tags=["Protobuf(
 app.include_router(auth_mobile.router, prefix="/mobile/auth", tags=["Protobuf(NO Swagger)"])
 
 
+def outer_execution_test(data):
+    print("Outer:", data)
+
+class Checker:
+    def __init__(self, host="localhost", port=7778) -> None:
+        self.host = host
+        self.port = port
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.connect((self.host, self.port))
+
+    def listen(self, callback):
+        print("Started listening")
+        while True:
+            data = self.sock.recv(1024)
+            if data:
+                callback(data)
+
 @app.get("/")
 async def index():
     cpu_load, ram_load = get_system_status()
@@ -64,4 +83,7 @@ async def shutdown():
 
 
 if __name__ == "__main__":
+    checker = Checker()
+    checker_process = multiprocessing.Process(target=lambda: checker.listen(outer_execution_test))
+    checker_process.start()
     uvicorn.run("main:app", port=SERVER_PORT, host=SERVER_HOST, reload=True, headers=[("server", "PoweredByPutincev")])

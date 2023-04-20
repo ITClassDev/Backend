@@ -41,8 +41,8 @@ class AchievementRepository(BaseRepository):
         values.pop("id", None)
         values.pop("accepted_by", None)
         query = achievements.insert().values(**values)
-        achievement_final = await self.database.execute(query)
-        return achievement_final
+        achievement_final_id = await self.database.execute(query)
+        return achievement_final_id, achievement_final
     
     async def accept(self, achievement_id: int, accepted_by: int, points: int):
         notifications = NotificationRepository(database)
@@ -74,7 +74,7 @@ class AchievementRepository(BaseRepository):
         return await self.database.execute(query)
 
     async def get_moderation_queue_for_one(self, for_user_id: int) -> List[Achievement]:
-        query = achievements.select().where(achievements.c.to_user == for_user_id, achievements.c.accepted_by == None)
+        query = achievements.select().where(achievements.c.to_user == for_user_id, achievements.c.accepted_by == None).order_by(achievements.c.id.desc())
         return await self.database.fetch_all(query)
     async def get_moderation_queue_for_all(self) -> List[Achievement]:
         query = achievements.select().where(achievements.c.accepted_by == None)
