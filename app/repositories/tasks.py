@@ -53,8 +53,8 @@ class TasksRepository(BaseRepository):
             query = submits.update().where(submits.c.id == submission).values(status=2, solved=data[submission][0], tests_results=data[submission][1])
             loop.create_task(self.database.execute(query))
 
+
     async def submit_day_challenge(self, user_id: int, source_path: str, checker) -> Submit:
-        # Create submit
         task_id = await self.get_day_challenge()
         submit = Submit(user_id=user_id, status=0, task_id=task_id.id, source=f"file:{source_path['file_name']}", refer_to=None, git_commit_id=None, solved=False, tests_results=[], send_date=datetime.datetime.now())
         values = {**submit.dict()}
@@ -64,14 +64,10 @@ class TasksRepository(BaseRepository):
         task_data = await self.database.fetch_one(tasks.select().where(tasks.c.id == task_id.id)) # Get task data
         tests = pickle.loads(task_data.tests)
         env = {"cpu_time_limit": task_data.time_limit, "memory_limit": task_data.memory_limit, "real_time_limit": task_data.time_limit}
-        # Start checker process; async loop
-        with open(os.path.join(USERS_STORAGE, "tasks_source_codes", source_path["file_name"]), "rb") as source_file:
-            source = source_file.read()
-            loop = asyncio.get_event_loop()
-            thread = threading.Thread(target=lambda: checker.check_one_task_thread(source, source_path["file_name"], tests, env, self.checker_callback, submit_id, loop))
-            thread.start()
-            
-        return submit_id
+        
+        #with open(os.path.join(USERS_STORAGE, "tasks_source_codes", source_path["file_name"]), "rb") as source_file:
+        #    source = source_file.read()
+        return submit_id, env, tests
 
     async def get_task_submits(self, user_id: int, task_id: int) -> List[Submit]:
         query = submits.select().where(submits.c.user_id == user_id, submits.c.task_id == task_id).order_by(submits.c.id.desc())

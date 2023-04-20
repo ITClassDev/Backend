@@ -31,11 +31,11 @@ class Checker:
         tasks_active = 0
         task_pending = 0
 
-    def check_one_task_thread(self, test_code, source_file_name, tests, env, callback, submit_id, loop) -> None:
+    def check_one_task_thread(self, test_code, language, tests, env, callback, submit_id, loop) -> None:
         # MESSY HACKATHON
         # FIXIT
         limits = {'cputime': env["cpu_time_limit"], 'memory': env["memory_limit"], 'realtime': env["real_time_limit"]}
-        language = {"py": 0, "cpp": 1}[source_file_name.split(".")[-1]]
+        # language = {"py": 0, "cpp": 1}[source_file_name.split(".")[-1]]
         if language == 0:  # python
             files = [{'name': 'main.py', 'content': test_code}]
             tests_statuses = []

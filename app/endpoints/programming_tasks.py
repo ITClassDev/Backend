@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, UploadFile
+from fastapi import APIRouter, Depends, UploadFile, HTTPException, status
 from repositories.users import UserRepository
 from repositories.tasks import TasksRepository
 from models.tasks import TaskIn
@@ -8,26 +8,58 @@ from .depends import get_tasks_repository, get_current_user
 from core.utils.files import upload_file
 import os
 from core.config import USERS_STORAGE
-import PyChecker.checker as CheckerBase
+import multiprocessing
+import socket
+import json
+
+
+# FIXIT Shit style
+class Checker:
+    def __init__(self, host="localhost", port=7778) -> None:
+        self.host = host
+        self.port = port
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.connect((self.host, self.port))
+
+    def listen(self, day_challenge_callback, homework_callback):
+        print("Started listening")
+        while True:
+            data = self.sock.recv(1024)
+            if data:
+                data = json.loads(data)
+                print(data)
+    
+    def day_challenge(self, submit_id, source, test):
+        pass
+
 
 router = APIRouter()
 
 # Create checker object
-Checker = CheckerBase.Checker()
+# Checker = CheckerBase.Checker()
+# Test code
+if 0:
+    checker = Checker()
+    callback_0 = lambda x: print("Homework")
+    callback_1 = lambda x: print("Contest")
+    checker_listen_process = multiprocessing.Process(target=lambda: checker.listen(callback_0, callback_1))
+    checker_listen_process.start()
 
 ### Tasks ###
 @router.get("/task/{task_id}/")
 async def get_task_info(task_id: int, tasks: TasksRepository = Depends(get_tasks_repository)):
     task_data = await tasks.get_by_id_full(task_id)
-    tests_data_dict = {**task_data}
-    demo_tests = []
-    ind = 0
-    for test in tests_data_dict["tests"]:
-        if "demo" in test and test["demo"]:
-            demo_tests.append({**test, "key": ind})
-            ind += 1
-    tests_data_dict["tests"] = demo_tests
-    return tests_data_dict
+    if task_data:
+        tests_data_dict = {**task_data}
+        demo_tests = []
+        ind = 0
+        for test in tests_data_dict["tests"]:
+            if "demo" in test and test["demo"]:
+                demo_tests.append({**test, "key": ind})
+                ind += 1
+        tests_data_dict["tests"] = demo_tests
+        return tests_data_dict
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No task with such id")
 
 @router.put("/task/add/") # Teacher level
 async def get_task_info(task_data: TaskIn, tasks: TasksRepository = Depends(get_tasks_repository), current_user: User = Depends(get_current_user)):
@@ -61,6 +93,7 @@ async def submit_day_challenge(file: UploadFile, tasks: TasksRepository = Depend
     allowed_extensions = ["cpp", "py"]  # c++ files and python files
     uploaded_source = await upload_file(file, allowed_extensions, os.path.join(USERS_STORAGE, "tasks_source_codes"))
     submit_id = await tasks.submit_day_challenge(current_user.id, uploaded_source, Checker)
+    # Run checker
     return {"submit_id": submit_id}
 
 @router.get("/task/my_submits/{task_id}/")
