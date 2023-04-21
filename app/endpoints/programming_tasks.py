@@ -20,6 +20,11 @@ def challenge(payload, save, loop):
     data = requests.post(f"{CHECKER_SERVICE_URL}/challenge", json=payload).json()
     save(data, loop)
 
+def homework(payload, save, loop):
+    data = requests.post(f"{CHECKER_SERVICE_URL}/homework", json=payload).json()
+    print(data)
+    save(data, loop)
+
 ### Tasks ###
 
 @router.get("/task/{task_id}/")
@@ -69,6 +74,9 @@ async def get_day_challenge(tasks: TasksRepository = Depends(get_tasks_repositor
     tests_data_dict["tests"] = demo_tests
     return {**tests_data_dict, "tests": demo_tests}
 
+@router.get("/day_challenge/leaderbard")
+async def get_day_challenge_leaderboard(current_user: User = Depends(get_current_user), tasks: TasksRepository = Depends(get_tasks_repository)):
+    print(tasks.get_day_challenge_submits())
 
 @router.post("/day_challenge/submit/")
 async def submit_day_challenge(file: UploadFile, tasks: TasksRepository = Depends(get_tasks_repository), current_user: User = Depends(get_current_user)):
@@ -123,7 +131,9 @@ async def get_homework(contest_id: int, tasks: TasksRepository = Depends(get_tas
 
 @router.post("/homework/submit/")
 async def send_submit(submit_data: SubmitContest, current_user: User = Depends(get_current_user), tasks: TasksRepository = Depends(get_tasks_repository)):
-    submit_id = await tasks.submit_contest(submit_data.contest_id, submit_data.git_url, current_user.id, submit_data.language, Checker)
+    loop = asyncio.get_event_loop()
+    submit_id, checker_payload = await tasks.submit_contest(submit_data.contest_id, submit_data.git_url, current_user.id, submit_data.language)
+    threading.Thread(target=lambda: homework({"tests": checker_payload, "git_url": submit_data.git_url}, tasks.checker_homework_callback, loop)).start()
     return {"submit_id": submit_id}
 
 

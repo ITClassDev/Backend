@@ -52,8 +52,10 @@ class TasksRepository(BaseRepository):
 
 
     def checker_homework_callback(self, data, loop):
-        for submission in data:
-            query = submits.update().where(submits.c.id == submission).values(status=2, solved=data[submission][0], tests_results=data[submission][1])
+        for submission in data["tests"]:
+            submission_id = int(submission)
+            print(submission_id)
+            query = submits.update().where(submits.c.id == submission_id).values(status=2, solved=data["tests"][submission][0], tests_results=data["tests"][submission][1])
             loop.create_task(self.database.execute(query))
 
 
@@ -100,7 +102,7 @@ class TasksRepository(BaseRepository):
         return await self.database.fetch_all(query)
 
 
-    async def submit_contest(self, contest_id: int, git_url: str, user_id: int, language: str, checker):
+    async def submit_contest(self, contest_id: int, git_url: str, user_id: int, language: str):
         tasks_all = await self.get_contest_tasks(contest_id)
         checker_payload = []
         for task in tasks_all.tasks_ids_list:
@@ -115,9 +117,10 @@ class TasksRepository(BaseRepository):
             submit_id = await self.database.execute(query)
             env = {"cpu_time_limit": task_data.time_limit, "memory_limit": task_data.memory_limit, "real_time_limit": task_data.time_limit}
             checker_payload.append({func_name: {"tests": tests, "submit_id": submit_id, "types": types, "env": env}})
-        loop = asyncio.get_event_loop()
-        thread = threading.Thread(target=lambda: checker.check_multiple_tasks(git_url, checker_payload, lambda data, loop: self.checker_homework_callback(data, loop), loop))
-        thread.start()
+        #loop = asyncio.get_event_loop()
+        #thread = threading.Thread(target=lambda: checker.check_multiple_tasks(git_url, checker_payload, lambda data, loop: self.checker_homework_callback(data, loop), loop))
+        #thread.start()
+        return submit_id, checker_payload
 
             
 
