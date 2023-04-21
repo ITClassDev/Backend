@@ -1,6 +1,7 @@
 from db.tasks import tasks
 from db.submits import submits
 from db.contests import contests
+from db.users import users
 from .base import BaseRepository
 from models.tasks import Task, TaskIn
 from models.submits import Submit
@@ -17,7 +18,7 @@ import datetime
 
 class TasksRepository(BaseRepository):
     async def get_by_id(self, task_id: int) -> Task:
-        query = select(tasks.c.id, tasks.c.author_id, tasks.c.title, tasks.c.text, tasks.c.time_limit, tasks.c.memory_limit, tasks.c.is_day_challenge).where(tasks.c.id == task_id)
+        query = select(tasks.c.id, tasks.c.author_id, tasks.c.tests, tasks.c.input_types, tasks.c.func_name, users.c.firstName, users.c.lastName, tasks.c.title, tasks.c.text, tasks.c.time_limit, tasks.c.memory_limit, tasks.c.is_day_challenge).where(tasks.c.id == task_id, tasks.c.author_id == users.c.id)
         return await self.database.fetch_one(query)
 
     async def get_by_id_full(self, task_id: int) -> Task:
@@ -36,7 +37,7 @@ class TasksRepository(BaseRepository):
         return task_id
 
     async def get_all(self, limit: int = 20) -> List[Task]:
-        query = select(tasks.c.id, tasks.c.author_id, tasks.c.title, tasks.c.text, tasks.c.time_limit, tasks.c.memory_limit, tasks.c.is_day_challenge).limit(limit).order_by(tasks.c.id.desc())
+        query = select(tasks.c.id, tasks.c.author_id, tasks.c.title, tasks.c.is_day_challenge, ).limit(limit).order_by(tasks.c.id.desc())
         return await self.database.fetch_all(query)
     
     async def get_day_challenge(self) -> dict:

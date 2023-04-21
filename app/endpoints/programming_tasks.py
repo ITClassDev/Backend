@@ -24,7 +24,7 @@ def challenge(payload, save, loop):
 
 @router.get("/task/{task_id}/")
 async def get_task_info(task_id: int, tasks: TasksRepository = Depends(get_tasks_repository)):
-    task_data = await tasks.get_by_id_full(task_id)
+    task_data = await tasks.get_by_id(task_id)
     if task_data:
         tests_data_dict = {**task_data}
         demo_tests = []
