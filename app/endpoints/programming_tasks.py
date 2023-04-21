@@ -145,6 +145,9 @@ async def get_task_submits(task_id: int, contest_id: int, current_user: User = D
 @router.get("/submission/details/")
 async def submission_details(submission_id: int, tasks: TasksRepository = Depends(get_tasks_repository)):
     data = await tasks.get_submission_details(submission_id)
-    with open(os.path.join(USERS_STORAGE, "tasks_source_codes", data.source.split(":")[1]), "r") as file:
-        source = file.read()
+    if not data.refer_to:
+        with open(os.path.join(USERS_STORAGE, "tasks_source_codes", data.source.split(":")[1]), "r") as file:
+            source = file.read()
+    else:
+        source = data.source
     return {"task": data, "source": source}
