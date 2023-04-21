@@ -32,8 +32,8 @@ class Checker:
         tasks_active = 0
         task_pending = 0
 
-    def check_one_task_thread(self, test_code_path, language, tests, env, callback, submit_id, loop) -> None:
-        # MESSY HACKATHON
+    def check_one_task_thread(self, test_code_path, language, tests, env, submit_id) -> None:
+        
         # FIXIT
         limits = {'cputime': env["cpu_time_limit"],
                   'memory': env["memory_limit"], 'realtime': env["real_time_limit"]}
@@ -53,12 +53,9 @@ class Checker:
                                            "timeout": result["timeout"], "memoryout": result["oom_killed"]})
                 # print("Checker finished")
                 # callback((tests_passed == len(tests), tests_statuses, submit_id))
-                callback({
-                    "status": tests_passed == len(tests),
-                    "tests": tests_statuses,
-                    "submit_id": submit_id,
-                    "type": 0
-                })
+                return {"status": tests_passed == len(tests),
+                        "tests": tests_statuses,
+                        "submit_id": submit_id}
             elif language == 1:  # c++
                 # like session storage
                 with epicbox.working_directory() as workdir:
@@ -82,20 +79,17 @@ class Checker:
                             tests_statuses.append({"status": test_status, "error_info": result["stderr"].decode("utf-8"), "duration": result["duration"],
                                                    "timeout": result["timeout"], "memoryout": result["oom_killed"]})
 
-                        callback({
+                        return {
                             "status": tests_passed == len(tests),
                             "tests": tests_statuses,
-                            "submit_id": submit_id,
-                            "type": 0
-                        })
+                            "submit_id": submit_id
+                        }
                     else:
-                        callback({
+                        return {
                             "status": False,
                             "tests": [],
-                            "submit_id": submit_id,
-                            "type": 0
-                        })
-                        # callback((False, [], submit_id))
+                            "submit_id": submit_id
+                        }
 
     def fetch_git(self, git_path):
         fetch_path = os.path.join(self.temp_workspace, self.name_gen())

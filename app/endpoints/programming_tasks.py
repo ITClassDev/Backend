@@ -7,48 +7,21 @@ from .depends import get_tasks_repository, get_current_user
 from core.utils.files import upload_file
 import os
 from core.config import USERS_STORAGE
-import multiprocessing
-import socket
-import json
-
-
-
-# FIXIT Shit style
-class Checker:
-    def __init__(self, tasks_repo, host="localhost", port=7777) -> None:
-        self.host = host
-        self.port = port
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.connect((self.host, self.port))
-        self.tasks_repo = tasks_repo
-
-    def listen(self):
-        print("Started listening")
-        while True:
-            data = self.sock.recv(1024)
-            if data:
-                data = json.loads(data)
-                print(data)
-                if data["type"] == 0:
-                    tasks_repo.checker_callback(data)
-    def send(self, payload):
-        payload = json.dumps(payload).encode("utf-8")
-        self.sock.sendall(payload)
-        print("Sent")
+import requests
+import asyncio
+import threading
 
 
 router = APIRouter()
 
+
+def challenge(payload, save, loop):
+    data = requests.post("http://localhost:7777/challenge", json=payload).json()
+    save(data, loop)
+
+
 # Create checker object
 # Checker = CheckerBase.Checker()
-# Test code
-tasks_repo = get_tasks_repository()
-checker = Checker(tasks_repo)
-
-
-#checker_listen_process = multiprocessing.Process(
-#    target=lambda: checker.listen())
-#checker_listen_process.start()
 
 ### Tasks ###
 
@@ -107,12 +80,9 @@ async def submit_day_challenge(file: UploadFile, tasks: TasksRepository = Depend
     uploaded_source = await upload_file(file, allowed_extensions, os.path.join(USERS_STORAGE, "tasks_source_codes"))
     # path = os.path.join("/home/stephan/Progs/ItClassDevelopment/Backend/app/static/users_data/uploads/tasks_source_codes", uploaded_source["file_name"])
     submit_id, env, tests = await tasks.submit_day_challenge(current_user.id, uploaded_source)
-    payload = {"source_code_path": uploaded_source["file_name"], "language": 0, "tests": tests, "submit_id": submit_id, "type": 0}
-    # Send task for test to checker service
-    #checker.send(payload)
-    router.checker.send({"source_code_path": "code.py", "language": 0, "tests": [], "submit_id": 66666, "type": 0})
+    payload = {"source_code_path": uploaded_source["file_name"], "language": 0, "tests": tests, "submit_id": submit_id}
+    threading.Thread(target=lambda: challenge(payload, tasks.checker_callback, asyncio.get_event_loop())).start()
     
-
     # Run checker
     return {"submit_id": submit_id}
 
