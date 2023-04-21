@@ -19,10 +19,6 @@ def challenge(payload, save, loop):
     data = requests.post("http://localhost:7777/challenge", json=payload).json()
     save(data, loop)
 
-
-# Create checker object
-# Checker = CheckerBase.Checker()
-
 ### Tasks ###
 
 
@@ -76,12 +72,13 @@ async def get_day_challenge(tasks: TasksRepository = Depends(get_tasks_repositor
 
 @router.post("/day_challenge/submit/")
 async def submit_day_challenge(file: UploadFile, tasks: TasksRepository = Depends(get_tasks_repository), current_user: User = Depends(get_current_user)):
+    loop = asyncio.get_event_loop()
     allowed_extensions = ["cpp", "py"]  # c++ files and python files
     uploaded_source = await upload_file(file, allowed_extensions, os.path.join(USERS_STORAGE, "tasks_source_codes"))
     # path = os.path.join("/home/stephan/Progs/ItClassDevelopment/Backend/app/static/users_data/uploads/tasks_source_codes", uploaded_source["file_name"])
     submit_id, env, tests = await tasks.submit_day_challenge(current_user.id, uploaded_source)
-    payload = {"source_code_path": uploaded_source["file_name"], "language": 0, "tests": tests, "submit_id": submit_id}
-    threading.Thread(target=lambda: challenge(payload, tasks.checker_callback, asyncio.get_event_loop())).start()
+    payload = {"source_code_path": uploaded_source["file_name"], "language": 0, "tests": tests, "submit_id": submit_id, "env": env}
+    threading.Thread(target=lambda: challenge(payload, tasks.checker_callback, loop)).start()
     
     # Run checker
     return {"submit_id": submit_id}

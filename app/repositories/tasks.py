@@ -47,6 +47,7 @@ class TasksRepository(BaseRepository):
         solved, tests_results_log, submit_id = data["status"], data["tests"], data["submit_id"]
         query = submits.update().where(submits.c.id == submit_id).values(status=2, solved=solved, tests_results=tests_results_log)
         loop.create_task(self.database.execute(query))
+        
 
 
     def checker_homework_callback(self, data, loop):

@@ -1,11 +1,5 @@
 import epicbox
-import sys
-import argparse
-import json
-import time
 import os
-from typing import List
-import asyncio
 import string
 import random
 import shutil
@@ -151,38 +145,3 @@ class Checker:
                     return None
         callback(final_callback_data, loop)  # send result data, to callback
         shutil.rmtree(source_path)
-
-
-if __name__ == "__main__":
-    checker = Checker()
-    tests = [
-        {"sum": {"tests": [
-            {"input": "100\n120", "output": "220"},
-            {"input": "20\n43", "output": 63},
-            {"input": "7\n123", "output": 130}
-        ], "submit_id": 100, "types": [0, 0], "env": {}}},
-        {"concat": {"tests": [{"input": "a\nb", "output": "ab"},
-                              {"input": "Hello,\nworld!",
-                                  "output": "Hello,world!"},
-                              {"input": "Result\nstring", "output": "Resultstring"}], "submit_id": 111, "types": [1, 1], "env": {}}}
-    ]
-    checker.check_multiple_tasks(
-        "https://github.com/ITClassDev/TestSolutions/", tests, lambda x, y, z: print(x), None)
-    # print(checker.name_gen())
-    # parser = argparse.ArgumentParser(description='Check task cli')
-    # parser.add_argument('--source_code', type=str, help='Path to test file')
-    # parser.add_argument('--tests', type=str, help='Path to tests json file')
-    # args = parser.parse_args()
-    # # LEGACY
-    # with open(args.source_code, "rb") as test_code_fd:
-    #     test_code = test_code_fd.read()
-
-    # with open(args.tests) as test_fd:
-    #     tests = json.load(test_fd)
-
-    # # LEGACY
-    # checker = Checker()
-    # checker.check_one_task_thread(test_code, tests, process_checker_result)
-    # while True:
-    #     print("Polling checker statistic")
-    #     time.sleep(1)
