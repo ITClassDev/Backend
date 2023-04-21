@@ -49,7 +49,7 @@ async def accept_achievement(achievement_data: AchievementModerate, current_user
 async def get_moderation_queue_for_one(current_user: User = Depends(get_current_user), achievements: AchievementRepository = Depends(get_achievement_repository)):
     return await achievements.get_moderation_queue_for_one(current_user.id)
 
-@router.get("/queu/")
+@router.get("/queue/")
 async def get_moderation_queue_for_all(current_user: User = Depends(get_current_user), achievements: AchievementRepository = Depends(get_achievement_repository)):
     if current_user.userRole > 0: # for users with status: 1 2 = teachers and super admins
         return await achievements.get_moderation_queue_for_all()

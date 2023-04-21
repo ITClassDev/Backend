@@ -7,3 +7,8 @@ class Notification(BaseModel):
     type: int
     viewed: bool
     data: dict
+
+class NotificationToGroup(BaseModel):
+    groupId: int
+    text: str
+    type: int

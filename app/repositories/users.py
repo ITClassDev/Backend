@@ -26,6 +26,12 @@ class UserRepository(BaseRepository):
         if not user: return None
         return User.parse_obj(user)
 
+    async def get_all_by_group(self, group_id: int):
+        query = select(users.c.id).where(users.c.groupId == group_id)
+        fetched = await self.database.fetch_all(query)
+        return [i.id for i in fetched]
+        #return [User.parse_obj(user) for user in fetched]
+
     async def update(self, user: User, user_data: UserUpdate) -> None:
         upd_values = {}
         if user_data.aboutText != None:

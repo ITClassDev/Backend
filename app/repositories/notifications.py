@@ -26,3 +26,5 @@ class NotificationRepository(BaseRepository):
     async def set_viewed(self, user_id: int) -> None:
         query = notifications.update().where(notifications.c.to_user == user_id, notifications.c.viewed != True).values(viewed=True)
         await self.database.execute(query)
+
+  
