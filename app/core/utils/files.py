@@ -28,7 +28,7 @@ async def upload_file(file, allowed_extensions, upload_path=None, custom_name=No
             if write:
                 with open(os.path.join(upload_path, file_name), "wb") as file_descr:
                     file_descr.write(contents)
-                return {"status": True, "file_name": file_name}
+                return {"status": True, "file_name": file_name, "extension": file_ext}
             else:
                 return {"status": True, "file_content": contents}
         else:

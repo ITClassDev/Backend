@@ -6,21 +6,21 @@ from models.contests import ContestIn, SubmitContest
 from .depends import get_tasks_repository, get_current_user
 from core.utils.files import upload_file
 import os
-from core.config import USERS_STORAGE
+from core.config import USERS_STORAGE, CHECKER_SERVICE_URL
 import requests
 import asyncio
 import threading
+
 
 
 router = APIRouter()
 
 
 def challenge(payload, save, loop):
-    data = requests.post("http://localhost:7777/challenge", json=payload).json()
+    data = requests.post(f"{CHECKER_SERVICE_URL}/challenge", json=payload).json()
     save(data, loop)
 
 ### Tasks ###
-
 
 @router.get("/task/{task_id}/")
 async def get_task_info(task_id: int, tasks: TasksRepository = Depends(get_tasks_repository)):
@@ -77,7 +77,7 @@ async def submit_day_challenge(file: UploadFile, tasks: TasksRepository = Depend
     uploaded_source = await upload_file(file, allowed_extensions, os.path.join(USERS_STORAGE, "tasks_source_codes"))
     # path = os.path.join("/home/stephan/Progs/ItClassDevelopment/Backend/app/static/users_data/uploads/tasks_source_codes", uploaded_source["file_name"])
     submit_id, env, tests = await tasks.submit_day_challenge(current_user.id, uploaded_source)
-    payload = {"source_code_path": uploaded_source["file_name"], "language": 0, "tests": tests, "submit_id": submit_id, "env": env}
+    payload = {"source_code_path": uploaded_source["file_name"], "language": {"py": 0, "cpp": 1}[uploaded_source["extension"]], "tests": tests, "submit_id": submit_id, "env": env}
     threading.Thread(target=lambda: challenge(payload, tasks.checker_callback, loop)).start()
     
     # Run checker
