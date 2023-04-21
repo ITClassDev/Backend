@@ -44,9 +44,10 @@ class TasksRepository(BaseRepository):
         return await self.database.fetch_one(query)
 
     def checker_callback(self, data, loop):
-        solved, tests_results_log, submit_id = data
+        solved, tests_results_log, submit_id = data["status"], data["tests"], data["submit_id"]
         query = submits.update().where(submits.c.id == submit_id).values(status=2, solved=solved, tests_results=tests_results_log)
         loop.create_task(self.database.execute(query))
+
 
     def checker_homework_callback(self, data, loop):
         for submission in data:
@@ -54,7 +55,7 @@ class TasksRepository(BaseRepository):
             loop.create_task(self.database.execute(query))
 
 
-    async def submit_day_challenge(self, user_id: int, source_path: str, checker) -> Submit:
+    async def submit_day_challenge(self, user_id: int, source_path: str) -> Submit:
         task_id = await self.get_day_challenge()
         submit = Submit(user_id=user_id, status=0, task_id=task_id.id, source=f"file:{source_path['file_name']}", refer_to=None, git_commit_id=None, solved=False, tests_results=[], send_date=datetime.datetime.now())
         values = {**submit.dict()}
