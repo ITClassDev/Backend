@@ -15,6 +15,14 @@ class NotificationRepository(BaseRepository):
     async def check_active_notifications(self, user_id: int) -> bool:
         query = notifications.select().where(notifications.c.to_user == user_id, notifications.c.viewed == False)
         return len(await self.database.fetch_all(query)) > 0
+    
+    async def get_active_notifications(self, user_id: int) -> bool:
+        query = notifications.select().where(notifications.c.to_user == user_id, notifications.c.viewed == False)
+        return await self.database.fetch_all(query)
+    
+    async def set_readed(self, user_id: int) -> None:
+        query = notifications.update().where(notifications.c.to_user == user_id).values(viewed=True)
+        await self.database.execute(query)
 
     async def send_notification(self, user_id: int, notification_type: int, data: dict) -> int:
         notification = Notification(to_user=user_id, type=notification_type, viewed=False, data=data)
