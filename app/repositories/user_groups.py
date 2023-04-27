@@ -13,3 +13,7 @@ class UserGroupsRepository(BaseRepository):
         values.pop("id", None)
         query = user_groups.insert().values(**values)
         return await self.database.execute(query)
+
+    async def delete(self, id: int) -> None:
+        query = user_groups.delete().where(user_groups.c.id == id)
+        return await self.database.execute(query)

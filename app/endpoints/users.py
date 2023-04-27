@@ -89,6 +89,11 @@ async def add_group(group: UserGroupIn, current_user: User = Depends(get_current
     else: 
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=ERROR_TEXTS.low_permissions)
 
+@router.delete("/groups/{group_id}/")
+async def delete_group(group_id: int, current_user: User = Depends(get_current_user), user_groups: UserGroupsRepository = Depends(get_user_groups_repository)):
+    await user_groups.delete(group_id)
+    return {}
+
 @router.get("/get_leaderboard/")
 async def get_leaderboard(limit: int = 10, users: UserRepository = Depends(get_user_repository)):
     return await users.get_top(limit)

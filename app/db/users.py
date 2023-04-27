@@ -1,6 +1,7 @@
 import sqlalchemy
 from .base import metadata
 from sqlalchemy.types import ARRAY
+#from sqlalchemy.orm import relationship
 
 users = sqlalchemy.Table(
     "users",
@@ -27,5 +28,6 @@ users = sqlalchemy.Table(
                       default="default.png"),
     sqlalchemy.Column("systemAchievements", ARRAY(sqlalchemy.Integer)),
     sqlalchemy.Column("techStack", sqlalchemy.String),
-    sqlalchemy.Column("groupId", sqlalchemy.Integer, sqlalchemy.ForeignKey('user_groups.id'))
+    sqlalchemy.Column("groupId", sqlalchemy.Integer, sqlalchemy.ForeignKey('user_groups.id')),
+
 )
