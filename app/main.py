@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 import uvicorn
-from core.config import SERVER_HOST, SERVER_PORT
+from core.config import SERVER_HOST, SERVER_PORT, ROOT_PATH
 from db.base import database
 from endpoints import users, auth, achievements, oauth, admin, notifications, programming_tasks, polls, notifications
 from endpoints.mobile import (
@@ -12,8 +12,26 @@ from fastapi.staticfiles import StaticFiles
 from core.config import USERS_STORAGE, API_VER
 from core.utils.system import get_system_status
 
+# Docs metadata
+description_metadata = '''
+Welcome to ShTP API Docs!
 
-app = FastAPI(title="ITC REST API", version=API_VER)
+[ShTP API Source Code](https://github.com/ItClassDev/Backend)
+'''
+
+
+tags_metadata = [
+    {
+        "name": "users",
+        "description": "CRUD Operations with users, users groups. To use some endpoints you have to auth via *auth/login* endpoint."
+    },
+    {
+        "name": "auth",
+        "description": "Generate JWT token for access to private endpoints and get current user via JWT token."
+    }
+]
+
+app = FastAPI(title="ITC REST API", version=API_VER, openapi_tags=tags_metadata, description=description_metadata)
 app.mount("/storage", StaticFiles(directory=USERS_STORAGE), name="storage")  # User data storage(local)
 
 # FIXIT Security ALERT; Remove on prod
@@ -67,4 +85,4 @@ async def shutdown():
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", port=SERVER_PORT, host=SERVER_HOST, reload=True, headers=[("server", "PoweredByPutincev")])
+    uvicorn.run("main:app", port=SERVER_PORT, host=SERVER_HOST, reload=True, headers=[("server", "PoweredByPutincev")], root_path=ROOT_PATH)
