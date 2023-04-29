@@ -11,6 +11,6 @@ USERS_STORAGE = config("ITC_USERS_STORAGE", cast=str)
 API_VER = config("ITC_API_VER", cast=str)
 SETUP_MODE = config("ITC_SETUP_MODE", cast=bool)
 CHECKER_SERVICE_URL = config("ITC_CHECKER_SERVICE", cast=str, default="http://172.17.0.1:7777")
-ROOT_PATH = config("ITC_ROOT_PATH", cast=str, default="/")
+ROOT_PATH = config("ITC_ROOT_PATH", cast=str, default="")
 class ERROR_TEXTS:
     low_permissions = "Not enought permissions to execute this API endpoint"

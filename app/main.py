@@ -31,7 +31,7 @@ tags_metadata = [
     }
 ]
 
-app = FastAPI(title="ITC REST API", version=API_VER, openapi_tags=tags_metadata, description=description_metadata)
+app = FastAPI(title="ITC REST API", version=API_VER, openapi_tags=tags_metadata, description=description_metadata, docs_url='/docs/', root_path=ROOT_PATH)
 app.mount("/storage", StaticFiles(directory=USERS_STORAGE), name="storage")  # User data storage(local)
 
 # FIXIT Security ALERT; Remove on prod
