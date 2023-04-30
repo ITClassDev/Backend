@@ -1,13 +1,10 @@
 from locust import HttpUser, between, task
 
-
 class WebsiteUser(HttpUser):
     wait_time = between(5, 10)
     def on_start(self):
         token = self.client.post('/api/auth/login/', json={'email': 'ret7020@gmail.com', 'password': '5322435Sz!'})
-        # print(token.text)
         self.client.headers = {'Authorization': f'Bearer: {token.json()["accessToken"]}'}
-        # print(token)
     
     @task
     def index(self):
@@ -18,6 +15,11 @@ class WebsiteUser(HttpUser):
     def profile(self):
        self.client.get("/profile?id=1")
     
+    @task
+    def profile_2(self):
+        self.client.get("/profile?id=2")
+
+
     @task
     def docs(self):
        self.client.get("/docs")
