@@ -14,6 +14,8 @@ from core.config import USERS_STORAGE
 import asyncio
 import threading
 import datetime
+import requests
+from pathlib import PurePath
 
 
 class TasksRepository(BaseRepository):
@@ -102,25 +104,32 @@ class TasksRepository(BaseRepository):
         return await self.database.fetch_all(query)
 
 
+    def get_repo_last_commit(self, git_url):
+        _, _, owner, repo = PurePath(git_url).parts
+        try:
+            return requests.get(f"https://api.github.com/repos/{owner}/{repo}/commits/master", timeout=1).json()["sha"]
+        except:
+            return "na"
+
     async def submit_contest(self, contest_id: int, git_url: str, user_id: int, language: str):
+        commit_id = self.get_repo_last_commit(git_url)
         tasks_all = await self.get_contest_tasks(contest_id)
         checker_payload = []
+        all_submits_ids = []
         for task in tasks_all.tasks_ids_list:
             task_data = await self.get_by_id_full(task)
             tests = pickle.loads(task_data.tests)
-            types = task_data.input_types
+            types = pickle.loads(task_data.types)
             func_name = task_data.func_name
-            submit = Submit(user_id=user_id, status=0, task_id=task, source=f"git:{git_url}", refer_to=contest_id, git_commit_id="testst", solved=False, tests_results=[], send_date=datetime.datetime.now())
+            submit = Submit(user_id=user_id, status=0, task_id=task, source=f"git:{git_url}", refer_to=contest_id, git_commit_id=commit_id, solved=False, tests_results=[], send_date=datetime.datetime.now())
             values = {**submit.dict()}
             values.pop("id", None)
             query = submits.insert().values(**values)
             submit_id = await self.database.execute(query)
             env = {"cpu_time_limit": task_data.time_limit, "memory_limit": task_data.memory_limit, "real_time_limit": task_data.time_limit}
-            checker_payload.append({func_name: {"tests": tests, "submit_id": submit_id, "types": types, "env": env}})
-        #loop = asyncio.get_event_loop()
-        #thread = threading.Thread(target=lambda: checker.check_multiple_tasks(git_url, checker_payload, lambda data, loop: self.checker_homework_callback(data, loop), loop))
-        #thread.start()
-        return submit_id, checker_payload
+            checker_payload.append({func_name: {"tests": tests, "submit_id": submit_id, "types": types, "env": env, "types": types}})
+            all_submits_ids.append(submit_id)
+        return checker_payload, all_submits_ids
 
             
 

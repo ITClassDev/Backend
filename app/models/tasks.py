@@ -1,6 +1,7 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional, List
 import datetime
+
 
 class Task(BaseModel):
     id: Optional[int] = None
@@ -11,6 +12,8 @@ class Task(BaseModel):
     memory_limit: int
     is_day_challenge: bool
     tests: List[dict]
+    types: Optional[dict] = None
+
 
 class TaskIn(BaseModel):
     title: str
@@ -19,3 +22,4 @@ class TaskIn(BaseModel):
     memory_limit: int
     is_day_challenge: bool
     tests: List[dict]
+    types: dict = Field(example={"in": ["string"], "out": ["vector<char>"]}, default=None)

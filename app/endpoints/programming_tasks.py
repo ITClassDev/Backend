@@ -15,14 +15,12 @@ import threading
 
 router = APIRouter()
 
-
 def challenge(payload, save, loop):
     data = requests.post(f"{CHECKER_SERVICE_URL}/challenge", json=payload).json()
     save(data, loop)
 
 def homework(payload, save, loop):
     data = requests.post(f"{CHECKER_SERVICE_URL}/homework", json=payload).json()
-    print(data)
     save(data, loop)
 
 ### Tasks ###
@@ -44,14 +42,14 @@ async def get_task_info(task_id: int, tasks: TasksRepository = Depends(get_tasks
                         detail="No task with such id")
 
 
-@router.put("/task/add/")  # Teacher level
-async def get_task_info(task_data: TaskIn, tasks: TasksRepository = Depends(get_tasks_repository), current_user: User = Depends(get_current_user)):
+@router.put("/task/")  # Teacher level
+async def create_new_task(task_data: TaskIn, tasks: TasksRepository = Depends(get_tasks_repository), current_user: User = Depends(get_current_user)):
     if current_user.userRole > 0:
         task_id = await tasks.add(task_data, current_user.id)
         return {"task_id": task_id}
 
 
-@router.get("/tasks/all/")  # All tasks
+@router.get("/tasks/")  # All tasks
 async def get_all_tasks(tasks: TasksRepository = Depends(get_tasks_repository), current_user: User = Depends(get_current_user)):
     if current_user.userRole > 0:
         return await tasks.get_all()
@@ -60,9 +58,8 @@ async def get_all_tasks(tasks: TasksRepository = Depends(get_tasks_repository), 
 
 ### Day Challenge ###
 
-
-@router.get("/day_challenge/current/")
-async def get_day_challenge(tasks: TasksRepository = Depends(get_tasks_repository)):
+@router.get("/day_challenge/")
+async def get_current_day_challenge(tasks: TasksRepository = Depends(get_tasks_repository)):
     task_data = await tasks.get_day_challenge()
     tests_data_dict = {**task_data}
     demo_tests = []
@@ -132,9 +129,10 @@ async def get_homework(contest_id: int, tasks: TasksRepository = Depends(get_tas
 @router.post("/homework/submit/")
 async def send_submit(submit_data: SubmitContest, current_user: User = Depends(get_current_user), tasks: TasksRepository = Depends(get_tasks_repository)):
     loop = asyncio.get_event_loop()
-    submit_id, checker_payload = await tasks.submit_contest(submit_data.contest_id, submit_data.git_url, current_user.id, submit_data.language)
-    threading.Thread(target=lambda: homework({"tests": checker_payload, "git_url": submit_data.git_url}, tasks.checker_homework_callback, loop)).start()
-    return {"submit_id": submit_id}
+    checker_payload, all_submits_ids = await tasks.submit_contest(submit_data.contest_id, submit_data.git_url, current_user.id, submit_data.language)
+    print(checker_payload)
+    #threading.Thread(target=lambda: homework({"tests": checker_payload, "git_url": submit_data.git_url}, tasks.checker_homework_callback, loop)).start()
+    return {"submits_ids": all_submits_ids}
 
 
 @router.get("/homework/get_task_submits/")

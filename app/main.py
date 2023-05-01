@@ -52,7 +52,7 @@ app.include_router(auth.router, prefix="/auth", tags=["auth"])
 app.include_router(achievements.router, prefix="/achievements", tags=["achievements"])
 app.include_router(oauth.router, prefix="/oauth", tags=["oauth"])
 app.include_router(admin.router, prefix="/admin", tags=["admin"])
-app.include_router(programming_tasks.router, prefix="/programming_tasks", tags=["programming_checker"])
+app.include_router(programming_tasks.router, prefix="/programming", tags=["programming assignment"])
 app.include_router(notifications.router, prefix="/notifications", tags=["notifications"])
 app.include_router(polls.router, prefix="/polls", tags=["polls"])
 

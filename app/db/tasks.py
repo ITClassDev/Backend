@@ -12,6 +12,6 @@ tasks = sqlalchemy.Table(
     sqlalchemy.Column("memory_limit", sqlalchemy.Integer, default=512),
     sqlalchemy.Column("is_day_challenge", sqlalchemy.Boolean, default=False),
     sqlalchemy.Column("tests", sqlalchemy.PickleType),
-    sqlalchemy.Column("input_types", sqlalchemy.types.ARRAY(sqlalchemy.Integer)),
+    sqlalchemy.Column("types", sqlalchemy.PickleType),
     sqlalchemy.Column("func_name", sqlalchemy.String),
 )
