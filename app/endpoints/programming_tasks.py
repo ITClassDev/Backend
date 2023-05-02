@@ -41,6 +41,10 @@ async def get_task_info(task_id: int, tasks: TasksRepository = Depends(get_tasks
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                         detail="No task with such id")
 
+@router.get("/tasks/search/")
+async def search_for_task(query: str, tasks: TasksRepository = Depends(get_tasks_repository)):
+    return await tasks.search(query)
+
 
 @router.put("/task/")  # Teacher level
 async def create_new_task(task_data: TaskIn, tasks: TasksRepository = Depends(get_tasks_repository), current_user: User = Depends(get_current_user)):

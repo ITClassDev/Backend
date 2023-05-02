@@ -27,6 +27,10 @@ class TasksRepository(BaseRepository):
         query = tasks.select().where(tasks.c.id == task_id)
         return await self.database.fetch_one(query)
 
+    async def search(self, query: str) -> List[Task]:
+        query = select(tasks.c.id, tasks.c.title).filter(tasks.c.title.like(query + "%"))
+        return await self.database.fetch_all(query)
+
     async def add(self, task_data: TaskIn, author_id: int) -> int:
         if task_data.is_day_challenge:
             query = tasks.update().values(is_day_challenge=False)
