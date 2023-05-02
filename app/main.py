@@ -14,7 +14,7 @@ from core.utils.system import get_system_status
 
 # Docs metadata
 description_metadata = '''
-Welcome to ShTP API Docs!
+Welcome to ShTP API Docs! To export openapi.json send get request to /openapi.json
 
 [ShTP API Source Code](https://github.com/ItClassDev/Backend)
 '''
@@ -31,7 +31,7 @@ tags_metadata = [
     }
 ]
 
-app = FastAPI(title="ITC REST API", version=API_VER, openapi_tags=tags_metadata, description=description_metadata, docs_url='/docs/', root_path=ROOT_PATH)
+app = FastAPI(title="ShTP REST", version=API_VER, openapi_tags=tags_metadata, description=description_metadata, docs_url='/docs/', root_path=ROOT_PATH)
 app.mount("/storage", StaticFiles(directory=USERS_STORAGE), name="storage")  # User data storage(local)
 
 # FIXIT Security ALERT; Remove on prod
