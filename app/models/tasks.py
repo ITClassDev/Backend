@@ -23,3 +23,6 @@ class TaskIn(BaseModel):
     is_day_challenge: bool
     tests: List[dict]
     types: dict = Field(example={"in": ["string"], "out": ["vector<char>"]}, default=None)
+
+class SearchTask(BaseModel):
+    query: str

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, UploadFile, HTTPException, status
 from repositories.tasks import TasksRepository
-from models.tasks import TaskIn
+from models.tasks import TaskIn, SearchTask
 from models.user import User
 from models.contests import ContestIn, SubmitContest
 from .depends import get_tasks_repository, get_current_user
@@ -41,9 +41,10 @@ async def get_task_info(task_id: int, tasks: TasksRepository = Depends(get_tasks
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                         detail="No task with such id")
 
-@router.get("/tasks/search/")
-async def search_for_task(query: str, tasks: TasksRepository = Depends(get_tasks_repository)):
-    return await tasks.search(query)
+@router.post("/tasks/search/")
+async def search_for_task(query: SearchTask, tasks: TasksRepository = Depends(get_tasks_repository)):
+    print(query.query)
+    return await tasks.search(query.query)
 
 
 @router.put("/task/")  # Teacher level
