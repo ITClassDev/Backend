@@ -1,4 +1,5 @@
-from fastapi import FastAPI
+from sys import prefix
+from fastapi import FastAPI, APIRouter
 import uvicorn
 from core.config import SERVER_HOST, SERVER_PORT, ROOT_PATH
 from db.base import database
@@ -31,7 +32,7 @@ tags_metadata = [
     }
 ]
 
-app = FastAPI(title="ShTP REST", version=API_VER, openapi_tags=tags_metadata, description=description_metadata, docs_url='/docs/', root_path=ROOT_PATH)
+app = FastAPI(title="ShTP REST", version=API_VER, openapi_tags=tags_metadata, description=description_metadata, docs_url='/docs/', prefix=ROOT_PATH)
 app.mount("/storage", StaticFiles(directory=USERS_STORAGE), name="storage")  # User data storage(local)
 
 # FIXIT Security ALERT; Remove on prod
