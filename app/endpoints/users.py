@@ -65,8 +65,7 @@ async def upload_file_test(file: UploadFile, current_user: User = Depends(get_cu
             os.remove(os.path.join(USERS_STORAGE, "avatars", current_user.userAvatarPath))
     except FileNotFoundError:
         pass
-    uploaded_avatar = await upload_file(file, allowed_extensions, os.path.join(USERS_STORAGE, "avatars"),
-                                        custom_name=f"{current_user.id}_avatar")
+    uploaded_avatar = await upload_file(file, allowed_extensions, os.path.join(USERS_STORAGE, "avatars"), md5_name=True)
     if uploaded_avatar["status"]:
         await users.update_avatar(current_user.id, uploaded_avatar["file_name"])
         return {"status": True, "avatar": uploaded_avatar["file_name"]}
