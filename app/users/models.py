@@ -164,3 +164,11 @@ class UserUpdate(BaseModel):
 
 class UpdateAvatarResponse(BaseModel):
     avatar: str
+
+
+class LeaderboardUser(BaseModel):
+    uuid: uuid_pkg.UUID
+    firstName: str
+    lastName: str
+    avatarPath: str
+    rating: int

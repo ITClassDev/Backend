@@ -13,7 +13,7 @@ async def get_current_user(Authorize: AuthJWT = Depends(), users: UsersCRUD = De
     return await users.get_by_email(str(email))
 
 
-async def access_by_role(acceptable_roles: List[str], Authorize: AuthJWT, users: UsersCRUD, ) -> User:
+async def access_by_role(acceptable_roles: List[str], Authorize: AuthJWT, users: UsersCRUD) -> User:
     Authorize.jwt_required()
     email = Authorize.get_jwt_subject()
     user = await users.get_by_email(str(email))

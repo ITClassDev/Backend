@@ -5,7 +5,7 @@ from fastapi import status as http_status
 from sqlalchemy import delete, select, update
 from sqlmodel.ext.asyncio.session import AsyncSession
 import app.core.security as security
-from app.users.models import User, UserCreate, UserUpdate
+from app.users.models import User, UserCreate, UserUpdate, LeaderboardUser
 import sqlalchemy
 from typing import List
 from app.core.security import verify_password, get_hashed_password
@@ -86,7 +86,7 @@ class UsersCRUD:
         user = results.scalar_one_or_none()
         if user is None:
             raise HTTPException(http_status.HTTP_404_NOT_FOUND,
-                                detail="User with such id not found")
+                                detail="User with such uuid not found")
         return user
 
     async def get_by_email(self, email: str) -> User | None:
@@ -94,12 +94,14 @@ class UsersCRUD:
         results = await self.session.execute(query)
         return results.scalar_one_or_none()
 
-    async def get_top_users(self, limit: int) -> List[User]:
+    async def get_top_users(self, limit: int) -> List[LeaderboardUser]:
         query = select(User.uuid, User.firstName, User.lastName, User.avatarPath,
                        User.rating).where(User.rating > 0).order_by(User.rating.desc()).limit(limit)
         results = await self.session.execute(query)
         return results.fetchall()
 
     async def all_(self) -> List[User]:
-        results = await self.session.execute(select(User))
+        results = await self.session.execute(select(User.uuid, User.role, User.rating, User.learningClass, User.shtpMaintainer, User.groupId,
+                                                    User.nickName, User.firstName, User.lastName, User.patronymicName, User.avatarPath, User.telegram,
+                                                    User.github, User.stepik, User.kaggle, User.website, User.techStack).order_by(User.created_at.asc()))
         return results.fetchall()

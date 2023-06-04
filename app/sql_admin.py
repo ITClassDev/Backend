@@ -6,11 +6,12 @@ from app.users.models import User
 from sqladmin.authentication import AuthenticationBackend
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
-from app.users.models import User
 from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
 from sqlmodel.ext.asyncio.session import AsyncSession
-from sqlalchemy import func
+
+from app.users.models import User
+from app.groups.models import Group
 
 class AdminAuth(AuthenticationBackend):
     async def login(self, request: Request) -> bool:
@@ -52,10 +53,14 @@ class AdminAuth(AuthenticationBackend):
 class UserAdmin(ModelView, model=User):
     column_list = [User.uuid, User.email, User.firstName, User.lastName]
 
+class GroupAdmin(ModelView, model=Group):
+    column_list = [Group.uuid, Group.name, Group.color]
+
 
 def create(app, secret_key):
     authentication_backend = AdminAuth(secret_key=secret_key)
     sql_admin = Admin(app, async_engine,
                       authentication_backend=authentication_backend, base_url="/db_admin")
     sql_admin.add_view(UserAdmin)
+    sql_admin.add_view(GroupAdmin)
     return sql_admin

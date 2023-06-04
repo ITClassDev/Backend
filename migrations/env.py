@@ -12,6 +12,7 @@ import sqlmodel
 
 # Models
 from app.users.models import User 
+from app.groups.models import Group
 
 config = context.config
 

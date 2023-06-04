@@ -3,7 +3,7 @@ from fastapi import status as http_status
 from app.users.crud import UsersCRUD
 from typing import List
 from app.users.dependencies import get_users_crud
-from app.users.models import UserCreate, UserRead, User, UserUpdate
+from app.users.models import UserCreate, UserRead, User, UserUpdate, LeaderboardUser
 from app.auth.dependencies import get_current_user, atleast_teacher_access
 import uuid as uuid_pkg
 from app import settings
@@ -12,6 +12,10 @@ from app.core.files import upload_file
 from app.users.models import UpdateAvatarResponse
 
 router = APIRouter()
+
+@router.get("", response_model=List[UserRead])
+async def get_all_users(users: UsersCRUD = Depends(get_users_crud), current_user: User = Depends(atleast_teacher_access)):
+    return await users.all_()
 
 
 @router.put("", response_model=UserRead)
@@ -57,20 +61,15 @@ async def update_avatar(avatar: UploadFile, current_user: User = Depends(get_cur
         raise HTTPException(http_status.HTTP_400_BAD_REQUEST,
                             detail=uploaded_avatar["info"])
 
-@router.get("/leaderboard")
+
+@router.get("/leaderboard", response_model=List[LeaderboardUser])
 async def get_leaderboard(limit: int = 10, users: UsersCRUD = Depends(get_users_crud)):
     resp = await users.get_top_users(limit)
     return resp
 
+
 @router.get("/{user_uuid}", response_model=UserRead)
 async def get_user_by_id(user_uuid: uuid_pkg.UUID, users: UsersCRUD = Depends(get_users_crud)):
     return await users.get(user_uuid)
-
-
-@router.get("", response_model=List[UserRead])
-async def get_all_users(users: UsersCRUD = Depends(get_users_crud), current_user: User = Depends(atleast_teacher_access)):
-    res = await users.all_()
-    print(res)
-    return res
 
 
