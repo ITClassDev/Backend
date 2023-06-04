@@ -127,6 +127,7 @@ class UserUpdateAdmin(BaseModel):
 class UserUpdate(BaseModel):
     uuid: Optional[uuid_pkg.UUID] = None
     aboutText: Optional[str] = None
+    nickName: Optional[str] = None
     socialLinks: Optional[SocialLinks]
     techStack: Optional[List[str]]
     password: Optional[UpdatePassword]
@@ -136,6 +137,7 @@ class UserUpdate(BaseModel):
         schma_extra = {"example": {
             "uuid": "If you are admin/teacher and want to modify another user data",
             "aboutText": "string",
+            "nickName": "string",
             "socialLinks": {
                 "github": "string",
                 "telegram": "string",

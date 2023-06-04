@@ -38,6 +38,8 @@ class UsersCRUD:
         upd_uuid = user.uuid
         if user_data.aboutText != None:
             upd_values["aboutText"] = user_data.aboutText
+        if user_data.nickName != None:
+            upd_values["nickName"] = user_data.nickName
         if user_data.socialLinks:
             for link in dict(user_data.socialLinks):
                 value = dict(user_data.socialLinks)[link]
