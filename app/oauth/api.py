@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-
+import uuid as uuid_pkg
 
 router = APIRouter()
 
@@ -20,5 +20,5 @@ async def provide_access_to_api():
 
 
 @router.get("/get_user/{user_uuid}")
-async def get_app_info(user_uuid: int):
+async def get_app_info(user_uuid: uuid_pkg.UUID):
     return user_uuid

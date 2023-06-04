@@ -1,4 +1,4 @@
-from uuid import UUID
+import uuid as uuid_pkg
 
 from fastapi import HTTPException
 from fastapi import status as http_status
@@ -74,9 +74,15 @@ class UsersCRUD:
 
         return upd_values
 
-    async def get(self, uuid: str | UUID) -> User:
+    async def update_avatar(self, uuid: uuid_pkg.UUID, avatarPath: str):
+        query = update(User).where(User.uuid == uuid).values(
+            {"avatarPath": avatarPath})
+        await self.session.execute(query)
+        await self.session.commit()
+
+    async def get(self, uuid: str | uuid_pkg.UUID) -> User:
         query = select(User).where(User.uuid == uuid)
-        results = await self.session.execute(statement=query)
+        results = await self.session.execute(query)
         user = results.scalar_one_or_none()
         if user is None:
             raise HTTPException(http_status.HTTP_404_NOT_FOUND,
@@ -87,6 +93,12 @@ class UsersCRUD:
         query = select(User).where(User.email == email)
         results = await self.session.execute(query)
         return results.scalar_one_or_none()
+
+    async def get_top_users(self, limit: int) -> List[User]:
+        query = select(User.uuid, User.firstName, User.lastName, User.avatarPath,
+                       User.rating).where(User.rating > 0).order_by(User.rating.desc()).limit(limit)
+        results = await self.session.execute(query)
+        return results.fetchall()
 
     async def all_(self) -> List[User]:
         results = await self.session.execute(select(User))

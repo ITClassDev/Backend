@@ -1,6 +1,6 @@
 import uvicorn
 from fastapi import FastAPI, Request
-
+from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
 from fastapi_jwt_auth.exceptions import AuthJWTException
@@ -16,9 +16,9 @@ app = FastAPI(
     openapi_url=f"{settings.api_v1_prefix}/openapi.json",
     debug=settings.debug
 )
+app.mount("/storage", StaticFiles(directory=settings.user_storage),
+          name="storage")  # User data storage(local)
 sql_admin.create(app, settings.secret_key)
-
-
 
 
 @AuthJWT.load_config  # type: ignore

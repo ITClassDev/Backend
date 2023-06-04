@@ -161,3 +161,6 @@ class UserUpdate(BaseModel):
                 "learningClass": 0
             }
         }}
+
+class UpdateAvatarResponse(BaseModel):
+    avatar: str

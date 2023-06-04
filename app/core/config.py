@@ -17,3 +17,6 @@ class Settings(BaseSettings):
     secret_key: str
     jwt_algorithm: str
     jwt_access_token_expire_at_minutes: int
+
+    # Storage
+    user_storage: str
