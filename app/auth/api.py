@@ -19,14 +19,15 @@ async def get_me(current_user: User = Depends(get_current_user)):
 async def login(auth_data: UserLogin, Authorize: AuthJWT = Depends(), users: UsersCRUD = Depends(get_users_crud)):
     user = await users.get_by_email(auth_data.email)
     if user:
-        print("DBG", auth_data.password, user.password)
         if verify_password(auth_data.password, user.password):
-            access_token = Authorize.create_access_token(subject=auth_data.email)
-            refresh_token = Authorize.create_refresh_token(subject=auth_data.email)
+            access_token = Authorize.create_access_token(
+                subject=auth_data.email)
+            refresh_token = Authorize.create_refresh_token(
+                subject=auth_data.email)
             return {"access_token": access_token, "refresh_token": refresh_token}
-    
+
     raise HTTPException(http_status.HTTP_403_FORBIDDEN,
-        detail="Invalid pair login && password")
+                        detail="Invalid pair login && password")
 
 
 @router.post("/refresh")

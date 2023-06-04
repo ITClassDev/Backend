@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 import uuid as uuid_pkg
 from sqlalchemy import Column, event, table
 from sqlalchemy.databases import postgres
@@ -37,6 +37,7 @@ class User(UUIDModel, TimestampModel, table=True):
     nickName: str = Field(max_length=100, nullable=True, unique=True)
     firstName: str = Field(max_length=50, nullable=False)
     lastName: str = Field(max_length=50, nullable=False)
+    aboutText: str = Field(max_length=100, nullable=True)
     patronymicName: str = Field(max_length=50, nullable=True)
     avatarPath: str = Field(nullable=False, default="default.png")
 
@@ -56,37 +57,38 @@ class UserCreate(BaseModel):
     lastName: str
     role: str
     groupId: int
+    learningClass: int
 
     class Config:
         schema_extra = {"example": {
-            "email": "email@yandex.ru",
+            "email": "email@1561.ru",
             "password": "12345",
-            "firstname": "Ivan",
-            "lastname": "Ivanov"
+            "firstName": "Ivan",
+            "lastName": "Ivanov",
+            "role": "student",
+            "learningClass": 10,
+            "groupId": 1
         }}
 
 
 class UserRead(BaseModel):
     uuid: uuid_pkg.UUID
     role: str
-    nickname: str
-    email: str
-    firstname: str
-    lastname: str
-    avatar: str
-    showcontacts: bool
-    github: Optional[str]
+    rating: int
+    learningClass: int
+    shtpMaintainer: bool
+    groupId: int
+    nickName: Optional[str]
+    firstName: str
+    lastName: str
+    patronymicName: Optional[str]
+    avatarPath: str
     telegram: Optional[str]
-    tel: Optional[str]
-
-    @root_validator
-    def hide_contacts(cls, values):
-        if not values["showcontacts"]:
-            values["github"] = "Hidden"
-            values["telegram"] = "Hidden"
-            values["tel"] = "Hidden"
-            values["email"] = "Hidden"
-        return values
+    github: Optional[str]
+    stepik: Optional[str]
+    kaggle: Optional[str]
+    website: Optional[str]
+    techStack: Optional[str]
 
 
 class UserLogin(BaseModel):
@@ -95,6 +97,65 @@ class UserLogin(BaseModel):
 
     class Config:
         schema_extra = {"example": {
-            "email": "email@yandex.ru",
+            "email": "email@1561.ru",
             "password": "12345"
+        }}
+
+
+class SocialLinks(BaseModel):
+    github: Optional[str]
+    telegram: Optional[str]
+    stepik: Optional[str]
+    kaggle: Optional[str]
+    website: Optional[str]
+
+
+class UpdatePassword(BaseModel):
+    currentPassword: str
+    newPassword: str
+    confirmPassword: str
+
+
+class UserUpdateAdmin(BaseModel):
+    firstName: Optional[str]
+    lastName: Optional[str]
+    patronymicName: Optional[str]
+    rating: Optional[int]
+    learningClass: Optional[int]
+
+
+class UserUpdate(BaseModel):
+    uuid: Optional[uuid_pkg.UUID] = None
+    aboutText: Optional[str] = None
+    socialLinks: Optional[SocialLinks]
+    techStack: Optional[List[str]]
+    password: Optional[UpdatePassword]
+    admin: Optional[UserUpdateAdmin]
+
+    class Config:
+        schma_extra = {"example": {
+            "uuid": "If you are admin/teacher and want to modify another user data",
+            "aboutText": "string",
+            "socialLinks": {
+                "github": "string",
+                "telegram": "string",
+                "stepik": "string",
+                "kaggle": "string",
+                "website": "string"
+            },
+            "techStack": [
+                "string"
+            ],
+            "password": {
+                "currentPassword": "string",
+                "newPassword": "string",
+                "confirmPassword": "string"
+            },
+            "admin": {
+                "firstName": "string",
+                "lastName": "string",
+                "patronymicName": "string",
+                "rating": 0,
+                "learningClass": 0
+            }
         }}
