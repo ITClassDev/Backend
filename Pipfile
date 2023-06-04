@@ -5,31 +5,17 @@ name = "pypi"
 
 [packages]
 fastapi = "*"
-sqlalchemy = "*"
 uvicorn = "*"
-databases = {extras = ["postgresql"], version = "*"}
-starlette = "*"
-psycopg2 = "*"
-pydantic = {extras = ["email"], version = "*"}
+sqlmodel = "*"
 alembic = "*"
+pydantic = {extras = ["email"], version = "*"}
+fastapi-jwt-auth = "*"
 passlib = "*"
-jose = "*"
-python-jose = "*"
-protobuf = "*"
-requests = "*"
-termcolor = "*"
-python-multipart = "*"
-psutil = "*"
 asyncpg = "*"
-epicbox = "*"
-pandas = "*"
-openpyxl = "*"
-httpx = "*"
-sqladmin = "*"
+python-dotenv = "*"
 
 [dev-packages]
 autopep8 = "*"
-pytest = "*"
 
 [requires]
 python_version = "3.10"
