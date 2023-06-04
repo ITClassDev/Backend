@@ -25,6 +25,7 @@ epicbox = "*"
 pandas = "*"
 openpyxl = "*"
 httpx = "*"
+sqladmin = "*"
 
 [dev-packages]
 autopep8 = "*"
