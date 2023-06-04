@@ -5,6 +5,7 @@ from app.users.models import UserLogin, UserRead, User
 from app.users.dependencies import get_users_crud
 from app.auth.dependencies import get_current_user
 from app.users.crud import UsersCRUD
+from app.core.security import verify_password
 
 router = APIRouter()
 
@@ -15,14 +16,17 @@ async def get_me(current_user: User = Depends(get_current_user)):
 
 
 @router.post("/login")
-async def login(user: UserLogin, Authorize: AuthJWT = Depends(), users: UsersCRUD = Depends(get_users_crud)):
-    if await users.get_by_email(user.email):
-        access_token = Authorize.create_access_token(subject=user.email)
-        refresh_token = Authorize.create_refresh_token(subject=user.email)
-        return {"access_token": access_token, "refresh_token": refresh_token}
-    else:
-        raise HTTPException(http_status.HTTP_403_FORBIDDEN,
-                            detail="No user with such email")
+async def login(auth_data: UserLogin, Authorize: AuthJWT = Depends(), users: UsersCRUD = Depends(get_users_crud)):
+    user = await users.get_by_email(auth_data.email)
+    if user:
+        print("DBG", auth_data.password, user.password)
+        if verify_password(auth_data.password, user.password):
+            access_token = Authorize.create_access_token(subject=auth_data.email)
+            refresh_token = Authorize.create_refresh_token(subject=auth_data.email)
+            return {"access_token": access_token, "refresh_token": refresh_token}
+    
+    raise HTTPException(http_status.HTTP_403_FORBIDDEN,
+        detail="Invalid pair login && password")
 
 
 @router.post("/refresh")

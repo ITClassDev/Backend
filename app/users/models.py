@@ -31,8 +31,9 @@ class User(UUIDModel, TimestampModel, table=True):
         default="student"
     ))
     rating: int = Field(default=0, nullable=False)
-    learningClass: int = Field(default=10, nullable=False)
+    learningClass: int = Field(default=0, nullable=False)
     groupId: int = Field(nullable=False)
+    shtpMaintainer: bool = Field(default=0, nullable=True)
     nickName: str = Field(max_length=100, nullable=True, unique=True)
     firstName: str = Field(max_length=50, nullable=False)
     lastName: str = Field(max_length=50, nullable=False)
@@ -45,7 +46,7 @@ class User(UUIDModel, TimestampModel, table=True):
     kaggle: str = Field(max_length=100, nullable=True, unique=True)
     website: str = Field(max_length=100, nullable=True, unique=True)
 
-    techStack: str = Field(max_length=800)
+    techStack: str = Field(max_length=800, nullable=True)
 
 
 class UserCreate(BaseModel):

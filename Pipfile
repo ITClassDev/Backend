@@ -13,6 +13,7 @@ fastapi-jwt-auth = "*"
 passlib = "*"
 asyncpg = "*"
 python-dotenv = "*"
+sqladmin = "*"
 
 [dev-packages]
 autopep8 = "*"

@@ -8,6 +8,7 @@ from app import settings
 from app.core.models import HealthCheck, JWTSettings
 from app.router.api_v1.endpoints import api_router
 from fastapi.openapi.utils import get_openapi
+import app.sql_admin as sql_admin
 
 app = FastAPI(
     title=settings.project_name,
@@ -15,6 +16,9 @@ app = FastAPI(
     openapi_url=f"{settings.api_v1_prefix}/openapi.json",
     debug=settings.debug
 )
+sql_admin.create(app, settings.secret_key)
+
+
 
 
 @AuthJWT.load_config  # type: ignore
