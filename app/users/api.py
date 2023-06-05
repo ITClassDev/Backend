@@ -3,15 +3,17 @@ from fastapi import status as http_status
 from app.users.crud import UsersCRUD
 from typing import List
 from app.users.dependencies import get_users_crud
-from app.users.models import UserCreate, UserRead, User, UserUpdate, LeaderboardUser
+from app.users.schemas import UserCreate, UserRead, UserUpdate, LeaderboardUser, UserUpdateResponse
+from app.users.models import User
 from app.auth.dependencies import get_current_user, atleast_teacher_access
 import uuid as uuid_pkg
 from app import settings
 import os
 from app.core.files import upload_file
-from app.users.models import UpdateAvatarResponse
+from app.users.schemas import UpdateAvatarResponse
 
 router = APIRouter()
+
 
 @router.get("", response_model=List[UserRead])
 async def get_all_users(users: UsersCRUD = Depends(get_users_crud), current_user: User = Depends(atleast_teacher_access)):
@@ -33,7 +35,7 @@ async def delete_user(user_uuid: uuid_pkg.UUID):
     pass
 
 
-@router.patch("")
+@router.patch("", response_model=UserUpdateResponse)
 async def update_user_info(update_data: UserUpdate, current_user: User = Depends(get_current_user), users: UsersCRUD = Depends(get_users_crud)):
     result = await users.update(current_user, update_data)
     if "raise" in result:
@@ -71,5 +73,3 @@ async def get_leaderboard(limit: int = 10, users: UsersCRUD = Depends(get_users_
 @router.get("/{user_uuid}", response_model=UserRead)
 async def get_user_by_id(user_uuid: uuid_pkg.UUID, users: UsersCRUD = Depends(get_users_crud)):
     return await users.get(user_uuid)
-
-

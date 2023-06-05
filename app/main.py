@@ -9,6 +9,7 @@ from app.core.models import HealthCheck, JWTSettings
 from app.router.api_v1.endpoints import api_router
 from fastapi.openapi.utils import get_openapi
 import app.sql_admin as sql_admin
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(
     title=settings.project_name,
@@ -16,6 +17,14 @@ app = FastAPI(
     openapi_url=f"{settings.api_v1_prefix}/openapi.json",
     debug=settings.debug
 )
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['*'],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.mount("/storage", StaticFiles(directory=settings.user_storage),
           name="storage")  # User data storage(local)
 sql_admin.create(app, settings.secret_key)

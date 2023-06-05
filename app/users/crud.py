@@ -5,7 +5,8 @@ from fastapi import status as http_status
 from sqlalchemy import delete, select, update
 from sqlmodel.ext.asyncio.session import AsyncSession
 import app.core.security as security
-from app.users.models import User, UserCreate, UserUpdate, LeaderboardUser
+from app.users.models import User
+from app.users.schemas import UserCreate, UserUpdate, LeaderboardUser
 import sqlalchemy
 from typing import List
 from app.core.security import verify_password, get_hashed_password

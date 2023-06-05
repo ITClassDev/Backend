@@ -13,18 +13,19 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from app.users.models import User
 from app.groups.models import Group
 
+
 class AdminAuth(AuthenticationBackend):
     async def login(self, request: Request) -> bool:
         form = await request.form()
-        
+
         email, password = form["username"], form["password"]
         async_session = sessionmaker(
             async_engine, expire_on_commit=False, class_=AsyncSession
         )
         async with async_session() as session:
             users_cnt = await session.execute(select(User))
-            
-            if not len(users_cnt.fetchall()): # ShTP Backend Run on empty db
+
+            if not len(users_cnt.fetchall()):  # ShTP Backend Run on empty db
                 request.session.update({"token": "shdfhsdf" * 50})
                 return True
             res = await session.execute(
@@ -52,6 +53,7 @@ class AdminAuth(AuthenticationBackend):
 
 class UserAdmin(ModelView, model=User):
     column_list = [User.uuid, User.email, User.firstName, User.lastName]
+
 
 class GroupAdmin(ModelView, model=Group):
     column_list = [Group.uuid, Group.name, Group.color]

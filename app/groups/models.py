@@ -9,6 +9,3 @@ class Group(UUIDModel, TimestampModel, table=True):
     name: str = Field(nullable=False)
     color: str = Field(nullable=False, default="#3B83BD")
 
-class GroupCreate(BaseModel):
-    name: str
-    color: str
