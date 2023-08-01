@@ -146,6 +146,7 @@ class UpdateAvatarResponse(BaseModel):
 
 class LeaderboardUser(BaseModel):
     uuid: uuid_pkg.UUID
+    nickName: Optional[str] = ""
     firstName: str
     lastName: str
     avatarPath: str

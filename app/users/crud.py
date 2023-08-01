@@ -2,7 +2,7 @@ import uuid as uuid_pkg
 
 from fastapi import HTTPException
 from fastapi import status as http_status
-from sqlalchemy import delete, select, update
+from sqlalchemy import select, update
 from sqlmodel.ext.asyncio.session import AsyncSession
 import app.core.security as security
 from app.users.models import User
@@ -81,13 +81,17 @@ class UsersCRUD:
         await self.session.execute(query)
         await self.session.commit()
 
-    async def get(self, uuid: str | uuid_pkg.UUID) -> User:
-        query = select(User).where(User.uuid == uuid)
+    async def get(self, id: str | uuid_pkg.UUID) -> User:
+        if type(id) == uuid_pkg.UUID:
+            query = select(User).where(User.uuid == id)
+        else:
+            query = select(User).where(User.nickName == id)
+
         results = await self.session.execute(query)
         user = results.scalar_one_or_none()
         if user is None:
             raise HTTPException(http_status.HTTP_404_NOT_FOUND,
-                                detail="User with such uuid not found")
+                                detail="User with such id/nickname not found")
         return user
 
     async def get_by_email(self, email: str) -> User | None:
@@ -96,7 +100,7 @@ class UsersCRUD:
         return results.scalar_one_or_none()
 
     async def get_top_users(self, limit: int) -> List[LeaderboardUser]:
-        query = select(User.uuid, User.firstName, User.lastName, User.avatarPath,
+        query = select(User.uuid, User.nickName, User.firstName, User.lastName, User.avatarPath,
                        User.rating).where(User.rating > 0).order_by(User.rating.desc()).limit(limit)
         results = await self.session.execute(query)
         return results.fetchall()

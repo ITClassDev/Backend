@@ -9,9 +9,9 @@ from starlette.responses import RedirectResponse
 from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
 from sqlmodel.ext.asyncio.session import AsyncSession
-
 from app.users.models import User
 from app.groups.models import Group
+from app.notifications.models import Notification
 
 
 class AdminAuth(AuthenticationBackend):
@@ -29,14 +29,16 @@ class AdminAuth(AuthenticationBackend):
                 request.session.update({"token": "shdfhsdf" * 50})
                 return True
             res = await session.execute(
-                select(User).where(User.email == "ret7020@gmail.com")
+                select(User).where(User.email == email)
             )
-            user = res.first()[0]
-            if user.role == "admin" or user.shtpMaintainer:
-                if verify_password(password, user.password):
-                    request.session.update({"token": "TOKEN"})
-                    return True
-        return 1
+            res = res.first()
+            if res:
+                user = res[0]
+                if user.role == "admin" or user.shtpMaintainer:
+                    if verify_password(password, user.password):
+                        request.session.update({"token": "TOKEN"})
+                        return True
+        return False
 
     async def logout(self, request: Request) -> bool:
         request.session.clear()
@@ -58,6 +60,9 @@ class UserAdmin(ModelView, model=User):
 class GroupAdmin(ModelView, model=Group):
     column_list = [Group.uuid, Group.name, Group.color]
 
+class NotificationAdmin(ModelView, model=Notification):
+    column_list = [Notification.uuid, Notification.type, Notification.data]
+
 
 def create(app, secret_key):
     authentication_backend = AdminAuth(secret_key=secret_key)
@@ -65,4 +70,5 @@ def create(app, secret_key):
                       authentication_backend=authentication_backend, base_url="/db_admin")
     sql_admin.add_view(UserAdmin)
     sql_admin.add_view(GroupAdmin)
+    sql_admin.add_view(NotificationAdmin)
     return sql_admin

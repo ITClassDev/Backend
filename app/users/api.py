@@ -70,6 +70,6 @@ async def get_leaderboard(limit: int = 10, users: UsersCRUD = Depends(get_users_
     return resp
 
 
-@router.get("/{uuid}", response_model=UserRead)
-async def get_user_by_id(uuid: uuid_pkg.UUID, users: UsersCRUD = Depends(get_users_crud)):
-    return await users.get(uuid)
+@router.get("/{id}", response_model=UserRead)
+async def get_user_by_uuid_or_nick(id: uuid_pkg.UUID | str, users: UsersCRUD = Depends(get_users_crud)):
+    return await users.get(id)

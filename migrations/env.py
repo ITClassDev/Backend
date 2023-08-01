@@ -13,6 +13,7 @@ import sqlmodel
 # Models
 from app.users.models import User 
 from app.groups.models import Group
+from app.notifications.models import Notification
 
 config = context.config
 
