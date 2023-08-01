@@ -19,11 +19,11 @@ async def accept_achievement():
     pass
 
 
-@router.get("/my_queue")
-async def get_my_achievements():
+@router.get("/pending")
+async def get_my_pending_achievements():
     pass
 
 
 @router.get("/queue")
-async def get_all_achievements_queue():
+async def admin_get_all_achievements_queue():
     pass

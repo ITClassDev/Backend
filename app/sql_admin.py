@@ -36,7 +36,7 @@ class AdminAuth(AuthenticationBackend):
                 if verify_password(password, user.password):
                     request.session.update({"token": "TOKEN"})
                     return True
-        return False
+        return 1
 
     async def logout(self, request: Request) -> bool:
         request.session.clear()
@@ -52,7 +52,7 @@ class AdminAuth(AuthenticationBackend):
 
 
 class UserAdmin(ModelView, model=User):
-    column_list = [User.uuid, User.email, User.firstName, User.lastName]
+    column_list = [User.uuid, User.email, User.firstName, User.lastName, User.groupId]
 
 
 class GroupAdmin(ModelView, model=Group):

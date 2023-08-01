@@ -102,7 +102,7 @@ class UsersCRUD:
         return results.fetchall()
 
     async def all_(self) -> List[User]:
-        results = await self.session.execute(select(User.uuid, User.role, User.rating, User.learningClass, User.shtpMaintainer, User.groupId,
+        results = await self.session.execute(select(User.uuid, User.role, User.rating, User.learningClass, User.aboutText, User.shtpMaintainer, User.groupId,
                                                     User.nickName, User.firstName, User.lastName, User.patronymicName, User.avatarPath, User.telegram,
                                                     User.github, User.stepik, User.kaggle, User.website, User.techStack).order_by(User.created_at.asc()))
         return results.fetchall()

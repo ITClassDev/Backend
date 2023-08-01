@@ -71,7 +71,8 @@ def do_run_migrations(connection):
         context.configure(
             connection=connection,
             target_metadata=target_metadata,
-            include_object=filter_db_objects
+            include_object=filter_db_objects,
+            compare_type=True
         )
         context.run_migrations()
 

@@ -20,14 +20,9 @@ async def generate_filename(file_ext, prefix="itc_upl_", custom_name=None):
     return f"{base_name}.{file_ext}"
 
 
-async def md5_hash_file(f, block_size=2**20):
-    md5 = hashlib.md5()
-    while True:
-        data = f.read(block_size)
-        if not data:
-            break
-        md5.update(data)
-    return md5.hexdigest()
+async def md5_hash_file(content):
+    return hashlib.md5(content).hexdigest()
+
 
 
 async def upload_file(file, allowed_extensions: list, upload_path: str = None, custom_name: str = None, write: bool = True, md5_name: bool = False):
@@ -38,7 +33,8 @@ async def upload_file(file, allowed_extensions: list, upload_path: str = None, c
             if not md5_name:
                 file_name = await generate_filename(file_ext, custom_name=custom_name)
             else:
-                file_name = await md5_hash_file(file.file)
+                file_name = await md5_hash_file(contents)
+                print("FILE NAME: ", file_name)
                 file_name = f"{file_name}.{file_ext}"
             if write:
                 with open(os.path.join(upload_path, file_name), "wb") as file_descr:

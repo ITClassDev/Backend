@@ -10,7 +10,7 @@ class UserCreate(BaseModel):
     firstName: str
     lastName: str
     role: str
-    groupId: int
+    groupId: uuid_pkg.UUID
     learningClass: int
 
     class Config:
@@ -21,7 +21,7 @@ class UserCreate(BaseModel):
             "lastName": "Ivanov",
             "role": "student",
             "learningClass": 10,
-            "groupId": 1
+            "groupId": ""
         }}
 
 
@@ -30,8 +30,8 @@ class UserRead(BaseModel):
     role: str
     rating: int
     learningClass: int
-    shtpMaintainer: bool
-    groupId: int
+    shtpMaintainer: Optional[bool] = False
+    groupId: uuid_pkg.UUID
     nickName: Optional[str]
     firstName: str
     lastName: str
@@ -43,6 +43,7 @@ class UserRead(BaseModel):
     kaggle: Optional[str]
     website: Optional[str]
     techStack: Optional[str]
+    aboutText: Optional[str] = None
 
 
 class UserLogin(BaseModel):
