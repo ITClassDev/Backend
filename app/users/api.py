@@ -25,7 +25,7 @@ async def create_user(user: UserCreate, users: UsersCRUD = Depends(get_users_cru
     return await users.create(user)
 
 
-@router.put("/from_csv")
+@router.put("/csv")
 async def create_multiple_users_from_csv():
     pass
 

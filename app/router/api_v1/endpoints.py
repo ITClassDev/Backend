@@ -6,7 +6,7 @@ from app.groups.api import router as groups_router
 from app.achievements.api import router as achievements_router
 from app.oauth.api import router as oauth_router
 from app.notifications.api import router as notifications_router
-
+from app.events.api import router as events_router
 
 api_router = APIRouter()
 
@@ -18,7 +18,8 @@ routers = (
     (groups_router, "groups", "groups"),
     (achievements_router, "achievements", "achievements"),
     (oauth_router, "oauth", "oauth"),
-    (notifications_router, "notifications", "notifications")
+    (notifications_router, "notifications", "notifications"),
+    (events_router, "events", "events")
 
 )
 

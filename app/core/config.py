@@ -20,3 +20,7 @@ class Settings(BaseSettings):
 
     # Storage
     user_storage: str
+
+    # Profil parser
+    profil_endpoint: str
+    profil_category: int

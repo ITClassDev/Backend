@@ -91,7 +91,7 @@ class UsersCRUD:
         user = results.scalar_one_or_none()
         if user is None:
             raise HTTPException(http_status.HTTP_404_NOT_FOUND,
-                                detail="User with such id/nickname not found")
+                                detail="User with such uuid/nickname not found")
         return user
 
     async def get_by_email(self, email: str) -> User | None:

@@ -13,4 +13,3 @@ class Notification(UUIDModel, TimestampModel, table=True):
         "data",
         JSON
     ))
-
