@@ -4,8 +4,10 @@ from fastapi import HTTPException
 from fastapi import status as http_status
 from sqlalchemy import select, update
 from sqlmodel.ext.asyncio.session import AsyncSession
+from sqlalchemy.orm import joinedload
 import app.core.security as security
 from app.users.models import User
+from app.groups.models import Group
 from app.users.schemas import UserCreate, UserUpdate, LeaderboardUser
 import sqlalchemy
 from typing import List
@@ -83,9 +85,9 @@ class UsersCRUD:
 
     async def get(self, id: str | uuid_pkg.UUID) -> User:
         if type(id) == uuid_pkg.UUID:
-            query = select(User).where(User.uuid == id)
+            query = select(User, Group).where(User.uuid == id).join(User.group)
         else:
-            query = select(User).where(User.nickName == id)
+            query = select(User, Group).where(User.nickName == id).join(User.group)
 
         results = await self.session.execute(query)
         user = results.scalar_one_or_none()
@@ -106,7 +108,5 @@ class UsersCRUD:
         return results.fetchall()
 
     async def all_(self) -> List[User]:
-        results = await self.session.execute(select(User.uuid, User.role, User.rating, User.learningClass, User.aboutText, User.shtpMaintainer, User.groupId,
-                                                    User.nickName, User.firstName, User.lastName, User.patronymicName, User.avatarPath, User.telegram,
-                                                    User.github, User.stepik, User.kaggle, User.website, User.techStack).order_by(User.created_at.asc()))
+        results = await self.session.execute(select(User).options(joinedload(User.group)).order_by(User.created_at.asc()))
         return results.fetchall()

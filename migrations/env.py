@@ -14,6 +14,7 @@ import sqlmodel
 from app.users.models import User 
 from app.groups.models import Group
 from app.notifications.models import Notification
+from app.achievements.models import Achievement
 
 config = context.config
 

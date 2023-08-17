@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
-
-
+from app.auth.dependencies import get_current_user
+from app.users.models import User
 router = APIRouter()
 
 
 @router.get("")
-async def get_my_achievements():
+async def get_current_user_achievements(current_user: User = Depends(get_current_user)):
     pass
 
 

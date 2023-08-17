@@ -1,6 +1,5 @@
-from sqlalchemy import Column, event, table, JSON
-from sqlalchemy.databases import postgres
-from sqlmodel import Field, SQLModel
+from sqlalchemy import Column, JSON
+from sqlmodel import Field
 import uuid as uuid_pkg
 from app.core.models import TimestampModel, UUIDModel
 

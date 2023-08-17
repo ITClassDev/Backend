@@ -4,7 +4,11 @@ import uuid as uuid_pkg
 router = APIRouter()
 
 
-@router.get("")
+@router.get("/apps/:uuid")
+async def get_app_info():
+    pass
+
+@router.get("/apps/my")
 async def get_app_info():
     pass
 

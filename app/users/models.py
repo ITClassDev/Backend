@@ -1,9 +1,10 @@
 from sqlalchemy import Column, event, table
 from sqlalchemy.databases import postgres
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, SQLModel, Relationship
 import uuid as uuid_pkg
 
 from app.core.models import TimestampModel, UUIDModel
+from app.groups.models import Group
 
 users_role_type = postgres.ENUM(
     "student",
@@ -31,6 +32,7 @@ class User(UUIDModel, TimestampModel, table=True):
     rating: int = Field(default=0, nullable=False)
     learningClass: int = Field(default=0, nullable=False)
     groupId: uuid_pkg.UUID = Field(nullable=False, foreign_key="groups.uuid")
+    group: Group = Relationship(back_populates="users", sa_relationship_kwargs={'lazy': 'selectin'})
     shtpMaintainer: bool = Field(default=0, nullable=True)
     nickName: str = Field(max_length=100, nullable=True, unique=True)
     firstName: str = Field(max_length=50, nullable=False)

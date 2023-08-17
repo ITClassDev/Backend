@@ -2,6 +2,7 @@ from typing import Optional
 import uuid as uuid_pkg
 from pydantic import BaseModel, EmailStr
 from typing import List
+from app.groups.schemas import GroupRead
 
 
 class UserCreate(BaseModel):
@@ -31,6 +32,7 @@ class UserRead(BaseModel):
     rating: int
     learningClass: int
     shtpMaintainer: Optional[bool] = False
+    group: Optional[GroupRead]
     groupId: uuid_pkg.UUID
     nickName: Optional[str]
     firstName: str

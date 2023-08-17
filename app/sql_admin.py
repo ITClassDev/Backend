@@ -12,6 +12,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from app.users.models import User
 from app.groups.models import Group
 from app.notifications.models import Notification
+from app.achievements.models import Achievement
 
 
 class AdminAuth(AuthenticationBackend):
@@ -54,7 +55,7 @@ class AdminAuth(AuthenticationBackend):
 
 
 class UserAdmin(ModelView, model=User):
-    column_list = [User.uuid, User.email, User.firstName, User.lastName, User.groupId]
+    column_list = [User.uuid, User.email, User.firstName, User.lastName, User.group]
 
 
 class GroupAdmin(ModelView, model=Group):
@@ -62,6 +63,9 @@ class GroupAdmin(ModelView, model=Group):
 
 class NotificationAdmin(ModelView, model=Notification):
     column_list = [Notification.uuid, Notification.type, Notification.data]
+
+class AchievementAdmin(ModelView, model=Achievement):
+    column_list = [Achievement.uuid, Achievement.title, Achievement.description]
 
 
 def create(app, secret_key):
@@ -71,4 +75,5 @@ def create(app, secret_key):
     sql_admin.add_view(UserAdmin)
     sql_admin.add_view(GroupAdmin)
     sql_admin.add_view(NotificationAdmin)
+    sql_admin.add_view(AchievementAdmin)
     return sql_admin

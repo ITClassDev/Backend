@@ -15,9 +15,10 @@ from app.users.schemas import UpdateAvatarResponse
 router = APIRouter()
 
 
-@router.get("", response_model=List[UserRead])
+@router.get("")
 async def get_all_users(users: UsersCRUD = Depends(get_users_crud), current_user: User = Depends(atleast_teacher_access)):
-    return await users.all_()
+    a = await users.all_()
+    return a
 
 
 @router.put("", response_model=UserRead)
