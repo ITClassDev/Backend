@@ -13,11 +13,11 @@ class Task(UUIDModel, TimestampModel, table=True):
     timeLimit: int = Field(nullable=False, default=1)
     memoryLimit: int = Field(nullable=False, default=512)
     dayChallenge: bool = Field(nullable=False, default=False)
-    tests: dict = Field(sa_column=Column(
+    tests: List[dict] = Field(sa_column=Column(
         "tests",
         JSON
     ), nullable=True)
-    testsTypes: dict = Field(sa_column=Column(
+    testsTypes: List[dict] = Field(sa_column=Column(
         "types",
         JSON
     ), nullable=True)

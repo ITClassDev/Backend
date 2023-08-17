@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 
 class TaskCreate(BaseModel):
     title: str
@@ -7,9 +7,9 @@ class TaskCreate(BaseModel):
     timeLimit: int
     memoryLimit: int
     dayChallenge: bool
-    tests: List[dict]
-    testsTypes: List[dict]
-    functionName: str
+    tests: Optional[List[dict]] = None
+    testsTypes: Optional[List[dict]] = None
+    functionName: Optional[str] = None
 
     class Config:
         schema_extra = {"example": {
@@ -18,8 +18,7 @@ class TaskCreate(BaseModel):
             "timeLimit": 1,
             "memoryLimit": 512,
             "dayChallenge": False,
-            "tests": [{}],
-            "testsTypes": [{}],
-            "functionName": "get_abbb"
+            "tests": [{"input": "1 2", "output": "3"}],
+            "testsTypes": [{"input": ["string", "string"], "output": ["string"]}],
+            "functionName": "testForContestName"
         }}
-    
