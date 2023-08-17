@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile
 from fastapi import status as http_status
-from app.auth.dependencies import get_current_user
+from app.auth.dependencies import get_current_user, atleast_teacher_access
 from app.users.models import User
 from app.achievements.crud import AchievementsCRUD
 from app.achievements.dependencies import get_achievements_crud
-from app.achievements.schemas import AchievementCreate, AchievementRead
+from app.achievements.schemas import AchievementCreate, AchievementRead, AchievementModerate
 from app import settings
 import os
 from typing import List
@@ -28,15 +28,15 @@ async def add_achievements(achievement: AchievementCreate, confirmFile: UploadFi
 
 
 @router.patch("/moderate")
-async def accept_achievement():
-    pass
+async def moderate_achievement(achievement: AchievementModerate, current_user: User = Depends(atleast_teacher_access), achievements: AchievementsCRUD = Depends(get_achievements_crud)):
+    await achievements.moderate(achievement, current_user.uuid)
 
 
-@router.get("/pending")
+@router.get("/pending", response_model=List[AchievementRead])
 async def get_user_pending_achievements(current_user: User = Depends(get_current_user), achievements: AchievementsCRUD = Depends(get_achievements_crud)):
     return await achievements.get_all_for_user(current_user.uuid, active=False)
 
 
-@router.get("/queue")
-async def admin_get_all_achievements_queue():
-    pass
+@router.get("/queue", response_model=List[AchievementRead])
+async def admin_get_all_achievements_queue(current_user: User = Depends(atleast_teacher_access), achievements: AchievementsCRUD = Depends(get_achievements_crud)):
+    return await achievements.all_queue()

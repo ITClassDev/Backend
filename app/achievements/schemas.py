@@ -44,3 +44,15 @@ class AchievementRead(BaseModel):
     
 
     User: MinimalUser
+
+
+class AchievementModerate(BaseModel):
+    uuid: uuid_pkg.UUID
+    status: int
+    points: Optional[int] = None
+    class Config:
+        schema_extra = {"example": {
+            "uuid": "Achievement UUID",
+            "status": "0 - reject | 1 - accept",
+            "points": 100
+        }}

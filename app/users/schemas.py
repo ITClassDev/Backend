@@ -53,7 +53,8 @@ class UsersReadAll(BaseModel):
     lastName: str
     avatarPath: str
     groupId: uuid_pkg.UUID
-    nickName: str
+    learningClass: int
+    nickName: Optional[str] = None
 
 class MinimalUser(BaseModel):
     uuid: uuid_pkg.UUID

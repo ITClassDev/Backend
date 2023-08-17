@@ -10,12 +10,12 @@ import uuid as uuid_pkg
 from app import settings
 import os
 from app.core.files import upload_file
-from app.users.schemas import UpdateAvatarResponse
+from app.users.schemas import UpdateAvatarResponse, UsersReadAll
 
 router = APIRouter()
 
 
-@router.get("")
+@router.get("", response_model=List[UsersReadAll])
 async def get_all_users(users: UsersCRUD = Depends(get_users_crud), current_user: User = Depends(atleast_teacher_access)):
     a = await users.all_()
     return a
