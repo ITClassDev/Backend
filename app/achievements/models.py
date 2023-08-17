@@ -1,12 +1,9 @@
 from sqlalchemy import Column, event
-from sqlalchemy.orm import relationship
 from sqlalchemy.databases import postgres
-from sqlmodel import Field, SQLModel, ForeignKey
-from sqlalchemy.dialects.postgresql import UUID
+from sqlmodel import Field, SQLModel
 import uuid as uuid_pkg
 from datetime import datetime
 from app.core.models import TimestampModel, UUIDModel
-from app.users.models import User
 
 achievement_type = postgres.ENUM(
     "olimpiad",
@@ -22,12 +19,8 @@ def _create_enums(metadata, conn, **kw):
 
 class Achievement(UUIDModel, TimestampModel, table=True):
     __tablename__ = "achievements"  # type: ignore
-    toUserId: uuid_pkg.UUID = Column(UUID(as_uuid=True), ForeignKey('users.uuid'))
-    toUser: object = relationship('User', foreign_keys=[toUserId])
-
-
-    acceptedById: uuid_pkg.UUID = Column(UUID(as_uuid=True), ForeignKey('users.uuid'))
-    acceptedBy: object = relationship('User', foreign_keys=[acceptedById])
+    toUser: uuid_pkg.UUID = Field(foreign_key="users.uuid", nullable=False)
+    acceptedBy: uuid_pkg.UUID = Field(foreign_key="users.uuid", nullable=True)
     
     eventType: str = Field(sa_column=Column(
         "role",
@@ -39,4 +32,4 @@ class Achievement(UUIDModel, TimestampModel, table=True):
     attachmentName: str = Field(nullable=False)
     description: str = Field(nullable=False, max_length=5000)
     points: int = Field(nullable=True)
-    acceptedAt: datetime = Field(default_factory=datetime.utcnow, nullable=True)
+    acceptedAt: datetime = Field(nullable=True)

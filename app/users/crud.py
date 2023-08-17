@@ -108,5 +108,5 @@ class UsersCRUD:
         return results.fetchall()
 
     async def all_(self) -> List[User]:
-        results = await self.session.execute(select(User).options(joinedload(User.group)).order_by(User.created_at.asc()))
+        results = await self.session.execute(select(User.firstName, User.lastName, User.groupId, User.uuid, User.avatarPath, User.nickName).order_by(User.created_at.asc()))
         return results.fetchall()

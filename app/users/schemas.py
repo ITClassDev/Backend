@@ -47,6 +47,19 @@ class UserRead(BaseModel):
     techStack: Optional[str]
     aboutText: Optional[str] = None
 
+class UsersReadAll(BaseModel):
+    uuid: uuid_pkg.UUID
+    firstName: str
+    lastName: str
+    avatarPath: str
+    groupId: uuid_pkg.UUID
+    nickName: str
+
+class MinimalUser(BaseModel):
+    uuid: uuid_pkg.UUID
+    firstName: str
+    lastName: str
+    avatarPath: str
 
 class UserLogin(BaseModel):
     email: EmailStr

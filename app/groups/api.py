@@ -31,6 +31,6 @@ async def update_user_group():
     pass
 
 
-@router.delete("")
-async def delete_user_group():
-    pass
+@router.delete("/{uuid}")
+async def delete_user_group(uuid: uuid_pkg.UUID, current_user: User = Depends(atleast_teacher_access), groups: GroupsCRUD = Depends(get_groups_crud)):
+    await groups.delete(uuid)

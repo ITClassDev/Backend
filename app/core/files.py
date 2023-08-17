@@ -34,7 +34,7 @@ async def upload_file(file, allowed_extensions: list, upload_path: str = None, c
                 file_name = await generate_filename(file_ext, custom_name=custom_name)
             else:
                 file_name = await md5_hash_file(contents)
-                print("FILE NAME: ", file_name)
+                # print("FILE NAME: ", file_name)
                 file_name = f"{file_name}.{file_ext}"
             if write:
                 with open(os.path.join(upload_path, file_name), "wb") as file_descr:
