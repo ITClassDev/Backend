@@ -1,0 +1,12 @@
+version: '3'
+services:
+  db:
+    image:  postgres:14
+    ports:
+      - 45195:5432
+    volumes:
+      - ~/postgres_data/shtp_2:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER:  root
+      POSTGRES_PASSWORD:  root
+      POSTGRES_DB: itc_system_new

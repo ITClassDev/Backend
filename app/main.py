@@ -1,43 +1,22 @@
-from sys import prefix
-from fastapi import FastAPI, APIRouter
 import uvicorn
-from core.config import SERVER_HOST, SERVER_PORT, ROOT_PATH
-from db.base import database
-from endpoints import users, auth, achievements, oauth, admin, notifications, programming_tasks, polls, notifications
-from endpoints.mobile import (
-    users as users_mobile,
-    auth as auth_mobile
-)
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
-from core.config import USERS_STORAGE, API_VER
-from core.utils.system import get_system_status
+from fastapi.responses import JSONResponse
+from fastapi_jwt_auth import AuthJWT
+from fastapi_jwt_auth.exceptions import AuthJWTException
+from app import settings
+from app.core.models import HealthCheck, JWTSettings
+from app.router.api_v1.endpoints import api_router
+from fastapi.openapi.utils import get_openapi
+import app.sql_admin as sql_admin
+from fastapi.middleware.cors import CORSMiddleware
 
-# Docs metadata
-description_metadata = '''
-Welcome to ShTP API Docs! To export openapi.json send get request to /openapi.json
-
-[ShTP API Source Code](https://github.com/ItClassDev/Backend)
-'''
-
-
-tags_metadata = [
-    {
-        "name": "users",
-        "description": "CRUD Operations with users, users groups. To use some endpoints you have to auth via *auth/login* endpoint."
-    },
-    {
-        "name": "auth",
-        "description": "Generate JWT token for access to private endpoints and get current user via JWT token."
-    }
-]
-
-app = FastAPI(title="ShTP REST", version=API_VER, openapi_tags=tags_metadata, description=description_metadata, docs_url='/docs/', prefix=ROOT_PATH)
-app.mount("/storage", StaticFiles(directory=USERS_STORAGE), name="storage")  # User data storage(local)
-
-# FIXIT Security ALERT; Remove on prod
-# We have to enable only frontend domain
-# But we didn't have it now
+app = FastAPI(
+    title=settings.project_name,
+    version=settings.version,
+    openapi_url=f"{settings.api_v1_prefix}/openapi.json",
+    debug=settings.debug
+)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=['*'],
@@ -46,44 +25,60 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-# Native JSON REST API
-app.include_router(users.router, prefix="/users", tags=["users"])
-app.include_router(auth.router, prefix="/auth", tags=["auth"])
-app.include_router(achievements.router, prefix="/achievements", tags=["achievements"])
-app.include_router(oauth.router, prefix="/oauth", tags=["oauth"])
-app.include_router(admin.router, prefix="/admin", tags=["admin"])
-app.include_router(programming_tasks.router, prefix="/programming", tags=["programming assignment"])
-app.include_router(notifications.router, prefix="/notifications", tags=["notifications"])
-app.include_router(polls.router, prefix="/polls", tags=["polls"])
-
-# Mobile Protocol buffer API
-app.include_router(users_mobile.router, prefix="/mobile/users", tags=["Protobuf(NO Swagger)"])
-app.include_router(auth_mobile.router, prefix="/mobile/auth", tags=["Protobuf(NO Swagger)"])
+app.mount("/storage", StaticFiles(directory=settings.user_storage),
+          name="storage")  # User data storage(local)
+sql_admin.create(app, settings.secret_key)
 
 
-@app.get("/")
-async def index():
-    cpu_load, ram_load = get_system_status()
-    return {"status": True, "api_ver": API_VER, "endpoints": {"storage": "/storage", "mobile": "/mobile/"},
-            "system_status": {"cpu": cpu_load, "ram": ram_load}}
+@AuthJWT.load_config  # type: ignore
+def get_config():
+    return JWTSettings(authjwt_secret_key=settings.secret_key, authjwt_access_token_expires=settings.jwt_access_token_expire_at_minutes)
 
 
-@app.get("/mobile")
-async def mobile_placeholder():
-    return {"status": True,
-            "about": "This is an optimized version of our API for mobile devices.This version of the api completely repeats the behavior of the main version.The only difference is that in the main version we use the usual json as serialization, but in this version we use the buffers protocol.You can learn more in our documentation."}
+@app.exception_handler(AuthJWTException)
+def authjwt_exception_handler(request: Request, exc: AuthJWTException):
+    return JSONResponse(
+        status_code=exc.status_code,  # type: ignore
+        content={"detail": exc.message}  # type: ignore
+    )
 
 
-@app.on_event("startup")
-async def startup():
-    await database.connect()
+@app.get("/", response_model=HealthCheck, tags=["status"])
+async def health_check():
+    return {
+        "name": settings.project_name,
+        "version": settings.version,
+        "description": settings.description
+    }
 
 
-@app.on_event("shutdown")
-async def shutdown():
-    await database.disconnect()
+app.include_router(api_router, prefix=settings.api_v1_prefix)
 
 
-if __name__ == "__main__":
-    uvicorn.run("main:app", port=SERVER_PORT, host=SERVER_HOST, reload=True, headers=[("server", "PoweredByPutincev")], root_path=ROOT_PATH)
+# Add JWT for fastapi_jwt_auth in swagger
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+    openapi_schema = get_openapi(
+        title=settings.project_name,
+        version=settings.version,
+        description=settings.description,
+        routes=app.routes,
+    )
+    openapi_schema["components"]["securitySchemes"] = {"bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+    }}
+
+    openapi_schema["security"] = [{"bearerAuth": []}]
+
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+
+app.openapi = custom_openapi
+
+
+if __name__ == '__main__':
+    uvicorn.run("main:app", port=8080, host="0.0.0.0", reload=True)

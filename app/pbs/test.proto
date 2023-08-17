@@ -1,8 +1,0 @@
-syntax = "proto3";
-
-package testpb;
-
-
-message TestData {
-    int32 a = 1;
-}
