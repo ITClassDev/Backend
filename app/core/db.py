@@ -13,7 +13,7 @@ if "pytest" in modules:
 
 async_engine = create_async_engine(
     db_connection_str,
-    echo=True,
+    echo=False,
     future=True
 )
 

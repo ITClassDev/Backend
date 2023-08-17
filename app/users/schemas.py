@@ -46,6 +46,7 @@ class UserRead(BaseModel):
     website: Optional[str]
     techStack: Optional[str]
     aboutText: Optional[str] = None
+    newNotifications: Optional[bool] = None
 
 class UsersReadAll(BaseModel):
     uuid: uuid_pkg.UUID

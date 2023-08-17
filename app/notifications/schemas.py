@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 import uuid as uuid_pkg
 from typing import Optional
+from datetime import datetime
 
 class NotificationCreate(BaseModel):
     toUser: Optional[uuid_pkg.UUID] = None
@@ -15,3 +16,10 @@ class NotificationCreate(BaseModel):
             "type": 0,
             "data": {"name": "Финалист НТО", "points": 100}
         }}
+class NotificationRead(BaseModel):
+    uuid: uuid_pkg.UUID
+    toUser: uuid_pkg.UUID
+    type: int
+    data: dict
+    viewed: bool
+    created_at: datetime

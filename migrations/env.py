@@ -15,6 +15,7 @@ from app.users.models import User
 from app.groups.models import Group
 from app.notifications.models import Notification
 from app.achievements.models import Achievement
+from app.assigments.models import Task, Contest, Submit
 
 config = context.config
 

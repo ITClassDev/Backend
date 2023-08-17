@@ -1,6 +1,7 @@
 from sqlmodel.ext.asyncio.session import AsyncSession
 from app.notifications.models import Notification
 from app.notifications.schemas import NotificationCreate
+from app.groups.crud import GroupsCRUD
 from fastapi import HTTPException
 from fastapi import status as http_status
 from sqlalchemy import select, update
@@ -27,7 +28,13 @@ class NotificationsCRUD:
         if toUser:
             return await self.create_single(notification)
         elif toGroup:
-            pass
+            groups_crud = GroupsCRUD(self.session)
+            all_users = await groups_crud.get_group_users(toGroup)
+            notification_single_values = notification
+            notification_single_values.toGroup = None
+            for user in all_users:
+                notification_single_values.toUser = user[0]
+                await self.create_single(notification=notification_single_values)
         else:
             raise HTTPException(http_status.HTTP_400_BAD_REQUEST, 
                                 detail="toUser and toGroup can't both be defined in request. Only one have to be defined.")
@@ -42,16 +49,18 @@ class NotificationsCRUD:
         return notification
     
     async def get_all_user(self, user_uuid: uuid_pkg.UUID) -> List[Notification]:
-        query = select(Notification).where(Notification.toUser == user_uuid)
+        query = select(Notification.uuid, Notification.data, Notification.created_at, Notification.toUser, Notification.type, Notification.viewed).where(Notification.toUser == user_uuid).order_by(Notification.created_at.desc())
         data = await self.session.execute(query)
         return data.fetchall()
     
     async def get_active_notifications(self, user_uuid: uuid_pkg.UUID) -> List[Notification]:
         query = select(Notification.uuid, Notification.data, Notification.type, Notification.created_at, 
-                    Notification.updated_at, Notification.toUser, Notification.viewed).where(Notification.toUser == user_uuid, Notification.viewed == False)
+                    Notification.updated_at, Notification.toUser, Notification.viewed).where(Notification.toUser == user_uuid, Notification.viewed == False).order_by(Notification.created_at.desc())
         data = await self.session.execute(query)
         return data.fetchall()
 
-    async def set_readed(self, uuid: uuid_pkg.UUID):
-        query = update()
+    async def set_readed(self, user_uuid: uuid_pkg.UUID) -> None:
+        query = update(Notification).where(Notification.toUser == user_uuid).values(viewed=1)
+        await self.session.execute(query)
+        await self.session.commit()
     

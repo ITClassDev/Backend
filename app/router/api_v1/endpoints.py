@@ -7,6 +7,7 @@ from app.achievements.api import router as achievements_router
 from app.oauth.api import router as oauth_router
 from app.notifications.api import router as notifications_router
 from app.events.api import router as events_router
+from app.assigments.api import router as assigments_router
 
 api_router = APIRouter()
 
@@ -19,7 +20,8 @@ routers = (
     (achievements_router, "achievements", "achievements"),
     (oauth_router, "oauth", "oauth"),
     (notifications_router, "notifications", "notifications"),
-    (events_router, "events", "events")
+    (events_router, "events", "events"),
+    (assigments_router, "assigments", "assigments")
 
 )
 

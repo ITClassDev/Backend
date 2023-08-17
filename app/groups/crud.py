@@ -4,6 +4,7 @@ from fastapi import status as http_status
 from app.groups.models import Group
 import uuid as uuid_pkg
 from sqlalchemy import select, delete
+from app.users.models import User
 from typing import List
 
 
@@ -38,5 +39,10 @@ class GroupsCRUD:
 
     async def all_(self) -> List[Group]:
         query = select(Group.uuid, Group.name, Group.color)
+        results = await self.session.execute(query)
+        return results.fetchall()
+    
+    async def get_group_users(self, uuid: uuid_pkg.UUID) -> List[User]:
+        query = select(User.uuid).where(User.groupId == uuid)
         results = await self.session.execute(query)
         return results.fetchall()
