@@ -2,6 +2,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from fastapi import HTTPException
 from fastapi import status as http_status
 import uuid as uuid_pkg
+import sqlalchemy
 from sqlalchemy import select, update, delete
 from typing import List
 from app.achievements.models import Achievement
@@ -27,6 +28,7 @@ class AchievementsCRUD:
             await self.session.refresh(achievement)
             return achievement
         except sqlalchemy.exc.IntegrityError as e:  # type: ignore
+            print(e)
             err_msg = str(e.orig).split(':')[-1].replace('\n', '').strip()
             raise HTTPException(
                 http_status.HTTP_400_BAD_REQUEST, detail=err_msg)

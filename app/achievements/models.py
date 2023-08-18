@@ -26,7 +26,7 @@ class Achievement(UUIDModel, TimestampModel, table=True):
         sa_column=Column(UUID(as_uuid=1), ForeignKey("users.uuid", ondelete="CASCADE")) 
     )
     user: Optional["User"] = Relationship(back_populates="achievements")
-    acceptedBy: uuid_pkg.UUID = Field(nullable=False)
+    acceptedBy: Optional[uuid_pkg.UUID] = Field(nullable=True)
     
     eventType: str = Field(sa_column=Column(
         "role",
