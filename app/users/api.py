@@ -3,7 +3,7 @@ from fastapi import status as http_status
 from app.users.crud import UsersCRUD
 from typing import List
 from app.users.dependencies import get_users_crud
-from app.users.schemas import UserCreate, UserRead, UserUpdate, LeaderboardUser, UserUpdateResponse
+from app.users.schemas import UserCreate, UserRead, UserUpdate, LeaderboardUser, UserUpdateResponse, MultipleCreate
 from app.users.models import User
 from app.auth.dependencies import get_current_user, atleast_teacher_access
 import uuid as uuid_pkg
@@ -11,6 +11,7 @@ from app import settings
 import os
 from app.core.files import upload_file
 from app.users.schemas import UpdateAvatarResponse, UsersReadAll
+import pandas as pd
 
 router = APIRouter()
 
@@ -26,14 +27,20 @@ async def create_user(user: UserCreate, users: UsersCRUD = Depends(get_users_cru
     return await users.create(user)
 
 
-@router.put("/csv")
-async def create_multiple_users_from_csv():
-    pass
+@router.put("/csv", response_model=MultipleCreate)
+async def create_multiple_users_from_csv(csv_file: UploadFile, users: UsersCRUD = Depends(get_users_crud), current_user: User = Depends(atleast_teacher_access)):
+    csv_content = await upload_file(csv_file, ["csv"], write=False) # In RAM processing
+    csv_content = csv_content["file_content"].decode("utf-8").strip()
+    df = pd.DataFrame([row.split(',') for row in csv_content.split('\n')[1:]], 
+                   columns=["firstName", "lastName", "email", "role", "password", "learningClass", "groupName"])
+    users_created, errors = await users.create_multiple(df)
+    return MultipleCreate(users=users_created, errors=errors)
+    
 
 
 @router.delete("/{user_id}")
-async def delete_user(user_uuid: uuid_pkg.UUID):
-    pass
+async def delete_user(user_uuid: uuid_pkg.UUID, current_user: User = Depends(atleast_teacher_access), users: UsersCRUD = Depends(get_users_crud)):
+    return await users.cascade_delete(user_uuid)
 
 
 @router.patch("", response_model=UserUpdateResponse)

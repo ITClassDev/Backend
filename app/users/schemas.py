@@ -26,6 +26,8 @@ class UserCreate(BaseModel):
         }}
 
 
+
+
 class UserRead(BaseModel):
     uuid: uuid_pkg.UUID
     role: str
@@ -56,6 +58,11 @@ class UsersReadAll(BaseModel):
     groupId: uuid_pkg.UUID
     learningClass: int
     nickName: Optional[str] = None
+    
+
+class MultipleCreate(BaseModel):
+    users: Optional[List[UsersReadAll]] = None # if None -> all created with errors, so now new users
+    errors: Optional[List[str]] = None # if None -> all users created, no errors
 
 class MinimalUser(BaseModel):
     uuid: uuid_pkg.UUID

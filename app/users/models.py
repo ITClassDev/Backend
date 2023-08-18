@@ -1,10 +1,16 @@
 from sqlalchemy import Column, event, table
+from sqlalchemy.orm import relationship
 from sqlalchemy.databases import postgres
 from sqlmodel import Field, SQLModel, Relationship
 import uuid as uuid_pkg
 
 from app.core.models import TimestampModel, UUIDModel
 from app.groups.models import Group
+from app.notifications.models import Notification
+from app.achievements.models import Achievement
+from app.assigments.models import Submit
+from typing import Optional, List
+
 
 users_role_type = postgres.ENUM(
     "student",
@@ -32,7 +38,7 @@ class User(UUIDModel, TimestampModel, table=True):
     rating: int = Field(default=0, nullable=False)
     learningClass: int = Field(default=0, nullable=False)
     groupId: uuid_pkg.UUID = Field(nullable=False, foreign_key="groups.uuid")
-    group: Group = Relationship(back_populates="users", sa_relationship_kwargs={'lazy': 'selectin'})
+    
     shtpMaintainer: bool = Field(default=0, nullable=True)
     nickName: str = Field(max_length=100, nullable=True, unique=True)
     firstName: str = Field(max_length=50, nullable=False)
@@ -48,5 +54,12 @@ class User(UUIDModel, TimestampModel, table=True):
     website: str = Field(max_length=100, nullable=True, unique=True)
 
     techStack: str = Field(max_length=800, nullable=True)
+
+    # Relations ORM layer object
+    group: Group = Relationship(back_populates="users", sa_relationship_kwargs={'lazy': 'selectin'})
+    notifications: Optional[List[Notification]] = Relationship(back_populates="user", sa_relationship_kwargs={'lazy': 'selectin', 'cascade': 'delete'})
+    achievements: Optional[List[Achievement]] = Relationship(back_populates="user", sa_relationship_kwargs={'lazy': 'selectin', 'cascade': 'delete'})
+    submits: Optional[List[Submit]] = Relationship(back_populates="user", sa_relationship_kwargs={'lazy': 'selectin', 'cascade': 'delete'})
+    
 
 

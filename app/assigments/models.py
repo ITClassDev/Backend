@@ -1,9 +1,10 @@
 import uuid as uuid_pkg
-from sqlalchemy import Column, JSON, String
+from sqlalchemy import Column, JSON, String, ForeignKey
 from sqlalchemy.types import ARRAY
+from sqlalchemy.dialects.postgresql import UUID
 from app.core.models import TimestampModel, UUIDModel
-from sqlmodel import Field
-from typing import List
+from sqlmodel import Field, Relationship
+from typing import List, Optional
 
 class Task(UUIDModel, TimestampModel, table=True):
     __tablename__ = "tasks"
@@ -41,7 +42,12 @@ class Contest(UUIDModel, TimestampModel, table=True):
 
 class Submit(UUIDModel, TimestampModel, table=True):
     __tablename__ = "submits"
-    userId: uuid_pkg.UUID = Field(foreign_key="users.uuid", nullable=False)
+    userId: uuid_pkg.UUID = Field(
+        nullable=False,
+        sa_column=Column(UUID(as_uuid=1), ForeignKey("users.uuid", ondelete="CASCADE")) 
+    )
+    user: Optional["User"] = Relationship(back_populates="submits")
+
     status: int = Field(nullable=False)
     taskId: uuid_pkg.UUID = Field(foreign_key="tasks.uuid", nullable=False)
     source: str = Field(nullable=False)

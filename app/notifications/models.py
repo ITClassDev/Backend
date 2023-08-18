@@ -1,13 +1,19 @@
-from sqlalchemy import Column, JSON
-from sqlmodel import Field
+from sqlalchemy import Column, JSON, ForeignKey
+from sqlmodel import Field, Relationship
 import uuid as uuid_pkg
 from app.core.models import TimestampModel, UUIDModel
+from sqlalchemy.dialects.postgresql import UUID
+from typing import Optional
 
 class Notification(UUIDModel, TimestampModel, table=True):
     __tablename__ = "notifications"  # type: ignore
-    toUser: uuid_pkg.UUID = Field(nullable=False, foreign_key="users.uuid")
+    toUser: uuid_pkg.UUID = Field(
+        nullable=False,
+        sa_column=Column(UUID(as_uuid=1), ForeignKey("users.uuid", ondelete="CASCADE")) 
+    )
     type: int = Field(default=0, nullable=False)
     viewed: bool = Field(default=False, nullable=False)
+    user: Optional["User"] = Relationship(back_populates="notifications")
     data: dict = Field(sa_column=Column(
         "data",
         JSON

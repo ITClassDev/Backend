@@ -2,7 +2,7 @@ import uuid as uuid_pkg
 
 from fastapi import HTTPException
 from fastapi import status as http_status
-from sqlalchemy import select, update
+from sqlalchemy import select, update, delete
 from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlalchemy.orm import joinedload
 import app.core.security as security
@@ -10,15 +10,17 @@ from app.users.models import User
 from app.groups.models import Group
 from app.users.schemas import UserCreate, UserUpdate, LeaderboardUser
 import sqlalchemy
-from typing import List
+from typing import List, Tuple
 from app.core.security import verify_password, get_hashed_password
+from app.groups.crud import GroupsCRUD
+import pandas as pd
 
 
 class UsersCRUD:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def create(self, data: UserCreate) -> User:
+    async def create(self, data: UserCreate, raise_on_error: bool = True) -> User:
         values = data.dict()
         if not "role" in values:
             values["role"] = "user"  # Set default role
@@ -33,8 +35,48 @@ class UsersCRUD:
             return user
         except sqlalchemy.exc.IntegrityError as e:  # type: ignore
             err_msg = str(e.orig).split(':')[-1].replace('\n', '').strip()
-            raise HTTPException(
-                http_status.HTTP_400_BAD_REQUEST, detail=err_msg)
+            if raise_on_error:
+                raise HTTPException(
+                    http_status.HTTP_400_BAD_REQUEST, detail=err_msg)
+            else:
+                return err_msg
+        
+    async def create_multiple(self, data: pd.DataFrame) -> Tuple[List[User], List[str]]:
+        '''
+        Return's list of created users and list of errors
+        '''
+        groups_crud = GroupsCRUD(self.session)
+        all_groups = await groups_crud.all_()
+        groups_map = {gr.name: gr.uuid for gr in all_groups}
+        errors = []
+        created = []
+        for _, row in data.iterrows():
+            try:
+                user = User(firstName=row["firstName"], lastName=row["lastName"], email=row["email"], role=row["role"], password=row["password"], learningClass=row["learningClass"], groupId=groups_map[row["groupName"]])
+                self.session.add(user)
+                await self.session.commit()
+                await self.session.refresh(user)
+                created.append(user)
+
+            except sqlalchemy.exc.IntegrityError as e:  # type: ignore
+                err_msg = str(e.orig).split(':')[-1].replace('\n', '').strip()
+                errors.append(f"User email: {row['email']} - {err_msg}")
+            except Exception as e: # Generic error
+                errors.append(f"User email: {row['email']} - {str(e)[:50]}")
+        
+        return created, errors
+    
+    async def cascade_delete(self, uuid: uuid_pkg.UUID) -> None:
+        '''
+        It is dangerous method!
+        It will delete user and all it's information, like ahievements, apps, projects and e.t.c
+        '''
+        
+        query = delete(User).where(User.uuid == uuid)
+        
+        await self.session.execute(query)
+        await self.session.commit()
+
 
     async def update(self, user: User, user_data: UserUpdate) -> dict:
         upd_values = {}
