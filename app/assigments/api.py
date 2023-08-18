@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 import uuid as uuid_pkg
-from app.assigments.schemas import TaskCreate
+from app.assigments.schemas import TaskCreate, TaskSearch
 from app.users.models import User
 from app.assigments.models import Task
 from app.auth.dependencies import get_current_user, atleast_teacher_access
@@ -14,27 +14,27 @@ router = APIRouter()
 async def get_all_tasks(tasks: TasksCRUD = Depends(get_tasks_crud), current_user: User = Depends(atleast_teacher_access)):
     return await tasks.get_all()
 
-@router.get("/tasks/{uuid}", response_model=Task)
-async def get_task(uuid: uuid_pkg.UUID, tasks: TasksCRUD = Depends(get_tasks_crud)):
-    return await tasks.get(uuid)
-
 @router.put("/tasks")
 async def create_task(task: TaskCreate, tasks: TasksCRUD = Depends(get_tasks_crud), current_user: User =  Depends(atleast_teacher_access)):
     return await tasks.create(task, current_user.uuid)
 
-@router.get("/tasks/search")
-async def search_task(query: str):
-    pass
+@router.get("/tasks/search", response_model=List[TaskSearch])
+async def search_task(query: str, tasks: TasksCRUD = Depends(get_tasks_crud)):
+    return await tasks.search(query)
 
 @router.get("/tasks/challenge")
-async def get_day_challenge():
-    pass
+async def get_day_challenge(tasks: TasksCRUD = Depends(get_tasks_crud)):
+    return await tasks.get_day_challenge()
+
+@router.patch("/tasks/challenge/set/{uuid}")
+async def set_challenge_task(uuid: uuid_pkg.UUID, tasks: TasksCRUD = Depends(get_tasks_crud), current_user: User = Depends(atleast_teacher_access)):
+    return await tasks.set_challenge(uuid)
 
 @router.get("/tasks/challenge/leaderboard")
 async def get_day_challenge_leaderboard():
     pass
 
-@router.post("/tasks/submission/{uuid}")
+@router.get("/tasks/submission/{uuid}")
 async def get_submit_details(uuid: uuid_pkg.UUID):
     pass
 
@@ -54,3 +54,6 @@ async def get_active_homeworks_for_current_user(uuid: uuid_pkg.UUID):
 async def submit_homework(uuid: uuid_pkg.UUID):
     pass
 
+@router.get("/tasks/{uuid}", response_model=Task)
+async def get_task(uuid: uuid_pkg.UUID, tasks: TasksCRUD = Depends(get_tasks_crud)):
+    return await tasks.get(uuid)

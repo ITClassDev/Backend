@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import List, Optional
+import uuid as uuid_pkg
 
 class TaskCreate(BaseModel):
     title: str
@@ -22,3 +23,8 @@ class TaskCreate(BaseModel):
             "testsTypes": [{"input": ["string", "string"], "output": ["string"]}],
             "functionName": "testForContestName"
         }}
+
+
+class TaskSearch(BaseModel):
+    uuid: uuid_pkg.UUID
+    title: str
