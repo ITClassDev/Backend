@@ -24,3 +24,6 @@ class Settings(BaseSettings):
     # Profil parser
     profil_endpoint: str
     profil_category: int
+
+    # Checker settings
+    checker_api: str

@@ -12,6 +12,7 @@ from typing import List
 import os
 from app.core.files import upload_file
 from app import settings
+from app.assigments.schemas import TaskLeaderBoard
 
 
 router = APIRouter()
@@ -36,9 +37,10 @@ async def get_day_challenge(tasks: TasksCRUD = Depends(get_tasks_crud)):
 async def set_challenge_task(uuid: uuid_pkg.UUID, tasks: TasksCRUD = Depends(get_tasks_crud), current_user: User = Depends(atleast_teacher_access)):
     return await tasks.set_challenge(uuid)
 
-@router.get("/tasks/challenge/leaderboard")
-async def get_day_challenge_leaderboard():
-    pass
+@router.get("/tasks/challenge/leaderboard", response_model=List[TaskLeaderBoard])
+async def get_day_challenge_leaderboard(tasks: TasksCRUD = Depends(get_tasks_crud)):
+    challenge = await tasks.get_day_challenge()
+    return await tasks.task_leaderboard(challenge.uuid)
 
 @router.get("/tasks/submit/{uuid}")
 async def get_submit_details(uuid: uuid_pkg.UUID, current_user: User = Depends(get_current_user), submits: SubmitsCRUD = Depends(get_submits_crud)):

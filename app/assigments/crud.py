@@ -5,7 +5,8 @@ from fastapi import HTTPException
 from fastapi import status as http_status
 import uuid as uuid_pkg
 from app.assigments.models import Task, Contest, Submit
-from app.assigments.schemas import TaskCreate
+from app.users.models import User
+from app.assigments.schemas import TaskCreate, TaskLeaderBoard
 from typing import List, Tuple
 
 class TasksCRUD:
@@ -18,6 +19,9 @@ class TasksCRUD:
         try:
             task = Task(**values)
             self.session.add(task)
+            if task.dayChallenge:
+                query_1 = update(Task).where(Task.uuid != task.uuid).values(dayChallenge=False) # Set other as not day challenge
+                await self.session.execute(query_1)
             await self.session.commit()
             await self.session.refresh(task)
             return task
@@ -27,7 +31,7 @@ class TasksCRUD:
                 http_status.HTTP_400_BAD_REQUEST, detail=err_msg)
         
     def only_example_tests(self, task: Task) -> Task:
-        task.tests = list(filter(lambda test: 'example' in test and test['example'], task.tests))
+        task.tests = list(filter(lambda test: 'demo' in test and test['demo'], task.tests))
         return task
         
     async def get(self, task_uuid: uuid_pkg.UUID) -> Task | None:
@@ -50,7 +54,7 @@ class TasksCRUD:
         return self.only_example_tests(task)
         
     async def get_all(self) -> List[Task]:
-        results = await self.session.execute(select(Task))
+        results = await self.session.execute(select(Task).order_by(Task.created_at.desc()))
         return [tuple(row)[0] for row in results]
     
     async def search(self, query: str) -> List[Task]:
@@ -66,6 +70,18 @@ class TasksCRUD:
         day_challenge = select(Task).where(Task.dayChallenge == True)
         day_challenge = await self.session.execute(day_challenge)
         return day_challenge.fetchall()
+    
+    async def task_leaderboard(self, task_uuid: uuid_pkg.UUID, limit: int = 10) -> List[TaskLeaderBoard]:
+        query = select(Submit.userId, Submit.created_at, User.firstName, User.lastName, User.avatarPath, User.nickName).where(Submit.taskId == task_uuid, Submit.solved == True, Submit.userId == User.uuid).order_by(Submit.created_at.asc()).limit(limit)
+        results = await self.session.execute(query)
+        uids = []
+        def filter_unique(entry: list):
+            if entry[0] not in uids:
+                uids.append(entry[0])
+                return True
+            return False
+        
+        return list(filter(filter_unique, results.fetchall()))
 
 
 class ContestsCRUD:
@@ -124,3 +140,4 @@ class SubmitsCRUD:
             
         raise HTTPException(
             http_status.HTTP_400_BAD_REQUEST, detail="No day challenge for now")
+    

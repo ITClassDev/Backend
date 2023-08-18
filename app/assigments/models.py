@@ -18,11 +18,11 @@ class Task(UUIDModel, TimestampModel, table=True):
         "tests",
         JSON
     ), nullable=True)
-    testsTypes: List[dict] = Field(sa_column=Column(
+    testsTypes: Optional[dict] = Field(sa_column=Column(
         "types",
         JSON
     ), nullable=True)
-    functionName: str = Field(nullable=True)
+    functionName: Optional[str] = Field(nullable=True)
 
 
 class Contest(UUIDModel, TimestampModel, table=True):

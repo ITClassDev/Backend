@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import List, Optional
 import uuid as uuid_pkg
+from datetime import datetime
 
 class TaskCreate(BaseModel):
     title: str
@@ -9,7 +10,7 @@ class TaskCreate(BaseModel):
     memoryLimit: int
     dayChallenge: bool
     tests: Optional[List[dict]] = None
-    testsTypes: Optional[List[dict]] = None
+    testsTypes: Optional[dict] = None
     functionName: Optional[str] = None
 
     class Config:
@@ -28,3 +29,12 @@ class TaskCreate(BaseModel):
 class TaskSearch(BaseModel):
     uuid: uuid_pkg.UUID
     title: str
+
+
+class TaskLeaderBoard(BaseModel):
+    userId: uuid_pkg.UUID
+    firstName: str
+    lastName: str
+    avatarPath: str
+    nickName: Optional[str] = None
+    created_at: datetime
