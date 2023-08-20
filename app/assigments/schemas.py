@@ -38,3 +38,11 @@ class TaskLeaderBoard(BaseModel):
     avatarPath: str
     nickName: Optional[str] = None
     created_at: datetime
+
+
+class ContestCreate(BaseModel):
+    tasks: List[uuid_pkg.UUID]
+    forGroups: List[uuid_pkg.UUID]
+    title: str
+    description: str
+    deadline: Optional[datetime] = None

@@ -6,13 +6,13 @@ from app.users.models import User
 from app.assigments.models import Task
 from app.auth.dependencies import get_current_user, atleast_teacher_access
 from app.assigments.crud import TasksCRUD, ContestsCRUD, SubmitsCRUD
-from app.assigments.models import Submit
+from app.assigments.models import Submit, Contest
 from app.assigments.dependencies import get_contests_crud, get_submits_crud, get_tasks_crud
 from typing import List
 import os
 from app.core.files import upload_file
 from app import settings
-from app.assigments.schemas import TaskLeaderBoard
+from app.assigments.schemas import TaskLeaderBoard, ContestCreate
 
 
 router = APIRouter()
@@ -33,7 +33,7 @@ async def search_task(query: str, tasks: TasksCRUD = Depends(get_tasks_crud)):
 async def get_day_challenge(tasks: TasksCRUD = Depends(get_tasks_crud)):
     return await tasks.get_day_challenge()
 
-@router.patch("/tasks/challenge/set/{uuid}")
+@router.patch("/tasks/challenge/set/{uuid}", response_model=Task)
 async def set_challenge_task(uuid: uuid_pkg.UUID, tasks: TasksCRUD = Depends(get_tasks_crud), current_user: User = Depends(atleast_teacher_access)):
     return await tasks.set_challenge(uuid)
 
@@ -63,11 +63,20 @@ async def get_current_user_challenge_submits(current_user: User = Depends(get_cu
 async def get_current_user_task_submits(uuid: uuid_pkg.UUID, current_user: User = Depends(get_current_user), submits: SubmitsCRUD = Depends(get_submits_crud)):
     return await submits.get_users_for_tasks(uuid, current_user.uuid)
 
-@router.get("/homeworks")
-async def get_active_homeworks_for_current_user(uuid: uuid_pkg.UUID):
+
+@router.get("/contests")
+async def get_all_contests_for_admin(_: User = Depends(atleast_teacher_access), contests: ContestsCRUD = Depends(get_contests_crud)):
+    return await contests.get_all()
+
+@router.get("/contests/available")
+async def get_active_contests_for_current_user():
     pass
 
-@router.post("/homeworks/submit")
+@router.put("/contests", response_model=Contest)
+async def create_contest(contest: ContestCreate, current_user: User = Depends(atleast_teacher_access), contests: ContestsCRUD = Depends(get_contests_crud)):
+    return await contests.create(contest, current_user.uuid)
+
+@router.post("/contests/submit")
 async def submit_homework(uuid: uuid_pkg.UUID):
     pass
 

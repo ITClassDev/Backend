@@ -5,6 +5,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from app.core.models import TimestampModel, UUIDModel
 from sqlmodel import Field, Relationship
 from typing import List, Optional
+from datetime import datetime
 
 class Task(UUIDModel, TimestampModel, table=True):
     __tablename__ = "tasks"
@@ -30,14 +31,17 @@ class Contest(UUIDModel, TimestampModel, table=True):
     authorId: uuid_pkg.UUID = Field(foreign_key="users.uuid", nullable=False)
     title: str = Field(nullable=False)
     description: str = Field(nullable=False)
+    deadline: datetime = Field(nullable=True, default=None)
+    
     tasks: List[uuid_pkg.UUID] = Field(sa_column=Column(
         "tasks",
-        ARRAY(String)
+        ARRAY(UUID(as_uuid=1))
     ))
     forGroups: List[uuid_pkg.UUID] = Field(sa_column=Column(
         "forGroups",
-        ARRAY(String)
+        ARRAY(UUID(as_uuid=1))
     ))
+    forLearningClass: int = Field(nullable=True)
     # TODO; Add special users list
 
 class Submit(UUIDModel, TimestampModel, table=True):

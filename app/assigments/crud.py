@@ -6,8 +6,8 @@ from fastapi import status as http_status
 import uuid as uuid_pkg
 from app.assigments.models import Task, Contest, Submit
 from app.users.models import User
-from app.assigments.schemas import TaskCreate, TaskLeaderBoard
-from typing import List, Tuple
+from app.assigments.schemas import TaskCreate, TaskLeaderBoard, ContestCreate
+from typing import List
 
 class TasksCRUD:
     def __init__(self, session: AsyncSession):
@@ -69,7 +69,7 @@ class TasksCRUD:
         await self.session.commit()
         day_challenge = select(Task).where(Task.dayChallenge == True)
         day_challenge = await self.session.execute(day_challenge)
-        return day_challenge.fetchall()
+        return day_challenge.scalar_one_or_none()
     
     async def task_leaderboard(self, task_uuid: uuid_pkg.UUID, limit: int = 10) -> List[TaskLeaderBoard]:
         query = select(Submit.userId, Submit.created_at, User.firstName, User.lastName, User.avatarPath, User.nickName).where(Submit.taskId == task_uuid, Submit.solved == True, Submit.userId == User.uuid).order_by(Submit.created_at.asc()).limit(limit)
@@ -87,6 +87,25 @@ class TasksCRUD:
 class ContestsCRUD:
     def __init__(self, session: AsyncSession):
         self.session = session
+
+    async def create(self, contest: ContestCreate, user_uuid: uuid_pkg.UUID) -> Contest:
+        values = contest.dict()
+        values["authorId"] = user_uuid
+        try:
+            contest = Contest(**values)
+            self.session.add(contest)
+            await self.session.commit()
+            await self.session.refresh(contest)
+            return contest
+        except sqlalchemy.exc.IntegrityError as e:  # type: ignore
+            err_msg = str(e.orig).split(':')[-1].replace('\n', '').strip()
+            raise HTTPException(
+                http_status.HTTP_400_BAD_REQUEST, detail=err_msg)
+    
+    async def get_all(self) -> List[Contest]:
+        results = await self.session.execute(select(Contest).order_by(Contest.updated_at.desc()))
+        return [tuple(row)[0] for row in results]
+
 
 class SubmitsCRUD:
     def __init__(self, session: AsyncSession):
