@@ -1,26 +1,19 @@
 from sys import modules
-
-from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlmodel.ext.asyncio.session import AsyncSession
-
 from app import settings
-
-# import os
-
-# from sqlmodel import create_engine, SQLModel, Session
-# from app.assigments.models import Contest
-
-
-# DATABASE_URL = "postgresql://root:root@172.19.0.2:5432/itc_system_new"
-
-# engine = create_engine(DATABASE_URL)
-# #
-# SQLModel.metadata.create_all(engine)
+import os
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlmodel import create_engine, SQLModel, Session
+from app.assigments.models import Contest
 
 
 
 db_connection_str = settings.db_async_connection_str
+
+#engine = create_engine(db_connection_str)
+#SQLModel.metadata.create_all(engine)
+
 if "pytest" in modules:
     db_connection_str = settings.db_async_test_connection_str
 

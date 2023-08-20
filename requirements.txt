@@ -1,6 +1,15 @@
 python-dotenv
 sqlmodel==0.0.8
 sqlalchemy==1.4.41
-fastapi==0.10.1
+fastapi==0.101.1
 uvicorn==0.23.2
 pandas
+requests
+sqladmin
+asyncpg
+passlib
+fastapi-jwt-auth
+pydantic
+pydantic[email]
+alembic
+itsdangerous
