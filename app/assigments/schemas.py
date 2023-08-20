@@ -46,3 +46,14 @@ class ContestCreate(BaseModel):
     title: str
     description: str
     deadline: Optional[datetime] = None
+
+class ContestSubmitGithub(BaseModel):
+    contest: uuid_pkg.UUID
+    githubLink: str
+    language: str
+    class Config:
+        schema_extra = {"example": {
+            "contest": uuid_pkg.uuid4(),
+            "githubLink": "https://github.com/ItClassDev/TestSolutions",
+            "language": "cpp OR py"
+        }}

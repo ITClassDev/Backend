@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, UploadFile, HTTPException
 from fastapi import status as http_status
 import uuid as uuid_pkg
-from app.assigments.schemas import TaskCreate, TaskSearch
+from app.assigments.schemas import TaskCreate, TaskSearch, ContestSubmitGithub
 from app.users.models import User
 from app.assigments.models import Task
 from app.auth.dependencies import get_current_user, atleast_teacher_access
@@ -69,16 +69,25 @@ async def get_all_contests_for_admin(_: User = Depends(atleast_teacher_access), 
     return await contests.get_all()
 
 @router.get("/contests/available")
-async def get_active_contests_for_current_user():
-    pass
+async def get_active_contests_for_current_user(current_user: User = Depends(get_current_user), contests: ContestsCRUD = Depends(get_contests_crud)):
+    return await contests.get_active_for_user(current_user.groupId, current_user.learningClass)
 
 @router.put("/contests", response_model=Contest)
 async def create_contest(contest: ContestCreate, current_user: User = Depends(atleast_teacher_access), contests: ContestsCRUD = Depends(get_contests_crud)):
     return await contests.create(contest, current_user.uuid)
 
+@router.get("/contests/{uuid}")
+async def get_contest_data(uuid: uuid_pkg.UUID, _: User = Depends(get_current_user), contests: ContestsCRUD = Depends(get_contests_crud)):
+    return await contests.get(uuid)
+
+@router.get("/contests/{contest_uuid}/task/{task_uuid}/submits")
+async def get_current_user_task_submits_refered_for_contest(contest_uuid: uuid_pkg.UUID, task_uuid: uuid_pkg.UUID, current_user: User = Depends(get_current_user), submits: SubmitsCRUD = Depends(get_submits_crud)):
+    return await submits.get_users_refered_for_contest_task(task_uuid, contest_uuid, current_user.uuid)
+
+
 @router.post("/contests/submit")
-async def submit_homework(uuid: uuid_pkg.UUID):
-    pass
+async def submit_homework(submit: ContestSubmitGithub, submits: SubmitsCRUD = Depends(get_submits_crud), current_user: User = Depends(get_current_user)):
+    return await submits.submit_contest(submit, current_user.uuid)
 
 @router.get("/tasks/{uuid}", response_model=Task)
 async def get_task(uuid: uuid_pkg.UUID, tasks: TasksCRUD = Depends(get_tasks_crud)):

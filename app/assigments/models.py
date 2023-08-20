@@ -1,7 +1,6 @@
 import uuid as uuid_pkg
 from sqlalchemy import Column, JSON, String, ForeignKey
-from sqlalchemy.types import ARRAY
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import UUID, ARRAY
 from app.core.models import TimestampModel, UUIDModel
 from sqlmodel import Field, Relationship
 from typing import List, Optional
