@@ -7,8 +7,9 @@ import uuid as uuid_pkg
 from app.assigments.models import Task, Contest, Submit
 from app.users.models import User
 from app.assigments.schemas import TaskCreate, TaskLeaderBoard, ContestCreate, ContestSubmitGithub
-from typing import List
+from typing import List, Tuple
 from datetime import datetime
+import asyncio
 
 class TasksCRUD:
     def __init__(self, session: AsyncSession):
@@ -32,8 +33,10 @@ class TasksCRUD:
                 http_status.HTTP_400_BAD_REQUEST, detail=err_msg)
         
     def only_example_tests(self, task: Task) -> Task:
-        task.tests = list(filter(lambda test: 'demo' in test and test['demo'], task.tests))
-        return task
+        tests = task.tests.copy()
+        task_new = task.dict()
+        task_new["tests"] = list(filter(lambda test: 'demo' in test and test['demo'], task.tests))
+        return Task.parse_obj(task_new)
         
     async def get(self, task_uuid: uuid_pkg.UUID) -> Task | None:
         query = select(Task).where(Task.uuid == task_uuid)
@@ -45,14 +48,15 @@ class TasksCRUD:
         
         return self.only_example_tests(task)
         
-    async def get_day_challenge(self) -> Task | None:
+    async def get_day_challenge(self, only_example_tests: bool = True) -> Task | None:
         query = select(Task).where(Task.dayChallenge == True)
         results = await self.session.execute(query)
         task = results.scalar_one_or_none()
         if not task:
             raise HTTPException(
                 http_status.HTTP_404_NOT_FOUND, detail="No day challenge for now")
-        return self.only_example_tests(task)
+        if only_example_tests: return self.only_example_tests(task)
+        return task
         
     async def get_all(self) -> List[Task]:
         results = await self.session.execute(select(Task).order_by(Task.created_at.desc()))
@@ -110,7 +114,7 @@ class ContestsCRUD:
     async def get(self, uuid: uuid_pkg.UUID) -> Contest:
         results_ = await self.session.execute(select(Contest).where(Contest.uuid == uuid))
         contest = results_.scalar_one_or_none()
-        contest_work = contest.dict()
+        contest_work = contest.dict().copy()
         contest_tasks = contest_work["tasks"]
         contest_work["tasks"] = []
         if contest:
@@ -118,7 +122,6 @@ class ContestsCRUD:
                 query = select(Task.title).where(Task.uuid == task_uuid)
                 results = await self.session.execute(query)
                 contest_work["tasks"].append({"uuid": task_uuid, "title": results.scalar_one_or_none()})
-            print(contest_work)
             return contest_work
         raise HTTPException(http_status.HTTP_404_NOT_FOUND, detail="No contest with such UUID")
     
@@ -169,23 +172,37 @@ class SubmitsCRUD:
             http_status.HTTP_404_NOT_FOUND, detail="No such submit"
         )
     
-    async def submit_day_challenge(self, source: str, user_uuid: uuid_pkg.UUID) -> Submit:
-        day_challenge = await self.tasks_crud.get_day_challenge()
+    async def submit_day_challenge(self, source: str, user_uuid: uuid_pkg.UUID) -> Tuple[Submit, Task]:
+        day_challenge = await self.tasks_crud.get_day_challenge(only_example_tests=False) # Get all tests
         if day_challenge:
-            return await self.submit(source, user_uuid, task_object=day_challenge)
+            return await self.submit(source, user_uuid, task_object=day_challenge), day_challenge
             
         raise HTTPException(
             http_status.HTTP_400_BAD_REQUEST, detail="No day challenge for now")
+    
+    def checker_callback(self, data: dict, loop: object) -> None:
+        '''
+        Sync function!
+        '''
+        solved, tests_results_log, submit_id = data["status"], data["tests"], uuid_pkg.UUID(data["submit_id"])
+        print(solved, tests_results_log, submit_id)
+        query = update(Submit).where(Submit.uuid == submit_id).values(status=2, solved=solved, testsResults=tests_results_log)
+        async def commit_async():
+            await self.session.execute(query)
+            await self.session.commit()
+        loop.create_task(commit_async())
+        
     
     async def submit_contest(self, contest_submit: ContestSubmitGithub, user_uuid: uuid_pkg.UUID) -> List[Submit]:
         contests_crud = ContestsCRUD(self.session)
         contest = await contests_crud.get(contest_submit.contest)
         
         submits = []
-        # print(contest.tasks)
         for task in contest["tasks"].copy():
             submits.append(await self.submit(contest_submit.githubLink, user_uuid, task["uuid"], referedContest=contest_submit.contest))
         print(contest)
+        await self.session.commit()
+
         return submits
     
     async def day_challenge_user_submits(self, user_uuid: uuid_pkg.UUID) -> List[Submit]:

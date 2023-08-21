@@ -38,10 +38,6 @@ async def create_multiple_users_from_csv(csv_file: UploadFile, users: UsersCRUD 
     
 
 
-@router.delete("/{user_id}")
-async def delete_user(user_uuid: uuid_pkg.UUID, current_user: User = Depends(atleast_teacher_access), users: UsersCRUD = Depends(get_users_crud)):
-    return await users.cascade_delete(user_uuid)
-
 
 @router.patch("", response_model=UserUpdateResponse)
 async def update_user_info(update_data: UserUpdate, current_user: User = Depends(get_current_user), users: UsersCRUD = Depends(get_users_crud)):
@@ -81,3 +77,8 @@ async def get_leaderboard(limit: int = 10, users: UsersCRUD = Depends(get_users_
 @router.get("/{id}", response_model=UserRead)
 async def get_user_by_uuid_or_nick(id: uuid_pkg.UUID | str, users: UsersCRUD = Depends(get_users_crud)):
     return await users.get(id)
+
+
+@router.delete("/{id}")
+async def delete_user(id: uuid_pkg.UUID, current_user: User = Depends(atleast_teacher_access), users: UsersCRUD = Depends(get_users_crud)):
+    return await users.cascade_delete(id)

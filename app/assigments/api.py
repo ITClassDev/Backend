@@ -13,7 +13,9 @@ import os
 from app.core.files import upload_file
 from app import settings
 from app.assigments.schemas import TaskLeaderBoard, ContestCreate
-
+import threading
+import app.assigments.checker_api as checker_api
+import asyncio
 
 router = APIRouter()
 
@@ -49,8 +51,12 @@ async def get_submit_details(uuid: uuid_pkg.UUID, current_user: User = Depends(g
 @router.post("/tasks/challenge/submit")
 async def submit_day_challenge(source: UploadFile, current_user: User = Depends(get_current_user), submits: SubmitsCRUD = Depends(get_submits_crud)):
     uploaded_source = await upload_file(source, ["py", "cpp"], os.path.join(settings.user_storage, "tasks_source_codes"))
+    loop = asyncio.get_event_loop()
     if uploaded_source["status"]:
-        submit = await submits.submit_day_challenge(uploaded_source["file_name"], current_user.uuid)
+        submit, task = await submits.submit_day_challenge(uploaded_source["file_name"], current_user.uuid)
+        env = {"cpu_time_limit": task.timeLimit, "real_time_limit": task.timeLimit + 0.5, "memory_limit": task.memoryLimit}
+        payload = {"source_code_path": uploaded_source["file_name"], "language": {"py": 0, "cpp": 1}[uploaded_source["extension"]], "tests": task.tests, "submit_id": str(submit.uuid), "env": env}
+        threading.Thread(target=lambda: checker_api.challenge(payload, submits.checker_callback, loop)).start()
         return submit
     raise HTTPException(status_code=http_status.HTTP_400_BAD_REQUEST, detail="Invalid file extension")
 
