@@ -17,7 +17,7 @@ async def access_by_role(acceptable_roles: List[str], Authorize: AuthJWT, users:
     Authorize.jwt_required()
     email = Authorize.get_jwt_subject()
     user = await users.get_by_email(str(email))
-    if user.role in acceptable_roles:
+    if user.role in acceptable_roles or user.shtpMaintainer:
         return user
     raise HTTPException(status_code=http_status.HTTP_403_FORBIDDEN,
                         detail="You can't access this endpoint!")

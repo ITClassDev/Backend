@@ -32,6 +32,7 @@ sql_admin.create(app, settings.secret_key)
 
 @AuthJWT.load_config  # type: ignore
 def get_config():
+    # print("Seconds:", settings.jwt_access_token_expire_at_minutes * 60)
     return JWTSettings(authjwt_secret_key=settings.secret_key, authjwt_access_token_expires=settings.jwt_access_token_expire_at_minutes * 60)
 
 

@@ -54,3 +54,4 @@ class TimestampModel(SQLModel):
 
 class JWTSettings(BaseModel):
     authjwt_secret_key: str
+    authjwt_access_token_expires: int
