@@ -8,8 +8,8 @@ class TaskCreate(BaseModel):
     text: str
     timeLimit: int
     memoryLimit: int
-    dayChallenge: bool
-    tests: Optional[List[dict]] = None
+    dayChallenge: Optional[bool] = False
+    tests: List[dict]
     testsTypes: Optional[dict] = None
     functionName: Optional[str] = None
 

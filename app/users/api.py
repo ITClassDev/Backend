@@ -73,6 +73,10 @@ async def get_leaderboard(limit: int = 10, users: UsersCRUD = Depends(get_users_
     resp = await users.get_top_users(limit)
     return resp
 
+@router.get("/search", response_model=List[UsersReadAll])
+async def search_for_users_by_first_last_name(query: str, users: UsersCRUD = Depends(get_users_crud), _: User = Depends(atleast_teacher_access)):
+    return await users.search(query)
+
 
 @router.get("/{id}", response_model=UserRead)
 async def get_user_by_uuid_or_nick(id: uuid_pkg.UUID | str, users: UsersCRUD = Depends(get_users_crud)):

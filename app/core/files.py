@@ -13,7 +13,7 @@ async def get_file_extension(filename):
     return filename[filename.rfind(".") + 1:]
 
 
-async def generate_filename(file_ext, prefix="itc_upl_", custom_name=None):
+async def generate_filename(file_ext, prefix="shtp_upl_", custom_name=None):
     base_name = f"{prefix}{int(time.time())}{await get_random_string(8)}"
     if custom_name:
         base_name = custom_name

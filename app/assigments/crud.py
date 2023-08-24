@@ -33,20 +33,27 @@ class TasksCRUD:
                 http_status.HTTP_400_BAD_REQUEST, detail=err_msg)
         
     def only_example_tests(self, task: Task) -> Task:
-        tests = task.tests.copy()
         task_new = task.dict()
         task_new["tests"] = list(filter(lambda test: 'demo' in test and test['demo'], task.tests))
         return Task.parse_obj(task_new)
+    
+    async def update(self, uuid: uuid_pkg.UUID, task: Task) -> Task:
+        new_data = task.dict()
+        query = update(Task).where(Task.uuid == uuid).values(**new_data)
+        await self.session.execute(query)
+        await self.session.commit()
+        return task
         
-    async def get(self, task_uuid: uuid_pkg.UUID) -> Task | None:
+    async def get(self, task_uuid: uuid_pkg.UUID, only_demo: bool = True) -> Task | None:
         query = select(Task).where(Task.uuid == task_uuid)
         results = await self.session.execute(query)
         task = results.scalar_one_or_none()
         if not task:
             raise HTTPException(
                 http_status.HTTP_404_NOT_FOUND, detail="Task with such uuid not found")
+        if only_demo: return self.only_example_tests(task)
+        return task
         
-        return self.only_example_tests(task)
         
     async def get_day_challenge(self, only_example_tests: bool = True) -> Task | None:
         query = select(Task).where(Task.dayChallenge == True)

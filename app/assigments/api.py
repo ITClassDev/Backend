@@ -69,6 +69,10 @@ async def get_current_user_challenge_submits(current_user: User = Depends(get_cu
 async def get_current_user_task_submits(uuid: uuid_pkg.UUID, current_user: User = Depends(get_current_user), submits: SubmitsCRUD = Depends(get_submits_crud)):
     return await submits.get_users_for_tasks(uuid, current_user.uuid)
 
+@router.patch("/tasks/{uuid}")
+async def update_task_data(uuid: uuid_pkg.UUID, task: TaskCreate, current_user: User = Depends(atleast_teacher_access), tasks: TasksCRUD = Depends(get_tasks_crud)):
+    return await tasks.update(uuid, task)
+
 
 @router.get("/contests")
 async def get_all_contests_for_admin(_: User = Depends(atleast_teacher_access), contests: ContestsCRUD = Depends(get_contests_crud)):
@@ -96,5 +100,5 @@ async def submit_homework(submit: ContestSubmitGithub, submits: SubmitsCRUD = De
     return await submits.submit_contest(submit, current_user.uuid)
 
 @router.get("/tasks/{uuid}", response_model=Task)
-async def get_task(uuid: uuid_pkg.UUID, tasks: TasksCRUD = Depends(get_tasks_crud)):
-    return await tasks.get(uuid)
+async def get_task(uuid: uuid_pkg.UUID, tasks: TasksCRUD = Depends(get_tasks_crud), current_user: User = Depends(get_current_user)):
+    return await tasks.get(uuid, False if current_user.role in ["teacher", "admin"] else True)

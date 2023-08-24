@@ -18,7 +18,7 @@ async def get_current_user_achievements(current_user: User = Depends(get_current
     return await achievements.get_all_for_user(current_user.uuid)
 
 
-@router.put("")
+@router.put("", response_model=AchievementRead)
 async def add_achievements(achievement: AchievementCreate, confirmFile: UploadFile, current_user: User = Depends(get_current_user), achievements: AchievementsCRUD = Depends(get_achievements_crud)):
     uploaded_image = await upload_file(confirmFile, ["png", "jpg", "pdf", "jpeg"], os.path.join(settings.user_storage, "achievements"))
     if uploaded_image["status"]:
@@ -27,7 +27,7 @@ async def add_achievements(achievement: AchievementCreate, confirmFile: UploadFi
         raise HTTPException(status_code=http_status.HTTP_400_BAD_REQUEST, detail="Can't upload such file; Check extension: [pdf, png, jpg, jpeg]")
 
 
-@router.patch("/moderate")
+@router.patch("/moderate", response_model=None)
 async def moderate_achievement(achievement: AchievementModerate, current_user: User = Depends(atleast_teacher_access), achievements: AchievementsCRUD = Depends(get_achievements_crud)):
     await achievements.moderate(achievement, current_user.uuid)
 

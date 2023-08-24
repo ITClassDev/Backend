@@ -2,18 +2,19 @@ import uuid as uuid_pkg
 
 from fastapi import HTTPException
 from fastapi import status as http_status
-from sqlalchemy import select, update, delete
+from sqlalchemy import select, update, delete, or_
 from sqlmodel.ext.asyncio.session import AsyncSession
-from sqlalchemy.orm import joinedload
+# from sqlalchemy.orm import joinedload
 import app.core.security as security
 from app.users.models import User
 from app.groups.models import Group
-from app.users.schemas import UserCreate, UserUpdate, LeaderboardUser
+from app.users.schemas import UserCreate, UserUpdate, LeaderboardUser, UsersReadAll
 import sqlalchemy
 from typing import List, Tuple
 from app.core.security import verify_password, get_hashed_password
 from app.groups.crud import GroupsCRUD
 import pandas as pd
+
 
 
 class UsersCRUD:
@@ -151,4 +152,12 @@ class UsersCRUD:
 
     async def all_(self) -> List[User]:
         results = await self.session.execute(select(User.firstName, User.lastName, User.groupId, User.uuid, User.avatarPath, User.nickName, User.learningClass).order_by(User.created_at.asc()))
+        return results.fetchall()
+    
+    async def search(self, query: str) -> List[UsersReadAll]:
+        query = select(User.uuid, User.firstName, User.lastName, User.avatarPath, User.groupId, User.learningClass, User.nickName).filter(or_(
+            User.firstName.like(f"%{query}%"),
+            User.lastName.like(f"%{query}%")
+        ))
+        results = await self.session.execute(query)
         return results.fetchall()
