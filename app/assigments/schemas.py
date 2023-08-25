@@ -46,6 +46,7 @@ class ContestCreate(BaseModel):
     title: str
     description: str
     deadline: Optional[datetime] = None
+    forLearningClass: int
 
 class ContestSubmitGithub(BaseModel):
     contest: uuid_pkg.UUID

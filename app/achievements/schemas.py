@@ -43,7 +43,7 @@ class AchievementRead(BaseModel):
     acceptedBy: Optional[uuid_pkg.UUID] = None
     
 
-    User: MinimalUser
+    User: Optional[MinimalUser] = None
 
 
 class AchievementModerate(BaseModel):

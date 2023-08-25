@@ -40,7 +40,7 @@ class Contest(UUIDModel, TimestampModel, table=True):
         "forGroups",
         ARRAY(UUID(as_uuid=1))
     ))
-    forLearningClass: int = Field(nullable=True)
+    forLearningClass: Optional[int] = Field(nullable=True)
     # TODO; Add special users list
 
 class Submit(UUIDModel, TimestampModel, table=True):
@@ -54,10 +54,10 @@ class Submit(UUIDModel, TimestampModel, table=True):
     status: int = Field(nullable=False)
     taskId: uuid_pkg.UUID = Field(foreign_key="tasks.uuid", nullable=False)
     source: str = Field(nullable=False)
-    referedContest: uuid_pkg.UUID = Field(nullable=True) # If submit contest
-    gitCommitId: str = Field(nullable=True) # If submit contest
+    referedContest: Optional[uuid_pkg.UUID] = Field(nullable=True) # If submit contest
+    gitCommitId: Optional[str] = Field(nullable=True) # If submit contest
     solved: bool = Field(nullable=False, default=False)
-    testsResults: dict = Field(sa_column=Column(
+    testsResults: Optional[List[dict]] = Field(sa_column=Column(
         "testsResults",
         JSON
     ), nullable=True)

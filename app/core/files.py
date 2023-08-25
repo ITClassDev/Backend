@@ -3,6 +3,7 @@ import string
 import os
 import time
 import hashlib
+import pathlib
 
 
 async def get_random_string(length):
@@ -46,3 +47,7 @@ async def upload_file(file, allowed_extensions: list, upload_path: str = None, c
             return {"status": False, "info": "Files with such extensions are forbidden"}
     else:
         return {"status": False, "info": "no file in request"}
+
+
+async def read_file(file_name: str, upload_path: str):
+    return pathlib.Path(os.path.join(upload_path, file_name)).read_text()

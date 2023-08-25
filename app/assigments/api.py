@@ -44,9 +44,11 @@ async def get_day_challenge_leaderboard(tasks: TasksCRUD = Depends(get_tasks_cru
     challenge = await tasks.get_day_challenge()
     return await tasks.task_leaderboard(challenge.uuid)
 
-@router.get("/tasks/submit/{uuid}")
-async def get_submit_details(uuid: uuid_pkg.UUID, current_user: User = Depends(get_current_user), submits: SubmitsCRUD = Depends(get_submits_crud)):
-    return await submits.get(uuid, current_user.uuid)
+
+
+# @router.get("/submit/{uuid}/source", response_model=str)
+# async def submit_source(uuid: uuid_pkg.UUID):
+#     await return 
 
 @router.post("/tasks/challenge/submit")
 async def submit_day_challenge(source: UploadFile, current_user: User = Depends(get_current_user), submits: SubmitsCRUD = Depends(get_submits_crud)):
@@ -102,3 +104,7 @@ async def submit_homework(submit: ContestSubmitGithub, submits: SubmitsCRUD = De
 @router.get("/tasks/{uuid}", response_model=Task)
 async def get_task(uuid: uuid_pkg.UUID, tasks: TasksCRUD = Depends(get_tasks_crud), current_user: User = Depends(get_current_user)):
     return await tasks.get(uuid, False if current_user.role in ["teacher", "admin"] else True)
+
+@router.get("/tasks/submit/{uuid}", response_model=Submit)
+async def get_submit_details(uuid: uuid_pkg.UUID, current_user: User = Depends(get_current_user), submits: SubmitsCRUD = Depends(get_submits_crud)):
+    return await submits.get(uuid, current_user.uuid)

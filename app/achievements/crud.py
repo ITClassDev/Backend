@@ -53,10 +53,11 @@ class AchievementsCRUD:
         await self.session.commit()
         
 
-    async def get_all_for_user(self, user_uuid: uuid_pkg.UUID, active: bool = True) -> List[Achievement]:
+    async def get_all_for_user(self, user_uuid: uuid_pkg.UUID, active: bool = True, limit: int = 10000) -> List[Achievement]:
         if active: # Moderated OK
             query = select(*self.columns).where(Achievement.toUser == user_uuid, User.uuid == user_uuid, Achievement.acceptedBy != None, Achievement.acceptedAt != None)
         else: # In moderation queue
             query = select(*self.columns).where(Achievement.toUser == user_uuid, User.uuid == user_uuid, Achievement.acceptedBy == None, Achievement.acceptedAt == None)
-        results = await self.session.execute(query.order_by(Achievement.created_at.desc()))
+        results = await self.session.execute(query.order_by(Achievement.created_at.desc()).join(Achievement).limit(limit))
         return results.fetchall()
+    

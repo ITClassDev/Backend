@@ -9,7 +9,9 @@ from app.users.models import User
 from app.assigments.schemas import TaskCreate, TaskLeaderBoard, ContestCreate, ContestSubmitGithub
 from typing import List, Tuple
 from datetime import datetime
-import asyncio
+import os
+from app import settings
+from app.core.files import read_file
 
 class TasksCRUD:
     def __init__(self, session: AsyncSession):
@@ -172,11 +174,15 @@ class SubmitsCRUD:
 
     async def get(self, uuid: uuid_pkg.UUID, user_id: uuid_pkg.UUID) -> Submit:
         query = select(Submit).where(Submit.uuid == uuid and Submit.userId == user_id)
+        print(user_id)
         results = await self.session.execute(query)
-        if results:
-            return results.scalar_one_or_none()
+        result_object = results.scalar_one_or_none()
+        if result_object.userId == user_id:
+            result_object = result_object.dict()
+            result_object["source"] = await read_file(result_object["source"], os.path.join(settings.user_storage, "tasks_source_codes"))
+            return result_object
         raise HTTPException(
-            http_status.HTTP_404_NOT_FOUND, detail="No such submit"
+            http_status.HTTP_404_NOT_FOUND, detail="No such submit or it is not your submit"
         )
     
     async def submit_day_challenge(self, source: str, user_uuid: uuid_pkg.UUID) -> Tuple[Submit, Task]:
@@ -207,7 +213,6 @@ class SubmitsCRUD:
         submits = []
         for task in contest["tasks"].copy():
             submits.append(await self.submit(contest_submit.githubLink, user_uuid, task["uuid"], referedContest=contest_submit.contest))
-        print(contest)
         await self.session.commit()
 
         return submits
