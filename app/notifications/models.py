@@ -1,9 +1,24 @@
-from sqlalchemy import Column, JSON, ForeignKey
-from sqlmodel import Field, Relationship
+from sqlalchemy import Column, JSON, ForeignKey, event
+from sqlmodel import Field, SQLModel, Relationship
 import uuid as uuid_pkg
 from app.core.models import TimestampModel, UUIDModel
 from sqlalchemy.dialects.postgresql import UUID
 from typing import Optional
+from sqlalchemy.databases import postgres
+
+
+notification_type = postgres.ENUM(
+    "info",
+    "warning",
+    "danger",
+    name=f"user_role"
+)
+
+
+@event.listens_for(SQLModel.metadata, "before_create")
+def _create_enums(metadata, conn, **kw):
+    notification_type.create(conn, checkfirst=True)
+
 
 class Notification(UUIDModel, TimestampModel, table=True):
     __tablename__ = "notifications"  # type: ignore
@@ -18,3 +33,9 @@ class Notification(UUIDModel, TimestampModel, table=True):
         "data",
         JSON
     ))
+
+class SystemNotification(UUIDModel, TimestampModel, table=True):
+    __tablename__ = "system_notifications"
+    active: bool = Field(nullable=False, default=False)
+    type: 
+    

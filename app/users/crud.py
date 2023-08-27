@@ -53,7 +53,7 @@ class UsersCRUD:
         created = []
         for _, row in data.iterrows():
             try:
-                user = User(firstName=row["firstName"], lastName=row["lastName"], email=row["email"], role=row["role"], password=row["password"], learningClass=row["learningClass"], groupId=groups_map[row["groupName"]])
+                user = User(firstName=row["firstName"], lastName=row["lastName"], email=row["email"], role=row["role"], password=security.get_hashed_password(row["password"]), learningClass=row["learningClass"], groupId=groups_map[row["groupName"]])
                 self.session.add(user)
                 await self.session.commit()
                 await self.session.refresh(user)
