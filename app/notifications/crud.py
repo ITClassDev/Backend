@@ -1,6 +1,6 @@
 from sqlmodel.ext.asyncio.session import AsyncSession
-from app.notifications.models import Notification
-from app.notifications.schemas import NotificationCreate
+from app.notifications.models import Notification, SystemNotification
+from app.notifications.schemas import NotificationCreate, SystemNotificationRead, SystemNotificaionCreate
 from app.groups.crud import GroupsCRUD
 from fastapi import HTTPException
 from fastapi import status as http_status
@@ -64,3 +64,15 @@ class NotificationsCRUD:
         await self.session.execute(query)
         await self.session.commit()
     
+    async def get_active_system(self) -> List[SystemNotificationRead]:
+        query = select(SystemNotification.uuid, SystemNotification.type, SystemNotification.active, SystemNotification.title, SystemNotification.content).where(SystemNotification.active == True)
+        results = await self.session.execute(query)
+        return results.fetchall()
+    
+    async def add_system(self, notification: SystemNotificaionCreate) -> SystemNotificaionCreate:
+        values = notification.dict()
+        notification = SystemNotification(**values)
+        self.session.add(notification)
+        await self.session.commit()
+        await self.session.refresh(notification)
+        return notification

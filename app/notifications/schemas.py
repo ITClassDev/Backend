@@ -23,3 +23,17 @@ class NotificationRead(BaseModel):
     data: dict
     viewed: bool
     created_at: datetime
+
+
+class SystemNotificationRead(BaseModel):
+    uuid: uuid_pkg.UUID
+    type: str
+    active: bool
+    title: str
+    content: str
+
+class SystemNotificaionCreate(BaseModel):
+    type: str
+    active: bool
+    title: str
+    content: str

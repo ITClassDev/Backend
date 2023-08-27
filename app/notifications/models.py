@@ -8,10 +8,11 @@ from sqlalchemy.databases import postgres
 
 
 notification_type = postgres.ENUM(
+    "success",
     "info",
     "warning",
-    "danger",
-    name=f"user_role"
+    "error",
+    name=f"notification_type"
 )
 
 
@@ -37,5 +38,12 @@ class Notification(UUIDModel, TimestampModel, table=True):
 class SystemNotification(UUIDModel, TimestampModel, table=True):
     __tablename__ = "system_notifications"
     active: bool = Field(nullable=False, default=False)
-    type: 
+    type: str = Field(sa_column=Column(
+        "type",
+        notification_type,
+        nullable=False,
+        default="info"
+    ))
+    title: str = Field(nullable=False)
+    content: str = Field(nullable=False)
     

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from app.notifications.crud import NotificationsCRUD
-from app.notifications.schemas import NotificationCreate, NotificationRead
+from app.notifications.schemas import NotificationCreate, NotificationRead, SystemNotificationRead, SystemNotificaionCreate
 from app.notifications.models import Notification
 from app.notifications.dependencies import get_notifications_crud
 from app.auth.dependencies import get_current_user, atleast_teacher_access
@@ -26,6 +26,10 @@ async def all_my_notifications(notifications: NotificationsCRUD = Depends(get_no
     return await notifications.get_all_user(current_user.uuid)
 
 
-@router.get("/system")
-async def get_system_banner_notification():
-    pass
+@router.get("/system", response_model=List[SystemNotificationRead])
+async def get_system_banner_notification(notifications: NotificationsCRUD = Depends(get_notifications_crud)):
+    return await notifications.get_active_system()
+
+@router.put("/system", response_model=SystemNotificationRead)
+async def get_system_banner_notification(notification: SystemNotificaionCreate, notifications: NotificationsCRUD = Depends(get_notifications_crud), current_user: User = Depends(atleast_teacher_access)):
+    return await notifications.add_system(notification)
