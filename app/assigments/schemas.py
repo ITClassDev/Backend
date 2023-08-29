@@ -32,6 +32,7 @@ class TaskSearch(BaseModel):
 
 
 class TaskLeaderBoard(BaseModel):
+    submitId: uuid_pkg.UUID
     userId: uuid_pkg.UUID
     firstName: str
     lastName: str
@@ -58,3 +59,7 @@ class ContestSubmitGithub(BaseModel):
             "githubLink": "https://github.com/ItClassDev/TestSolutions",
             "language": "cpp OR py"
         }}
+
+class SubmitSourceCode(BaseModel):
+    language: str
+    source: str

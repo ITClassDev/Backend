@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, UploadFile, HTTPException
 from fastapi import status as http_status
 import uuid as uuid_pkg
-from app.assigments.schemas import TaskCreate, TaskSearch, ContestSubmitGithub
+from app.assigments.schemas import TaskCreate, TaskSearch, ContestSubmitGithub, SubmitSourceCode
 from app.users.models import User
 from app.assigments.models import Task
 from app.auth.dependencies import get_current_user, atleast_teacher_access
@@ -44,11 +44,9 @@ async def get_day_challenge_leaderboard(tasks: TasksCRUD = Depends(get_tasks_cru
     challenge = await tasks.get_day_challenge()
     return await tasks.task_leaderboard(challenge.uuid)
 
-
-
-# @router.get("/submit/{uuid}/source", response_model=str)
-# async def submit_source(uuid: uuid_pkg.UUID):
-#     await return 
+@router.get("/submit/{uuid}/source", response_model=SubmitSourceCode)
+async def submit_source(uuid: uuid_pkg.UUID, _: User = Depends(atleast_teacher_access), submits: SubmitsCRUD = Depends(get_submits_crud)):
+    return await submits.get_source_code(uuid)
 
 @router.post("/tasks/challenge/submit")
 async def submit_day_challenge(source: UploadFile, current_user: User = Depends(get_current_user), submits: SubmitsCRUD = Depends(get_submits_crud)):

@@ -6,7 +6,7 @@ from fastapi import status as http_status
 import uuid as uuid_pkg
 from app.assigments.models import Task, Contest, Submit
 from app.users.models import User
-from app.assigments.schemas import TaskCreate, TaskLeaderBoard, ContestCreate, ContestSubmitGithub
+from app.assigments.schemas import TaskCreate, TaskLeaderBoard, ContestCreate, ContestSubmitGithub, SubmitSourceCode
 from typing import List, Tuple
 from datetime import datetime
 import os
@@ -86,7 +86,7 @@ class TasksCRUD:
         return day_challenge.scalar_one_or_none()
     
     async def task_leaderboard(self, task_uuid: uuid_pkg.UUID, limit: int = 10) -> List[TaskLeaderBoard]:
-        query = select(Submit.userId, Submit.created_at, User.firstName, User.lastName, User.avatarPath, User.nickName).where(Submit.taskId == task_uuid, Submit.solved == True, Submit.userId == User.uuid).order_by(Submit.created_at.asc()).limit(limit)
+        query = select(Submit.userId, Submit.uuid.label("submitId"), Submit.created_at, User.firstName, User.lastName, User.avatarPath, User.nickName).where(Submit.taskId == task_uuid, Submit.solved == True, Submit.userId == User.uuid).order_by(Submit.created_at.asc()).limit(limit)
         results = await self.session.execute(query)
         uids = []
         def filter_unique(entry: list):
@@ -174,7 +174,6 @@ class SubmitsCRUD:
 
     async def get(self, uuid: uuid_pkg.UUID, user_id: uuid_pkg.UUID) -> Submit:
         query = select(Submit).where(Submit.uuid == uuid and Submit.userId == user_id)
-        print(user_id)
         results = await self.session.execute(query)
         result_object = results.scalar_one_or_none()
         if result_object.userId == user_id:
@@ -185,6 +184,18 @@ class SubmitsCRUD:
             http_status.HTTP_404_NOT_FOUND, detail="No such submit or it is not your submit"
         )
     
+    async def get_source_code(self, uuid: uuid_pkg.UUID) -> SubmitSourceCode:
+        query = select(Submit).where(Submit.uuid == uuid)
+        results = await self.session.execute(query)
+        results = results.scalar_one_or_none()
+        
+        if results:
+            source = await read_file(results.source, os.path.join(settings.user_storage, "tasks_source_codes"))
+            return SubmitSourceCode(source=source, language={"cpp": "c++", "py": "python"}[results.source.split(".")[-1]])
+        raise HTTPException(
+            http_status.HTTP_404_NOT_FOUND, detail="No such submit"
+        )
+
     async def submit_day_challenge(self, source: str, user_uuid: uuid_pkg.UUID) -> Tuple[Submit, Task]:
         day_challenge = await self.tasks_crud.get_day_challenge(only_example_tests=False) # Get all tests
         if day_challenge:
