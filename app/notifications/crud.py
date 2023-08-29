@@ -1,10 +1,10 @@
 from sqlmodel.ext.asyncio.session import AsyncSession
 from app.notifications.models import Notification, SystemNotification
-from app.notifications.schemas import NotificationCreate, SystemNotificationRead, SystemNotificaionCreate
+from app.notifications.schemas import NotificationCreate, SystemNotificationRead, SystemNotificaionCreate, SystemNotificaionEdit
 from app.groups.crud import GroupsCRUD
 from fastapi import HTTPException
 from fastapi import status as http_status
-from sqlalchemy import select, update
+from sqlalchemy import select, update, delete
 import uuid as uuid_pkg
 from typing import List
 
@@ -64,9 +64,11 @@ class NotificationsCRUD:
         await self.session.execute(query)
         await self.session.commit()
     
-    async def get_active_system(self) -> List[SystemNotificationRead]:
-        query = select(SystemNotification.uuid, SystemNotification.type, SystemNotification.active, SystemNotification.title, SystemNotification.content).where(SystemNotification.active == True)
-        results = await self.session.execute(query)
+    async def get_system(self, active: bool = True) -> List[SystemNotificationRead]:
+        query = select(SystemNotification.uuid, SystemNotification.type, SystemNotification.active, SystemNotification.title, SystemNotification.content)
+        if active: 
+            query = query.where(SystemNotification.active == True)
+        results = await self.session.execute(query.order_by(SystemNotification.created_at.desc()))
         return results.fetchall()
     
     async def add_system(self, notification: SystemNotificaionCreate) -> SystemNotificaionCreate:
@@ -76,3 +78,20 @@ class NotificationsCRUD:
         await self.session.commit()
         await self.session.refresh(notification)
         return notification
+
+
+    async def edit_system(self, uuid: uuid_pkg.UUID, notification: SystemNotificaionEdit) -> None:
+        edit_items = {k: v for k, v in notification.dict().items() if v is not None}
+        query = select(SystemNotification).where(SystemNotification.uuid == uuid)
+        notify = await self.session.execute(query)
+        notify = notify.scalar_one_or_none()
+        if notify:
+            for change in edit_items:
+                setattr(notify, change, edit_items[change])
+            await self.session.commit()
+            return None
+        raise HTTPException(status_code=http_status.HTTP_404_NOT_FOUND)
+
+    async def delete_system(self, uuid: uuid_pkg.UUID) -> None:
+        await self.session.execute(delete(SystemNotification).where(SystemNotification.uuid == uuid))
+        await self.session.commit()

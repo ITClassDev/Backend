@@ -37,3 +37,9 @@ class SystemNotificaionCreate(BaseModel):
     active: bool
     title: str
     content: str
+
+class SystemNotificaionEdit(BaseModel):
+    type: Optional[str] = None
+    active: Optional[bool] = None
+    title: Optional[str] = None
+    content: Optional[str] = None
