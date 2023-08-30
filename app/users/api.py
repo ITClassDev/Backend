@@ -12,19 +12,21 @@ import os
 from app.core.files import upload_file
 from app.users.schemas import UpdateAvatarResponse, UsersReadAll
 import pandas as pd
-
+from app.core.logs import log_event
 router = APIRouter()
 
 
 @router.get("", response_model=List[UsersReadAll])
-async def get_all_users(users: UsersCRUD = Depends(get_users_crud), current_user: User = Depends(atleast_teacher_access)):
+async def get_all_users(users: UsersCRUD = Depends(get_users_crud), _: User = Depends(atleast_teacher_access)):
     a = await users.all_()
     return a
 
 
 @router.put("", response_model=UserRead)
-async def create_user(user: UserCreate, users: UsersCRUD = Depends(get_users_crud)):
-    return await users.create(user)
+async def create_user(user: UserCreate, users: UsersCRUD = Depends(get_users_crud), current_user: User = Depends(atleast_teacher_access)):
+    new_user = await users.create(user)
+    log_event(f"Create user with uuid: {new_user.uuid}", "users", current_user.uuid)
+    return new_user
 
 
 @router.put("/csv", response_model=MultipleCreate)
@@ -34,13 +36,13 @@ async def create_multiple_users_from_csv(csv_file: UploadFile, users: UsersCRUD 
     df = pd.DataFrame([row.split(',') for row in csv_content.split('\n')[1:]], 
                    columns=["firstName", "lastName", "email", "role", "password", "learningClass", "groupName"])
     users_created, errors = await users.create_multiple(df)
+    log_event(f"Bulk user creation", "users", current_user.uuid)
     return MultipleCreate(users=users_created, errors=errors)
     
 
-
-
 @router.patch("", response_model=UserUpdateResponse)
 async def update_user_info(update_data: UserUpdate, current_user: User = Depends(get_current_user), users: UsersCRUD = Depends(get_users_crud)):
+    log_event(f"Update user: {update_data.uuid} with new data: {update_data.dict()}", "users", current_user.uuid)
     result = await users.update(current_user, update_data)
     if "raise" in result:
         raise HTTPException(

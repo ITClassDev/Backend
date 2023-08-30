@@ -115,6 +115,7 @@ class UsersCRUD:
                 User.uuid == upd_uuid).values(**upd_values)
             await self.session.execute(query)
             await self.session.commit()
+            upd_values["password"] = None # empty hash from result
         else:
             return {"raise": "Nothing to update"}
 

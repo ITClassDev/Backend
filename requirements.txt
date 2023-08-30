@@ -13,3 +13,4 @@ pydantic
 pydantic[email]
 alembic
 itsdangerous
+beautifulsoup4

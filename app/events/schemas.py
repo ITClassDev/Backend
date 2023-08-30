@@ -22,3 +22,7 @@ class EventsMosParsed(BaseModel):
             "startTime": "2023-07-09T17:00:00.000Z",
             "finishTime": "2023-07-09T20:00:00.000Z"
         }}
+
+
+class OlimpiadsParsed(BaseModel):
+    id: int

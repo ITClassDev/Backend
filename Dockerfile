@@ -6,7 +6,7 @@ WORKDIR /api
 COPY ./requirements.txt /api/requirements.txt
 RUN pip3 install --no-cache-dir --upgrade -r /api/requirements.txt
 # Copy source
-COPY . /api
+COPY ./. /api/
 # Delete migrations
 RUN rm -r /api/migrations/versions/*.py
 # Delete all migrations

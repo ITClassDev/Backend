@@ -17,9 +17,11 @@ async def send_notification(notification: NotificationCreate, notifications: Not
 
 @router.get("", response_model=List[Notification])
 async def notification_polling(notifications: NotificationsCRUD = Depends(get_notifications_crud), current_user: User = Depends(get_current_user)):
-    data = await notifications.get_active_notifications(current_user.uuid)
-    await notifications.set_readed(current_user.uuid)
-    return data
+    if current_user:
+        data = await notifications.get_active_notifications(current_user.uuid)
+        await notifications.set_readed(current_user.uuid)
+        return data
+    return []
 
 @router.get("/all", response_model=List[NotificationRead])
 async def all_my_notifications(notifications: NotificationsCRUD = Depends(get_notifications_crud), current_user: User = Depends(get_current_user)):

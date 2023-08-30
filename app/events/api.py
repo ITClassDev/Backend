@@ -3,7 +3,8 @@ from fastapi import status as http_status
 from app import settings
 from typing import List
 import requests
-from app.events.schemas import EventsMosParsed
+from app.events.schemas import EventsMosParsed, OlimpiadsParsed
+from bs4 import BeautifulSoup
 
 router = APIRouter()
 
@@ -36,7 +37,26 @@ async def parse_events_from_profil_mos():
     
 
 
+@router.get("/olimpiads/{forClass}", response_model=List[OlimpiadsParsed])
+async def parse_olimpiads_ru(forClass: int):
+    '''
+    curl 'https://olimpiada.ru/include/activity/megalist.php?class=10&type=any&period_date=&period=year' 
+    --compressed -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/116.0' 
+    -H 'Accept: */*' -H 'Accept-Language: en-US,en;q=0.5' -H 'Accept-Encoding: gzip, deflate, br' 
+    -H 'X-Requested-With: XMLHttpRequest' -H 'Connection: keep-alive' 
+    -H 'Referer: https://olimpiada.ru/activities?class=10&type=any&period_date=&period=year' 
+    -H 'Cookie: __ddg1_=UIQ2DXs2889sdD4H9HvT; region=77; tmr_vid_5756=1; 
+    ADD &cnow=20
+    SUBJECT 7 - Informatics 
+    '''
+    print(forClass)
+    count = requests.get(f"https://olimpiada.ru/include/activity/megatitle.php?subject[7]=on&class={forClass}&type=any&period_date=&period=year").text
+    print(count)
+    count = int(count.split()[0])
+    html = requests.get(f"https://olimpiada.ru/include/activity/megalist.php?subject[7]=on&class={forClass}&type=any&period_date=&period=year").text
+    soup = BeautifulSoup(html, 'html.parser')
+    return []
 
-@router.get("/generic", response_model=List[EventsMosParsed])
-async def parse_school_events():
+@router.get("/school", response_model=List[EventsMosParsed])
+async def get_school_events():
     pass

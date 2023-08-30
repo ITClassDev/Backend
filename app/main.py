@@ -10,6 +10,7 @@ from app.router.api_v1.endpoints import api_router
 from fastapi.openapi.utils import get_openapi
 import app.sql_admin as sql_admin
 from fastapi.middleware.cors import CORSMiddleware
+import logging
 
 app = FastAPI(
     title=settings.project_name,
@@ -29,7 +30,13 @@ app.add_middleware(
 app.mount("/storage", StaticFiles(directory=settings.user_storage),
           name="storage")  # User data storage(local)
 sql_admin.create(app, settings.secret_key)
+logging.basicConfig(filename="./app/logs/events.txt",
+                    filemode='a',
+                    format='%(asctime)s.%(msecs)d %(service_name)s %(levelname)s %(message)s; By: %(by_user)s',
+                    datefmt='%H:%M:%S',
+                    level=logging.INFO)
 
+logging.info("ShTP REST API Started", extra={"service_name": "main", "by_user": "root"})
 
 @AuthJWT.load_config  # type: ignore
 def get_config():
