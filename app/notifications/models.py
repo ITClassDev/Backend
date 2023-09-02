@@ -46,4 +46,5 @@ class SystemNotification(UUIDModel, TimestampModel, table=True):
     ))
     title: str = Field(nullable=False)
     content: str = Field(nullable=False)
+    authorId: Optional[uuid_pkg.UUID] = Field(nullable=True)
     
