@@ -16,10 +16,12 @@ router = APIRouter()
 
 @router.get("/me", response_model=UserRead)
 async def get_me(current_user: User = Depends(get_current_user), notifications: NotificationsCRUD = Depends(get_notifications_crud)):
-    values = current_user.dict()
-    values["group"] = current_user.group.dict()
-    values["newNotifications"] = len(await notifications.get_active_notifications(current_user.uuid)) > 0
-    return values
+    if current_user:
+        values = current_user.dict()
+        values["group"] = current_user.group.dict()
+        values["newNotifications"] = len(await notifications.get_active_notifications(current_user.uuid)) > 0
+        return values
+    raise HTTPException(status_code=http_status.HTTP_403_FORBIDDEN, detail="No login")
 
 
 @router.post("/login", response_model=AuthData)

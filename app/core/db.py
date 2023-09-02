@@ -12,7 +12,7 @@ from app.assigments.models import Contest
 db_connection_str = settings.db_async_connection_str
 
 #engine = create_engine(db_connection_str)
-#SQLModel.metadata.create_all(engine)
+#SQLModel.metadata.create_all(engine)\
 
 if "pytest" in modules:
     db_connection_str = settings.db_async_test_connection_str

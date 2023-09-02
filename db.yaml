@@ -5,8 +5,8 @@ services:
     ports:
       - 45195:5432
     volumes:
-      - ~/postgres_data/shtp_2:/var/lib/postgresql/data
+      - ~/postgres_data/shtp_new:/var/lib/postgresql/data
     environment:
       POSTGRES_USER:  root
       POSTGRES_PASSWORD:  root
-      POSTGRES_DB: itc_system_new
+      POSTGRES_DB: itc_system

@@ -14,3 +14,4 @@ pydantic[email]
 alembic
 itsdangerous
 beautifulsoup4
+psycopg2

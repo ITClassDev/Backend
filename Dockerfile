@@ -7,8 +7,10 @@ COPY ./requirements.txt /api/requirements.txt
 RUN pip3 install --no-cache-dir --upgrade -r /api/requirements.txt
 # Copy source
 COPY ./. /api/
+
+# Remove following shit later
 # Delete migrations
-RUN rm -r /api/migrations/versions/*.py
+# RUN rm -r /api/migrations/versions/*.py
 # Delete all migrations
 # RUN alembic -c /api/app/alembic_docker.ini revision --autogenerate -m 'Init' 
 # RUN alembic init alembic
