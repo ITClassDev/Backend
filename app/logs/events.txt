@@ -32,3 +32,19 @@
 15:39:52.505 users INFO Update user: None with new data: {'uuid': None, 'aboutText': None, 'nickName': None, 'socialLinks': None, 'techStack': None, 'password': {'currentPassword': '12345', 'newPassword': '12345', 'confirmPassword': '12345'}, 'admin': None}; By: 3ae26583-47a5-486b-a3ed-8426bcb69c83
 15:40:11.138 main INFO ShTP REST API Started; By: root
 16:48:43.888 main INFO ShTP REST API Started; By: root
+22:52:30.784 main INFO ShTP REST API Started; By: root
+22:54:20.522 users INFO Create user with uuid: 64faa1b4-45ba-4c85-9681-00b1620ede12; By: 3fb01e93-368f-468f-80d8-d7d8f3bdf1fb
+23:13:22.684 main INFO ShTP REST API Started; By: root
+23:14:00.311 main INFO ShTP REST API Started; By: root
+23:19:42.410 main INFO ShTP REST API Started; By: root
+23:21:24.879 main INFO ShTP REST API Started; By: root
+23:21:48.18 main INFO ShTP REST API Started; By: root
+23:21:53.484 main INFO ShTP REST API Started; By: root
+23:32:11.951 main INFO ShTP REST API Started; By: root
+23:33:07.143 main INFO ShTP REST API Started; By: root
+23:33:14.108 main INFO ShTP REST API Started; By: root
+23:33:38.61 main INFO ShTP REST API Started; By: root
+23:33:59.928 main INFO ShTP REST API Started; By: root
+23:36:11.414 main INFO ShTP REST API Started; By: root
+23:36:19.760 main INFO ShTP REST API Started; By: root
+23:39:04.572 main INFO ShTP REST API Started; By: root

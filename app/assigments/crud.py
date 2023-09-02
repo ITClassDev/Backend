@@ -238,3 +238,10 @@ class SubmitsCRUD:
         raise HTTPException(
             http_status.HTTP_400_BAD_REQUEST, detail="No day challenge for now")
     
+
+    async def reject(self, submit_uuid: uuid_pkg.UUID) -> None:
+        print(submit_uuid)
+        query = update(Submit).where(Submit.uuid == submit_uuid).values(solved=False, status=3) # Set rejected (3) status to submit
+        await self.session.execute(query)
+        await self.session.commit()
+    

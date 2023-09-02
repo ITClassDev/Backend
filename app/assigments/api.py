@@ -48,9 +48,14 @@ async def get_day_challenge_leaderboard(tasks: TasksCRUD = Depends(get_tasks_cru
 async def submit_source(uuid: uuid_pkg.UUID, _: User = Depends(atleast_teacher_access), submits: SubmitsCRUD = Depends(get_submits_crud)):
     return await submits.get_source_code(uuid)
 
+@router.delete("/submit/{uuid}/reject", response_model=None)
+async def reject_submit(uuid: uuid_pkg.UUID, _: User = Depends(atleast_teacher_access), submits: SubmitsCRUD = Depends(get_submits_crud)):
+    await submits.reject(uuid)
+
 @router.post("/tasks/challenge/submit")
 async def submit_day_challenge(source: UploadFile, current_user: User = Depends(get_current_user), submits: SubmitsCRUD = Depends(get_submits_crud)):
     uploaded_source = await upload_file(source, ["py", "cpp"], os.path.join(settings.user_storage, "tasks_source_codes"))
+    if not uploaded_source["size"]: raise HTTPException(status_code=http_status.HTTP_400_BAD_REQUEST, detail="Empty source code")
     loop = asyncio.get_event_loop()
     if uploaded_source["status"]:
         submit, task = await submits.submit_day_challenge(uploaded_source["file_name"], current_user.uuid)

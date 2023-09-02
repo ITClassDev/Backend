@@ -31,6 +31,7 @@ async def upload_file(file, allowed_extensions: list, upload_path: str = None, c
         file_ext = await get_file_extension(file.filename)
         if file_ext and file_ext in allowed_extensions:
             contents = file.file.read()
+            size = len(contents)
             if not md5_name:
                 file_name = await generate_filename(file_ext, custom_name=custom_name)
             else:
@@ -40,9 +41,9 @@ async def upload_file(file, allowed_extensions: list, upload_path: str = None, c
             if write:
                 with open(os.path.join(upload_path, file_name), "wb") as file_descr:
                     file_descr.write(contents)
-                return {"status": True, "file_name": file_name, "extension": file_ext}
+                return {"status": True, "file_name": file_name, "extension": file_ext, "size": size}
             else:
-                return {"status": True, "file_content": contents}
+                return {"status": True, "file_content": contents, "size": size}
         else:
             return {"status": False, "info": "Files with such extensions are forbidden"}
     else:
