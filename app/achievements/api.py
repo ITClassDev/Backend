@@ -31,20 +31,21 @@ async def add_achievements(achievement: AchievementCreate, confirmFile: UploadFi
 async def export_current_user_achievements(current_user: User = Depends(get_current_user), achievements: AchievementsCRUD = Depends(get_achievements_crud)):
     if current_user.role == "student":
         all_ = await achievements.get_all_for_user(current_user.uuid, active=True, limit=10000)
-        attachments = []
-        md_text = ""
-        for i in all_:
-            attachments.append(i.attachmentName)
-            md_text += f"## {i.title}\nУченик: {current_user.firstName} {current_user.lastName}\n\nОписание: {i.description}\n\nБаллы: {i.points}\n\nДата: {i.acceptedAt}\n\n"
-        result_archive = await create_archive(os.path.join(settings.user_storage, "achievements"), attachments, [{"name": "achievements.md", "content": md_text}])
-        response = StreamingResponse(
-                iter([result_archive.getvalue()]),
-                media_type="application/x-zip-compressed",
-                headers = {"Content-Disposition":f"attachment;filename=achievements_dump.zip",
-                            "Content-Length": str(result_archive.getbuffer().nbytes)}
-            )
-        return response
-    
+        if len(all_):
+            attachments = []
+            md_text = ""
+            for i in all_:
+                attachments.append(i.attachmentName)
+                md_text += f"## {i.title}\nУченик: {current_user.firstName} {current_user.lastName}\n\nОписание: {i.description}\n\nБаллы: {i.points}\n\nДата: {i.acceptedAt}\n\nНазвание файла диплома: {i.attachmentName}\n\n"
+            result_archive = await create_archive(os.path.join(settings.user_storage, "achievements"), attachments, [{"name": "achievements.md", "content": md_text}])
+            response = StreamingResponse(
+                    iter([result_archive.getvalue()]),
+                    media_type="application/x-zip-compressed",
+                    headers = {"Content-Disposition":f"attachment;filename=achievements_dump.zip",
+                                "Content-Length": str(result_archive.getbuffer().nbytes)}
+                )
+            return response
+        raise HTTPException(status_code=http_status.HTTP_404_NOT_FOUND, detail="You don't have achievements yet!")
     raise HTTPException(status_code=http_status.HTTP_403_FORBIDDEN, detail="Only for students")
 
 @router.patch("/moderate", response_model=None)
