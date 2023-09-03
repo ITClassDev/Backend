@@ -1,12 +1,12 @@
 from sqlmodel.ext.asyncio.session import AsyncSession
 import sqlalchemy
-from sqlalchemy import select, update
+from sqlalchemy import select, update, or_
 from fastapi import HTTPException
 from fastapi import status as http_status
 import uuid as uuid_pkg
 from app.assigments.models import Task, Contest, Submit
 from app.users.models import User
-from app.assigments.schemas import TaskCreate, TaskLeaderBoard, ContestCreate, ContestSubmitGithub, SubmitSourceCode
+from app.assigments.schemas import TaskCreate, TaskLeaderBoard, ContestCreate, ContestSubmitGithub, SubmitSourceCode, ContestRead, ContestStatisticsSolved
 from typing import List, Tuple
 from datetime import datetime
 import os
@@ -134,12 +134,43 @@ class ContestsCRUD:
             return contest_work
         raise HTTPException(http_status.HTTP_404_NOT_FOUND, detail="No contest with such UUID")
     
-    async def get_active_for_user(self, user_group: uuid_pkg.UUID, user_class: int) -> List[Contest]:
+    async def get_active_for_user(self, user_uuid: uuid_pkg.UUID, user_group: uuid_pkg.UUID, user_class: int) -> List[ContestRead]:
         query = select(Contest).where(Contest.forLearningClass == user_class, Contest.forGroups.contains([user_group]), Contest.deadline >= datetime.utcnow())
         results = await self.session.execute(query)
-        return [tuple(row)[0] for row in results]
+        results = [ContestRead(**tuple(row)[0].dict()) for row in results]
+        for index, contest in enumerate(results):
+            tmp = await self.session.execute(select(Submit.taskId).where(Submit.referedContest == contest.uuid, Submit.userId == user_uuid, Submit.solved == True))
+            results[index].solvedPercentage = len([tuple(row)[0] for row in tmp.fetchall()]) / len(contest.tasks) * 100
+        return results
+    
+    async def get_solved_tasks(self, contest_uuid: uuid_pkg.UUID, user_uuid: uuid_pkg.UUID) -> Tuple[List[uuid_pkg.UUID], List[uuid_pkg.UUID]]: 
+        results = await self.session.execute(select(Submit.taskId).where(Submit.referedContest == contest_uuid, Submit.userId == user_uuid, Submit.solved == True))
+        solved = [tuple(row)[0] for row in results.fetchall()]
+        results = await self.session.execute(select(Submit.taskId).where(Submit.referedContest == contest_uuid, Submit.userId == user_uuid, Submit.solved == False, or_(Submit.status == 2, Submit.status == 3))) # not solved and rejected or checked
+        failed = [tuple(row)[0] for row in results.fetchall()]
+        return solved, failed
         
-
+    async def statistics(self, uuid: uuid_pkg.UUID) -> Tuple[int, List[ContestStatisticsSolved]]:
+        contest = await self.session.execute(select(Contest).where(Contest.uuid == uuid))
+        contest = contest.scalar_one_or_none()
+        statistics = []
+        if contest:
+            affected_users = await self.session.execute(select(User.uuid, User.nickName, User.avatarPath, User.firstName, User.lastName).where(User.learningClass == contest.forLearningClass, User.groupId.in_(contest.forGroups)))
+            affected_users = affected_users.fetchall()
+            for user in affected_users:
+                all_submits = await self.session.execute(select(Submit.uuid, Submit.solved).where(Submit.userId == user.uuid, Submit.referedContest == contest.uuid).order_by(Submit.created_at))
+                all_submits = all_submits.fetchall()
+                pointer = 0
+                solved_count = 0
+                while pointer < len(all_submits):
+                    if all_submits[pointer].solved:
+                        solved_count += 1
+                    else:
+                        break
+                    pointer += 1
+                statistics.append(ContestStatisticsSolved(userId=user.uuid, nickName=user.nickName, avatarPath=user.avatarPath, firstName=user.firstName, lastName=user.lastName, solvedCount=solved_count))
+            return len(contest.tasks), statistics
+        raise HTTPException(status_code=http_status.HTTP_404_NOT_FOUND, detail="No such contest")
 
 class SubmitsCRUD:
     def __init__(self, session: AsyncSession):
@@ -162,7 +193,7 @@ class SubmitsCRUD:
         Direct task object used in day challenge, to prevent day challenge reselect
         '''
         # Resolve task obj
-        # Statuses: 0 - Pending; 1 - Checking; 2 - Checked
+        # Statuses: 0 - Pending; 1 - Checking; 2 - Checked; 3 - rejected
         task = task_object
         if not task: task = await self.tasks_crud.get(task_uuid)
         task_uuid = task.uuid

@@ -63,3 +63,33 @@ class ContestSubmitGithub(BaseModel):
 class SubmitSourceCode(BaseModel):
     language: str
     source: str
+
+class ContestsSolvedTasks(BaseModel):
+    solved: List[uuid_pkg.UUID]
+    failed: List[uuid_pkg.UUID]
+
+class ContestRead(BaseModel):
+    uuid: uuid_pkg.UUID
+    created_at: datetime
+    updated_at: datetime
+    authorId: uuid_pkg.UUID
+    title: str
+    description: str
+    deadline: datetime
+    tasks: List[uuid_pkg.UUID]
+    forGroups: List[uuid_pkg.UUID]
+    forLearningClass: Optional[int]
+    solvedPercentage: Optional[float]
+
+
+class ContestStatisticsSolved(BaseModel):
+    userId: uuid_pkg.UUID
+    firstName: str
+    lastName: str
+    solvedCount: int
+    nickName: Optional[str]
+    avatarPath: str
+
+class ContestStatistics(BaseModel):
+    tasksCount: int
+    students: List[ContestStatisticsSolved]
