@@ -31,7 +31,7 @@ class Contest(UUIDModel, TimestampModel, table=True):
     title: str = Field(nullable=False)
     description: str = Field(nullable=False)
     deadline: datetime = Field(nullable=True, default=None)
-    
+
     tasks: List[uuid_pkg.UUID] = Field(sa_column=Column(
         "tasks",
         ARRAY(UUID(as_uuid=1))
@@ -41,6 +41,9 @@ class Contest(UUIDModel, TimestampModel, table=True):
         ARRAY(UUID(as_uuid=1))
     ))
     forLearningClass: Optional[int] = Field(nullable=True)
+    mark5: Optional[int] = Field(nullable=False, default=100)
+    mark4: Optional[int] = Field(nullable=False, default=100)
+    mark3: Optional[int] = Field(nullable=False, default=100)
     # TODO; Add special users list
 
 class Submit(UUIDModel, TimestampModel, table=True):

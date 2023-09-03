@@ -48,6 +48,9 @@ class ContestCreate(BaseModel):
     description: str
     deadline: Optional[datetime] = None
     forLearningClass: int
+    mark5: int
+    mark4: int 
+    mark3: int
 
 class ContestSubmitGithub(BaseModel):
     contest: uuid_pkg.UUID
@@ -89,7 +92,9 @@ class ContestStatisticsSolved(BaseModel):
     solvedCount: int
     nickName: Optional[str]
     avatarPath: str
+    mark: int
 
 class ContestStatistics(BaseModel):
     tasksCount: int
     students: List[ContestStatisticsSolved]
+    grading: List[int]

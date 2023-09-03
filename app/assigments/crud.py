@@ -162,14 +162,19 @@ class ContestsCRUD:
                 all_submits = all_submits.fetchall()
                 pointer = 0
                 solved_count = 0
+                mark = 2
                 while pointer < len(all_submits):
                     if all_submits[pointer].solved:
                         solved_count += 1
                     else:
                         break
                     pointer += 1
-                statistics.append(ContestStatisticsSolved(userId=user.uuid, nickName=user.nickName, avatarPath=user.avatarPath, firstName=user.firstName, lastName=user.lastName, solvedCount=solved_count))
-            return len(contest.tasks), statistics
+                if solved_count >= contest.mark5: mark = 5
+                elif solved_count >= contest.mark4: mark = 4
+                elif solved_count >= contest.mark3: mark = 3
+                else: mark = 2
+                statistics.append(ContestStatisticsSolved(userId=user.uuid, nickName=user.nickName, avatarPath=user.avatarPath, firstName=user.firstName, lastName=user.lastName, solvedCount=solved_count, mark=mark))
+            return len(contest.tasks), [contest.mark5, contest.mark4, contest.mark3], statistics
         raise HTTPException(status_code=http_status.HTTP_404_NOT_FOUND, detail="No such contest")
 
 class SubmitsCRUD:

@@ -97,9 +97,8 @@ async def get_contest_data(uuid: uuid_pkg.UUID, _: User = Depends(get_current_us
 
 @router.get("/contest/{uuid}/statistics", response_model=ContestStatistics)
 async def get_contest_solved_statistics(uuid: uuid_pkg.UUID, _: User = Depends(atleast_teacher_access), contests: ContestsCRUD = Depends(get_contests_crud)):
-    allTasksCount, solvedStatistics = await contests.statistics(uuid)
-    print(allTasksCount, solvedStatistics)
-    return ContestStatistics(tasksCount=allTasksCount, students=solvedStatistics)
+    allTasksCount, grading, solvedStatistics = await contests.statistics(uuid)
+    return ContestStatistics(tasksCount=allTasksCount, students=solvedStatistics, grading=grading)
 
 @router.get("/contest/{uuid}/solved", response_model=ContestsSolvedTasks)
 async def get_tasks_solved_by_current_user(uuid: uuid_pkg.UUID, current_user: User = Depends(get_current_user), contests: ContestsCRUD = Depends(get_contests_crud)):
