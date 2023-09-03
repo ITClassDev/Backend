@@ -4,7 +4,9 @@ import os
 import time
 import hashlib
 import pathlib
-
+import zipfile
+import io
+from typing import List, Dict
 
 async def get_random_string(length):
     return ''.join(random.choice(string.ascii_lowercase) for i in range(length))
@@ -52,3 +54,15 @@ async def upload_file(file, allowed_extensions: list, upload_path: str = None, c
 
 async def read_file(file_name: str, upload_path: str):
     return pathlib.Path(os.path.join(upload_path, file_name)).read_text()
+
+async def create_archive(source_path: str, file_pathes: List[str], extra_files: List[Dict[str, str]] = []) -> io.BytesIO:
+    zip_bytes_io = io.BytesIO()
+    with zipfile.ZipFile(zip_bytes_io, 'w', zipfile.ZIP_DEFLATED) as zipped:
+        # Write path based files
+        for file_name in file_pathes:
+            zipped.write(os.path.join(source_path, file_name), file_name, zipfile.ZIP_DEFLATED)
+        # Write extra files
+        for file_ in extra_files:
+            zipped.writestr(file_["name"], file_["content"])
+
+    return zip_bytes_io
