@@ -109,9 +109,17 @@ async def get_tasks_solved_by_current_user(uuid: uuid_pkg.UUID, current_user: Us
 async def get_current_user_task_submits_refered_for_contest(contest_uuid: uuid_pkg.UUID, task_uuid: uuid_pkg.UUID, current_user: User = Depends(get_current_user), submits: SubmitsCRUD = Depends(get_submits_crud)):
     return await submits.get_users_refered_for_contest_task(task_uuid, contest_uuid, current_user.uuid)
 
-@router.post("/contests/submit")
+@router.post("/contests/submit", response_model=None)
 async def submit_homework(submit: ContestSubmitGithub, submits: SubmitsCRUD = Depends(get_submits_crud), current_user: User = Depends(get_current_user)):
-    return await submits.submit_contest(submit, current_user.uuid)
+    loop = asyncio.get_event_loop()
+    submits_payloads = await submits.submit_contest(submit, current_user.uuid)
+    checker_payload = {
+        "language": submit.language,
+        "github_link": submit.githubLink,
+        "test_type": "header_test",
+        "tests_description": submits_payloads
+    }
+    threading.Thread(target=lambda: checker_api.homework(checker_payload, submits.checker_save_results, loop)).start()
 
 @router.get("/tasks/{uuid}", response_model=Task)
 async def get_task(uuid: uuid_pkg.UUID, tasks: TasksCRUD = Depends(get_tasks_crud), current_user: User = Depends(get_current_user)):

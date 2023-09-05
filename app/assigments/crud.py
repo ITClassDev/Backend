@@ -134,6 +134,26 @@ class ContestsCRUD:
             return contest_work
         raise HTTPException(http_status.HTTP_404_NOT_FOUND, detail="No contest with such UUID")
     
+    async def extended_get(self, uuid: uuid_pkg.UUID) -> Contest:
+        '''
+        Only for local usage inside crud and checker pipeline
+        '''
+        results_ = await self.session.execute(select(Contest).where(Contest.uuid == uuid))
+        contest = results_.scalar_one_or_none()
+        contest_work = contest.dict().copy()
+        contest_tasks = contest_work["tasks"]
+        contest_work["tasks"] = []
+        if contest:
+            for task_uuid in contest_tasks:
+                query = select(Task.functionName, Task.tests, Task.testsTypes, Task.timeLimit, Task.memoryLimit).where(Task.uuid == task_uuid)
+                results = await self.session.execute(query)
+                results = results.fetchall()[0]
+                # print(results)
+                if results:
+                    contest_work["tasks"].append({"uuid": task_uuid, "function_name": results[0], "tests": results[1], "types": results[2], "time": results[3], "memory": results[4]})
+            return contest_work
+        raise HTTPException(http_status.HTTP_404_NOT_FOUND, detail="No contest with such UUID")
+    
     async def get_active_for_user(self, user_uuid: uuid_pkg.UUID, user_group: uuid_pkg.UUID, user_class: int) -> List[ContestRead]:
         query = select(Contest).where(Contest.forLearningClass == user_class, Contest.forGroups.contains([user_group]), Contest.deadline >= datetime.utcnow())
         results = await self.session.execute(query)
@@ -214,7 +234,10 @@ class SubmitsCRUD:
         result_object = results.scalar_one_or_none()
         if result_object.userId == user_id:
             result_object = result_object.dict()
-            result_object["source"] = await read_file(result_object["source"], os.path.join(settings.user_storage, "tasks_source_codes"))
+            if not result_object["referedContest"]:
+                result_object["source"] = await read_file(result_object["source"], os.path.join(settings.user_storage, "tasks_source_codes"))
+            else:
+                result_object["source"] = result_object["source"]
             return result_object
         raise HTTPException(
             http_status.HTTP_404_NOT_FOUND, detail="No such submit or it is not your submit"
@@ -251,18 +274,44 @@ class SubmitsCRUD:
             await self.session.execute(query)
             await self.session.commit()
         loop.create_task(commit_async())
-        
-    
-    async def submit_contest(self, contest_submit: ContestSubmitGithub, user_uuid: uuid_pkg.UUID) -> List[Submit]:
-        contests_crud = ContestsCRUD(self.session)
-        contest = await contests_crud.get(contest_submit.contest)
-        
-        submits = []
-        for task in contest["tasks"].copy():
-            submits.append(await self.submit(contest_submit.githubLink, user_uuid, task["uuid"], referedContest=contest_submit.contest))
-        await self.session.commit()
 
-        return submits
+    def checker_save_results(self, data: dict, loop: object) -> None:
+        '''
+        Sync function!
+        '''
+        async def commit_async(queries):
+            for query in queries:
+                await self.session.execute(query)
+            await self.session.commit()
+
+        pending = []
+        for submit in data:
+            solved, tests_results_log, submit_id = submit["solved"], submit["tests_results"], uuid_pkg.UUID(submit["submit_id"])
+            query = update(Submit).where(Submit.uuid == submit_id).values(status=2, solved=solved, testsResults=tests_results_log)
+            pending.append(query)
+        loop.create_task(commit_async(pending))
+
+    async def submit_contest(self, contest_submit: ContestSubmitGithub, user_uuid: uuid_pkg.UUID) -> List[dict]:
+        contests_crud = ContestsCRUD(self.session)
+        contest = await contests_crud.extended_get(contest_submit.contest)
+        
+        submits_payloads = []
+        for task in contest["tasks"].copy():
+            tmp_submit = await self.submit(contest_submit.githubLink, user_uuid, task["uuid"], referedContest=contest_submit.contest)
+            submits_payloads.append({
+                "name": task["function_name"],
+                "tests": task["tests"],
+                "submit_id": str(tmp_submit.uuid),
+                "types": {
+                    "in": task["types"]["input"],
+                    "out": task["types"]["output"][0]
+                },
+                "env": {"mem": task["memory"], "proc": 2, "time": task["time"]}
+            })
+
+
+        await self.session.commit()
+        return submits_payloads
     
     async def day_challenge_user_submits(self, user_uuid: uuid_pkg.UUID) -> List[Submit]:
         day_challenge = await self.tasks_crud.get_day_challenge()
