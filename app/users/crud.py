@@ -158,7 +158,8 @@ class UsersCRUD:
     async def search(self, query: str) -> List[UsersReadAll]:
         query = select(User.uuid, User.firstName, User.lastName, User.avatarPath, User.groupId, User.learningClass, User.nickName).filter(or_(
             User.firstName.like(f"%{query}%"),
-            User.lastName.like(f"%{query}%")
+            User.lastName.like(f"%{query}%"),
+            User.email.like(f"%{query}%")
         ))
         results = await self.session.execute(query)
         return results.fetchall()
